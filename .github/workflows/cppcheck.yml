@@ -19,7 +19,7 @@ jobs:
   cppcheck-linux:
     name: cppcheck (Linux)
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 500
 
     steps:
       - name: Setup Dependencies
@@ -29,7 +29,8 @@ jobs:
             cppcheck \
             autoconf \
             automake \
-            libtool
+            libtool \
+            libmbedtls-dev
 
       - name: Checkout (with submodules)
         uses: actions/checkout@v6
