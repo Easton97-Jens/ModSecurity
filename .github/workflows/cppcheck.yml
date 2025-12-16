@@ -19,7 +19,7 @@ jobs:
   cppcheck-linux:
     name: cppcheck (Linux)
     runs-on: ubuntu-24.04
-    timeout-minutes: 500
+    timeout-minutes: 800
 
     steps:
       - name: Setup Dependencies
