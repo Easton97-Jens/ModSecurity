@@ -1,4 +1,4 @@
-/# ModSecurity configure.ac
+# ModSecurity configure.ac
 
 
 # Get the hash of the last commit, to be used if it is not an
