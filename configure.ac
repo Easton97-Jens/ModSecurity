@@ -1,4 +1,4 @@
-# ModSecurity configure.ac
+/# ModSecurity configure.ac
 
 
 # Get the hash of the last commit, to be used if it is not an
@@ -373,6 +373,15 @@ case $assertions in
     *) AC_MSG_ERROR(bad value ${assertions} for assertions) ;;
 esac
 GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $ASSERTIONS_CPPCFLAGS"
+
+MBEDTLS_CPPFLAGS='-DMBEDTLS_CONFIG_FILE=\"mbedtls/mbedtls_config.h\" \
+-I$(top_srcdir)/others/mbedtls/include \
+-I$(top_srcdir)/others/mbedtls/tf-psa-crypto/include \
+-I$(top_srcdir)/others/mbedtls/tf-psa-crypto/drivers/builtin/include \
+-I$(top_srcdir)/others/mbedtls/include \
+-I$(top_srcdir)/others/mbedtls/tf-psa-crypto/core \
+-I$(top_srcdir)/others/mbedtls/tf-psa-crypto/drivers/builtin/src'
+GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $MBEDTLS_CPPFLAGS"
 
 AC_SUBST(GLOBAL_LDADD)
 AC_SUBST(GLOBAL_CPPFLAGS)

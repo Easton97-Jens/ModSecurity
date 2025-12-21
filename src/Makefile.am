@@ -338,6 +338,7 @@ libmodsecurity_la_LIBADD = \
 	$(LUA_LDADD) \
 	../others/libinjection.la \
 	../others/libmbedtls.la \
+	../others/libmbedcrypto.la \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(MAXMIND_LDADD) \
