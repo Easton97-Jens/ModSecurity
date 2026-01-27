@@ -8,9 +8,14 @@
 #ifndef SRC_UTILS_SHA1_H_
 #define SRC_UTILS_SHA1_H_
 
+#include <array>
+#include <cstddef>    // std::byte
+#include <cstring>    // std::memcpy
+#include <mutex>      // std::once_flag, std::call_once
+#include <span>
 #include <string>
 #include <string_view>
-#include <mutex>      // NEW: std::once_flag, std::call_once
+#include <vector>
 
 #include "src/utils/string.h"
 
@@ -19,89 +24,97 @@
 
 namespace modsecurity::Utils {
 
-using DigestOp = int (*)(const unsigned char *, size_t, unsigned char []);
+// Digest operation: takes input bytes and writes DigestSize bytes to output.
+template <std::size_t DigestSize>
+using DigestOp = int (*)(std::span<const std::byte> input,
+                         std::span<std::byte, DigestSize> output);
 
-// Shared, thread-safe PSA initialization for all digests
+// Shared, thread-safe PSA initialization for all digests.
 namespace detail {
+
 inline bool ensure_psa_init() {
     static std::once_flag once;
     static psa_status_t init_status = PSA_ERROR_GENERIC_ERROR;
 
-    std::call_once(once, []() {
-        init_status = psa_crypto_init();
-    });
+    std::call_once(once, []() { init_status = psa_crypto_init(); });
 
     return init_status == PSA_SUCCESS;
 }
+
+inline std::span<const std::byte> to_bytes(std::string_view s) noexcept {
+    const std::span<const char> chars{s.data(), s.size()};
+    return std::as_bytes(chars);
+}
+
 }  // namespace detail
 
-
-template<DigestOp digestOp, int DigestSize>
+template <auto DigestFn, std::size_t DigestSize>
 class DigestImpl {
  public:
     static std::string digest(const std::string& input) {
-        return digestHelper(input, [](std::string_view digest) {
-            return std::string(digest);
-        });
+        return digestHelper(input, [](std::string_view d) { return std::string{d}; });
     }
 
     static void digestReplace(std::string& value) {
-        digestHelper(value, [&value](std::string_view digest) mutable {
-            value.assign(digest.data(), digest.size());
-        });
+        value = digest(value);
     }
 
-    static std::string hexdigest(const std::string &input) {
-        return digestHelper(input, [](std::string_view digest) {
-            return utils::string::string_to_hex(digest);
+    static std::string hexdigest(const std::string& input) {
+        return digestHelper(input, [](std::string_view d) {
+            return utils::string::string_to_hex(d);
         });
     }
 
  private:
-    template<typename ConvertOp>
-    static auto digestHelper(const std::string &input, ConvertOp convertOp)
+    template <typename ConvertOp>
+    static auto digestHelper(const std::string& input, ConvertOp convertOp)
         -> decltype(convertOp(std::string_view{})) {
 
-        unsigned char digest[DigestSize];
+        std::array<std::byte, DigestSize> digest_bytes{};
 
-        const int ret = (*digestOp)(
-            reinterpret_cast<const unsigned char *>(input.data()),
-            input.size(),
-            digest
-        );
-
-        // NEW: not assert-only; otherwise potential UB in release builds.
-        if (ret != 0) {
-            return convertOp(std::string_view{}); // empty digest signals error
+        if (DigestFn(detail::to_bytes(input),
+                     std::span<std::byte, DigestSize>{digest_bytes}) != 0) {
+            // Empty digest signals an error.
+            return convertOp(std::string_view{});
         }
 
-        return convertOp(std::string_view(
-            reinterpret_cast<const char*>(digest), DigestSize
-        ));
+        // Convert byte array to a binary std::string without pointer punning.
+        std::string raw(DigestSize, '\0');
+        std::memcpy(raw.data(), digest_bytes.data(), DigestSize);
+
+        return convertOp(std::string_view{raw});
     }
 };
 
-
-// PSA wrapper with legacy signature
-inline int modsec_psa_sha1(const unsigned char *input,
-                           size_t ilen,
-                           unsigned char output[20])
-{
+// PSA wrapper for SHA-1 (legacy-friendly error convention: 0 = success, non-zero = error).
+inline int modsec_psa_sha1(std::span<const std::byte> input,
+                           std::span<std::byte, 20> output) {
     if (!detail::ensure_psa_init()) {
         return -1;
     }
 
+    // psa_hash_compute uses uint8_t; copy to avoid unsafe casts.
+    std::vector<uint8_t> input_u8(input.size());
+    std::memcpy(input_u8.data(), input.data(), input.size());
+
+    std::array<uint8_t, 20> output_u8{};
     size_t out_len = 0;
-    psa_status_t status = psa_hash_compute(
+
+    const auto status = psa_hash_compute(
         PSA_ALG_SHA_1,
-        input,
-        ilen,
-        output,
-        20,
+        input_u8.data(),
+        input_u8.size(),
+        output_u8.data(),
+        output_u8.size(),
         &out_len
     );
 
-    return (status == PSA_SUCCESS && out_len == 20) ? 0 : -1;
+    if (status != PSA_SUCCESS || out_len != output_u8.size()) {
+        return -1;
+    }
+
+    std::memcpy(output.data(), output_u8.data(), output_u8.size());
+    return 0;
 }
 
 class Sha1 : public DigestImpl<&modsec_psa_sha1, 20> {};
