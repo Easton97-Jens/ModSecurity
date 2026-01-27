@@ -131,6 +131,12 @@ bool AuditLog::setFormat(AuditLogFormat fmt) {
     return true;
 }
 
+bool AuditLog::setStorageDirModeType(AuditLogStorageDirMode mode) {
+    this->m_storageDirMode = mode;
+    this->m_storageDirModeSet = true;
+    return true;
+}
+
 int AuditLog::addParts(int parts, std::string_view new_parts) {
     PARTS_CONSTAINS('A', AAuditLogPart)
     PARTS_CONSTAINS('B', BAuditLogPart)
@@ -194,6 +200,10 @@ int AuditLog::getParts() const {
     }
 
     return m_parts;
+}
+
+AuditLog::AuditLogStorageDirMode AuditLog::getStorageDirModeType() const {
+    return m_storageDirMode;
 }
 
 
@@ -355,6 +365,11 @@ bool AuditLog::merge(AuditLog *from, std::string *error) {
 
     if (from->m_format != NotSetAuditLogFormat) {
         m_format = from->m_format;
+    }
+
+    if (from->m_storageDirModeSet) {
+        m_storageDirMode = from->m_storageDirMode;
+        m_storageDirModeSet = true;
     }
 
     if (from->m_ctlAuditEngineActive) {
