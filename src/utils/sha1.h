@@ -14,14 +14,14 @@
 
 #include "src/utils/string.h"
 
-// PSA statt mbedtls/sha1.h
+// PSA instead of mbedtls/sha1.h
 #include <psa/crypto.h>
 
 namespace modsecurity::Utils {
 
 using DigestOp = int (*)(const unsigned char *, size_t, unsigned char []);
 
-// Gemeinsamer, thread-sicherer PSA-Init für alle Digests
+// Shared, thread-safe PSA initialization for all digests
 namespace detail {
 inline bool ensure_psa_init() {
     static std::once_flag once;
@@ -70,9 +70,9 @@ class DigestImpl {
             digest
         );
 
-        // NEW: kein assert-only; in Release sonst potentiell UB.
+        // NEW: not assert-only; otherwise potential UB in release builds.
         if (ret != 0) {
-            return convertOp(std::string_view{}); // leerer Digest signalisiert Fehler
+            return convertOp(std::string_view{}); // empty digest signals error
         }
 
         return convertOp(std::string_view(
@@ -82,7 +82,7 @@ class DigestImpl {
 };
 
 
-// PSA-Wrapper mit alter Signatur
+// PSA wrapper with legacy signature
 inline int modsec_psa_sha1(const unsigned char *input,
                            size_t ilen,
                            unsigned char output[20])

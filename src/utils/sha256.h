@@ -1,7 +1,7 @@
 #ifndef SRC_UTILS_SHA256_H_
 #define SRC_UTILS_SHA256_H_
 
-#include "src/utils/sha1.h"   // bringt DigestImpl + detail::ensure_psa_init()
+#include "src/utils/sha1.h"   // provides DigestImpl + detail::ensure_psa_init()
 #include <psa/crypto.h>
 
 namespace modsecurity::Utils {
