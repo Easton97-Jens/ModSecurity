@@ -589,6 +589,7 @@ using namespace modsecurity::operators;
   CONFIG_SEC_SERVER_SIG                        "CONFIG_SEC_SERVER_SIG"
   CONFIG_DIR_AUDIT_DIR                         "CONFIG_DIR_AUDIT_DIR"
   CONFIG_DIR_AUDIT_DIR_MOD                     "CONFIG_DIR_AUDIT_DIR_MOD"
+  CONFIG_DIR_AUDIT_STORAGE_DIR_MODE            "CONFIG_DIR_AUDIT_STORAGE_DIR_MODE"
   CONFIG_DIR_AUDIT_ENG                         "CONFIG_DIR_AUDIT_ENG"
   CONFIG_DIR_AUDIT_FLE_MOD                     "CONFIG_DIR_AUDIT_FLE_MOD"
   CONFIG_DIR_AUDIT_LOG                         "CONFIG_DIR_AUDIT_LOG"
@@ -653,6 +654,10 @@ using namespace modsecurity::operators;
   CONFIG_VALUE_DETC                            "CONFIG_VALUE_DETC"
   CONFIG_VALUE_HTTPS                           "CONFIG_VALUE_HTTPS"
   CONFIG_VALUE_ONLYARGS                        "CONFIG_VALUE_ONLYARGS"
+  CONFIG_VALUE_DAY                             "CONFIG_VALUE_DAY"
+  CONFIG_VALUE_HOUR                            "CONFIG_VALUE_HOUR"
+  CONFIG_VALUE_MINUTE                          "CONFIG_VALUE_MINUTE"
+  CONFIG_VALUE_SECOND                          "CONFIG_VALUE_SECOND"
   CONFIG_VALUE_OFF                             "CONFIG_VALUE_OFF"
   CONFIG_VALUE_ON                              "CONFIG_VALUE_ON"
   CONFIG_VALUE_PARALLEL                        "CONFIG_VALUE_PARALLEL"
@@ -739,6 +744,24 @@ audit_log:
     CONFIG_DIR_AUDIT_DIR_MOD
       {
         driver.m_auditLog->setStorageDirMode(strtol($1.c_str(), NULL, 8));
+      }
+
+    /* SecAuditLogStorageDirMode */
+    | CONFIG_DIR_AUDIT_STORAGE_DIR_MODE CONFIG_VALUE_DAY
+      {
+        driver.m_auditLog->setStorageDirModeType(modsecurity::audit_log::AuditLog::StorageDirDay);
+      }
+    | CONFIG_DIR_AUDIT_STORAGE_DIR_MODE CONFIG_VALUE_HOUR
+      {
+        driver.m_auditLog->setStorageDirModeType(modsecurity::audit_log::AuditLog::StorageDirHour);
+      }
+    | CONFIG_DIR_AUDIT_STORAGE_DIR_MODE CONFIG_VALUE_MINUTE
+      {
+        driver.m_auditLog->setStorageDirModeType(modsecurity::audit_log::AuditLog::StorageDirMinute);
+      }
+    | CONFIG_DIR_AUDIT_STORAGE_DIR_MODE CONFIG_VALUE_SECOND
+      {
+        driver.m_auditLog->setStorageDirModeType(modsecurity::audit_log::AuditLog::StorageDirSecond);
       }
 
     /* SecAuditLogStorageDir */
