@@ -60,6 +60,13 @@ class AuditLog {
      NativeAuditLogFormat
     };
 
+    enum AuditLogStorageDirMode {
+     StorageDirSecond,
+     StorageDirMinute,
+     StorageDirHour,
+     StorageDirDay
+    };
+
     enum AuditLogParts {
      /**
       * Audit log header (mandatory).
@@ -159,10 +166,12 @@ class AuditLog {
     bool setStorageDir(std::string_view path);
     bool setPrefix(std::string_view prefix);
     bool setFormat(AuditLogFormat fmt);
+    bool setStorageDirModeType(AuditLogStorageDirMode mode);
 
     int getDirectoryPermission() const;
     int getFilePermission() const;
     int getParts() const;
+    AuditLogStorageDirMode getStorageDirModeType() const;
 
     bool setParts(std::string_view new_parts);
     bool setType(AuditLogType audit_type);
@@ -189,6 +198,8 @@ class AuditLog {
     std::string m_prefix = std::string("");
 
     AuditLogFormat m_format = NotSetAuditLogFormat;
+    AuditLogStorageDirMode m_storageDirMode = StorageDirSecond;
+    bool m_storageDirModeSet = false;
 
  protected:
     int m_parts = -1;

@@ -341,6 +341,7 @@ CONFIG_CONTENT_INJECTION                (?i:SecContentInjection)
 CONFIG_SEC_ARGUMENT_SEPARATOR           (?i:SecArgumentSeparator)
 CONFIG_DIR_AUDIT_DIR                    (?i:SecAuditLogStorageDir)
 CONFIG_DIR_AUDIT_DIR_MOD                (?i:SecAuditLogDirMode)
+CONFIG_DIR_AUDIT_STORAGE_DIR_MODE       (?i:SecAuditLogStorageDirMode)
 CONFIG_DIR_AUDIT_ENG                    (?i:SecAuditEngine)
 CONFIG_DIR_AUDIT_FLE_MOD                (?i:SecAuditLogFileMode)
 CONFIG_DIR_AUDIT_LOG2                   (?i:SecAuditLog2)
@@ -403,6 +404,10 @@ CONFIG_VALUE_DETC                       (?i:DetectionOnly)
 CONFIG_VALUE_HTTPS                      (?i:https)
 CONFIG_VALUE_NUMBER                     [0-9]+
 CONFIG_VALUE_ONLYARGS                   (?i:OnlyArgs)
+CONFIG_VALUE_DAY                        (?i:Day)
+CONFIG_VALUE_HOUR                       (?i:Hour)
+CONFIG_VALUE_MINUTE                     (?i:Minute)
+CONFIG_VALUE_SECOND                     (?i:Second)
 CONFIG_VALUE_OFF                        (?i:Off)
 CONFIG_VALUE_ON                         (?i:On)
 CONFIG_VALUE_PARALLEL                   (?i:Parallel|Concurrent)
@@ -1366,4 +1371,3 @@ void Driver::scan_end () {
 }
 
 }
-
