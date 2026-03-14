@@ -52,9 +52,56 @@ project(mbedcrypto C)
 
 set(MBEDTLS_DIR ${BASE_DIR}/others/mbedtls)
 
-add_library(mbedcrypto STATIC ${MBEDTLS_DIR}/library/base64.c ${MBEDTLS_DIR}/library/sha1.c ${MBEDTLS_DIR}/library/md5.c ${MBEDTLS_DIR}/library/platform_util.c ${MBEDTLS_DIR}/library/constant_time.c)
+set(TF_PSA_CRYPTO_CORE_DIR ${MBEDTLS_DIR}/tf-psa-crypto/core)
+set(TF_PSA_CRYPTO_BUILTIN_DIR ${MBEDTLS_DIR}/tf-psa-crypto/drivers/builtin/src)
+set(MBEDTLS_PSA_WRAPPERS_C ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/psa_crypto_driver_wrappers_no_static.c)
+set(MBEDTLS_PSA_WRAPPERS_H ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/psa_crypto_driver_wrappers.h)
 
-target_include_directories(mbedcrypto PRIVATE ${MBEDTLS_DIR}/include)
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} -c "import jinja2, jsonschema"
+    RESULT_VARIABLE MBEDTLS_PYTHON_MODULES_RESULT
+    OUTPUT_QUIET
+    ERROR_QUIET
+)
+
+if(NOT MBEDTLS_PYTHON_MODULES_RESULT EQUAL 0)
+  message(FATAL_ERROR
+    "Python modules 'jinja2' and 'jsonschema' are required for mbedTLS v4 wrapper generation. "
+    "Install them for ${Python3_EXECUTABLE}, e.g.: ${Python3_EXECUTABLE} -m pip install jinja2 jsonschema")
+endif()
+
+add_custom_command(
+    OUTPUT ${MBEDTLS_PSA_WRAPPERS_C} ${MBEDTLS_PSA_WRAPPERS_H}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    COMMAND ${Python3_EXECUTABLE} ${MBEDTLS_DIR}/tf-psa-crypto/scripts/generate_driver_wrappers.py ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    DEPENDS
+        ${MBEDTLS_DIR}/tf-psa-crypto/scripts/generate_driver_wrappers.py
+        ${MBEDTLS_DIR}/tf-psa-crypto/scripts/data_files/driver_templates/psa_crypto_driver_wrappers.h.jinja
+        ${MBEDTLS_DIR}/tf-psa-crypto/scripts/data_files/driver_templates/psa_crypto_driver_wrappers_no_static.c.jinja
+)
+
+file(GLOB MBEDTLS_PSA_CORE_SOURCES CONFIGURE_DEPENDS ${TF_PSA_CRYPTO_CORE_DIR}/*.c)
+list(FILTER MBEDTLS_PSA_CORE_SOURCES EXCLUDE REGEX "psa_crypto_driver_wrappers_no_static\\.c$")
+file(GLOB MBEDTLS_BUILTIN_SOURCES CONFIGURE_DEPENDS ${TF_PSA_CRYPTO_BUILTIN_DIR}/*.c)
+
+add_library(mbedcrypto STATIC
+    ${MBEDTLS_PSA_CORE_SOURCES}
+    ${MBEDTLS_BUILTIN_SOURCES}
+    ${MBEDTLS_PSA_WRAPPERS_C}
+)
+
+target_include_directories(mbedcrypto PRIVATE
+    ${MBEDTLS_DIR}/include
+    ${MBEDTLS_DIR}/tf-psa-crypto/include
+    ${TF_PSA_CRYPTO_CORE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    ${MBEDTLS_DIR}/tf-psa-crypto/drivers/builtin/include
+    ${TF_PSA_CRYPTO_BUILTIN_DIR}
+)
+
+target_link_libraries(mbedcrypto PRIVATE bcrypt)
 
 # get mbedtls version with git describe
 execute_process(

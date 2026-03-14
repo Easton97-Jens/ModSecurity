@@ -57,6 +57,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 PKG_PROG_PKG_CONFIG
+AC_PATH_PROGS([PYTHON], [python3 python], [:])
 
 
 # Set C++ standard version and check if compiler supports it.
@@ -100,6 +101,33 @@ AC_MSG_ERROR([\
 
    ])
 fi
+
+if test "x$PYTHON" = "x:"; then
+AC_MSG_ERROR([\
+
+  Python interpreter was not found.
+
+  Mbed TLS v4 integration requires Python to generate PSA wrapper sources.
+  Please install python3 (preferred) or python and re-run build.sh/configure.
+
+   ])
+fi
+
+if ! "$PYTHON" -c "import jinja2, jsonschema" >/dev/null 2>&1; then
+AC_MSG_ERROR([\
+
+  Python modules 'jinja2' and 'jsonschema' were not found.
+
+  Mbed TLS v4 integration requires these modules to run
+  others/mbedtls/tf-psa-crypto/scripts/generate_driver_wrappers.py.
+
+  Install them for the selected interpreter and re-run configure, e.g.:
+     python3 -m pip install jinja2 jsonschema
+
+   ])
+fi
+
+AC_SUBST([PYTHON])
 # Mbed TLS version
 AC_DEFUN([MBEDTLS_VERSION], m4_esyscmd_s(cd "others/mbedtls" && git describe && cd ../..))
 
@@ -541,4 +569,3 @@ if test "$aflFuzzer" = "true"; then
     echo "  $ export CC=afl-clang-fast "
     echo " "
 fi
-
