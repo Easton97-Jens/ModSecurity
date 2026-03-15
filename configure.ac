@@ -57,7 +57,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 PKG_PROG_PKG_CONFIG
-AC_PATH_PROGS([PYTHON], [python3 python], [:])
+AC_PATH_PROG([PYTHON3], [python3], [:])
 
 
 # Set C++ standard version and check if compiler supports it.
@@ -102,32 +102,63 @@ AC_MSG_ERROR([\
    ])
 fi
 
-if test "x$PYTHON" = "x:"; then
+if test "x$PYTHON3" = "x:"; then
 AC_MSG_ERROR([\
 
-  Python interpreter was not found.
+  python3 was not found.
 
-  Mbed TLS v4 integration requires Python to generate PSA wrapper sources.
-  Please install python3 (preferred) or python and re-run build.sh/configure.
+  Mbed TLS v4 integration requires python3 + venv to generate PSA wrapper and
+  config-check sources in an isolated environment.
+
+  Please install python3 (including the venv module) and re-run build.sh/configure.
 
    ])
 fi
 
-if ! "$PYTHON" -c "import jinja2, jsonschema" >/dev/null 2>&1; then
+if ! "$PYTHON3" -c "import venv" >/dev/null 2>&1; then
 AC_MSG_ERROR([\
 
-  Python modules 'jinja2' and 'jsonschema' were not found.
+  python3 module 'venv' is not available.
 
-  Mbed TLS v4 integration requires these modules to run
-  others/mbedtls/tf-psa-crypto/scripts/generate_driver_wrappers.py.
+  ModSecurity's mbedTLS v4 build creates an isolated Python environment
+  automatically and requires python3-venv support.
 
-  Install them for the selected interpreter and re-run configure, e.g.:
-     python3 -m pip install jinja2 jsonschema
+  Please install python3-venv (or your platform equivalent) and re-run configure.
 
    ])
 fi
 
-AC_SUBST([PYTHON])
+MBEDTLS_PYTHON_VENV_DIR="`pwd`/.build-venv"
+MBEDTLS_PYTHON="$MBEDTLS_PYTHON_VENV_DIR/bin/python"
+
+if test ! -x "$MBEDTLS_PYTHON"; then
+  AC_MSG_NOTICE([Creating Python virtual environment for mbedTLS v4 in $MBEDTLS_PYTHON_VENV_DIR])
+  if ! "$PYTHON3" -m venv "$MBEDTLS_PYTHON_VENV_DIR" >/dev/null 2>&1; then
+    AC_MSG_ERROR([Failed to create Python virtual environment in $MBEDTLS_PYTHON_VENV_DIR.])
+  fi
+fi
+
+if ! "$MBEDTLS_PYTHON" -m pip --version >/dev/null 2>&1; then
+  if ! "$MBEDTLS_PYTHON" -m ensurepip --upgrade >/dev/null 2>&1; then
+    AC_MSG_ERROR([Failed to bootstrap pip inside $MBEDTLS_PYTHON_VENV_DIR.])
+  fi
+fi
+
+if ! "$MBEDTLS_PYTHON" -c "import jinja2, jsonschema" >/dev/null 2>&1; then
+  AC_MSG_NOTICE([Installing Python build dependencies (jinja2, jsonschema) into $MBEDTLS_PYTHON_VENV_DIR])
+  if ! "$MBEDTLS_PYTHON" -m pip install --disable-pip-version-check jinja2 jsonschema >/dev/null 2>&1; then
+AC_MSG_ERROR([\
+
+  Failed to install Python modules 'jinja2' and 'jsonschema' into:
+    $MBEDTLS_PYTHON_VENV_DIR
+
+  Please verify network/package access and re-run configure.
+
+   ])
+  fi
+fi
+
+AC_SUBST([MBEDTLS_PYTHON])
 # Mbed TLS version
 AC_DEFUN([MBEDTLS_VERSION], m4_esyscmd_s(cd "others/mbedtls" && git describe && cd ../..))
 

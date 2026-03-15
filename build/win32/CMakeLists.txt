@@ -56,28 +56,86 @@ set(TF_PSA_CRYPTO_CORE_DIR ${MBEDTLS_DIR}/tf-psa-crypto/core)
 set(TF_PSA_CRYPTO_BUILTIN_DIR ${MBEDTLS_DIR}/tf-psa-crypto/drivers/builtin/src)
 set(MBEDTLS_PSA_WRAPPERS_C ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/psa_crypto_driver_wrappers_no_static.c)
 set(MBEDTLS_PSA_WRAPPERS_H ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/psa_crypto_driver_wrappers.h)
+set(MBEDTLS_TF_PSA_CONFIG_HEADERS
+    ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/tf_psa_crypto_config_check_before.h
+    ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/tf_psa_crypto_config_check_final.h
+    ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/tf_psa_crypto_config_check_user.h
+)
 
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 execute_process(
-    COMMAND ${Python3_EXECUTABLE} -c "import jinja2, jsonschema"
-    RESULT_VARIABLE MBEDTLS_PYTHON_MODULES_RESULT
+    COMMAND ${Python3_EXECUTABLE} -c "import venv"
+    RESULT_VARIABLE MBEDTLS_PYTHON_VENV_RESULT
     OUTPUT_QUIET
     ERROR_QUIET
 )
 
-if(NOT MBEDTLS_PYTHON_MODULES_RESULT EQUAL 0)
+if(NOT MBEDTLS_PYTHON_VENV_RESULT EQUAL 0)
   message(FATAL_ERROR
-    "Python modules 'jinja2' and 'jsonschema' are required for mbedTLS v4 wrapper generation. "
-    "Install them for ${Python3_EXECUTABLE}, e.g.: ${Python3_EXECUTABLE} -m pip install jinja2 jsonschema")
+    "python3 module 'venv' is required for mbedTLS v4 wrapper generation environment setup. "
+    "Please install python3-venv (or equivalent) for ${Python3_EXECUTABLE}.")
+endif()
+
+set(MBEDTLS_PYTHON_VENV_DIR ${CMAKE_CURRENT_BINARY_DIR}/.build-venv)
+if(WIN32)
+    set(MBEDTLS_PYTHON ${MBEDTLS_PYTHON_VENV_DIR}/Scripts/python.exe)
+else()
+    set(MBEDTLS_PYTHON ${MBEDTLS_PYTHON_VENV_DIR}/bin/python)
+endif()
+
+if(NOT EXISTS ${MBEDTLS_PYTHON})
+    execute_process(
+        COMMAND ${Python3_EXECUTABLE} -m venv ${MBEDTLS_PYTHON_VENV_DIR}
+        RESULT_VARIABLE MBEDTLS_VENV_CREATE_RESULT
+    )
+    if(NOT MBEDTLS_VENV_CREATE_RESULT EQUAL 0)
+      message(FATAL_ERROR "Failed to create Python virtual environment: ${MBEDTLS_PYTHON_VENV_DIR}")
+    endif()
+endif()
+
+execute_process(
+    COMMAND ${MBEDTLS_PYTHON} -m pip --version
+    RESULT_VARIABLE MBEDTLS_PIP_CHECK_RESULT
+    OUTPUT_QUIET
+    ERROR_QUIET
+)
+if(NOT MBEDTLS_PIP_CHECK_RESULT EQUAL 0)
+    execute_process(
+        COMMAND ${MBEDTLS_PYTHON} -m ensurepip --upgrade
+        RESULT_VARIABLE MBEDTLS_ENSUREPIP_RESULT
+    )
+    if(NOT MBEDTLS_ENSUREPIP_RESULT EQUAL 0)
+      message(FATAL_ERROR "Failed to bootstrap pip in ${MBEDTLS_PYTHON_VENV_DIR}")
+    endif()
+endif()
+
+execute_process(
+    COMMAND ${MBEDTLS_PYTHON} -c "import jinja2, jsonschema"
+    RESULT_VARIABLE MBEDTLS_PYTHON_MODULES_RESULT
+    OUTPUT_QUIET
+    ERROR_QUIET
+)
+if(NOT MBEDTLS_PYTHON_MODULES_RESULT EQUAL 0)
+    execute_process(
+        COMMAND ${MBEDTLS_PYTHON} -m pip install --disable-pip-version-check jinja2 jsonschema
+        RESULT_VARIABLE MBEDTLS_PIP_INSTALL_RESULT
+    )
+    if(NOT MBEDTLS_PIP_INSTALL_RESULT EQUAL 0)
+      message(FATAL_ERROR
+        "Failed to install Python modules 'jinja2' and 'jsonschema' into ${MBEDTLS_PYTHON_VENV_DIR}. "
+        "Please verify network/package access and re-run CMake.")
+    endif()
 endif()
 
 add_custom_command(
-    OUTPUT ${MBEDTLS_PSA_WRAPPERS_C} ${MBEDTLS_PSA_WRAPPERS_H}
+    OUTPUT ${MBEDTLS_PSA_WRAPPERS_C} ${MBEDTLS_PSA_WRAPPERS_H} ${MBEDTLS_TF_PSA_CONFIG_HEADERS}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
-    COMMAND ${Python3_EXECUTABLE} ${MBEDTLS_DIR}/tf-psa-crypto/scripts/generate_driver_wrappers.py ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    COMMAND ${MBEDTLS_PYTHON} ${MBEDTLS_DIR}/tf-psa-crypto/scripts/generate_driver_wrappers.py ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    COMMAND ${CMAKE_COMMAND} -E chdir ${MBEDTLS_DIR}/tf-psa-crypto ${MBEDTLS_PYTHON} scripts/generate_config_checks.py ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
     DEPENDS
         ${MBEDTLS_DIR}/tf-psa-crypto/scripts/generate_driver_wrappers.py
+        ${MBEDTLS_DIR}/tf-psa-crypto/scripts/generate_config_checks.py
         ${MBEDTLS_DIR}/tf-psa-crypto/scripts/data_files/driver_templates/psa_crypto_driver_wrappers.h.jinja
         ${MBEDTLS_DIR}/tf-psa-crypto/scripts/data_files/driver_templates/psa_crypto_driver_wrappers_no_static.c.jinja
 )
@@ -90,6 +148,8 @@ add_library(mbedcrypto STATIC
     ${MBEDTLS_PSA_CORE_SOURCES}
     ${MBEDTLS_BUILTIN_SOURCES}
     ${MBEDTLS_PSA_WRAPPERS_C}
+    ${MBEDTLS_PSA_WRAPPERS_H}
+    ${MBEDTLS_TF_PSA_CONFIG_HEADERS}
 )
 
 target_include_directories(mbedcrypto PRIVATE
