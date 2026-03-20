@@ -214,7 +214,7 @@ jobs:
           ./configure
 
       - name: Run cppcheck
-        run: make check-static
+        run: make check-static --exclude=.build-venv
 
   cppcheck-linux:
     name: Static analysis (cppcheck, Linux, debian:sid)
@@ -265,4 +265,4 @@ jobs:
         run: ./configure
 
       - name: Run cppcheck
-        run: make check-static
+        run: make check-static --exclude=.build-venv
