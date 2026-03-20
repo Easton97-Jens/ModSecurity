@@ -57,6 +57,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 PKG_PROG_PKG_CONFIG
+AC_PATH_PROG([PYTHON3], [python3], [:])
 
 
 # Set C++ standard version and check if compiler supports it.
@@ -100,6 +101,92 @@ AC_MSG_ERROR([\
 
    ])
 fi
+
+if test "x$PYTHON3" = "x:"; then
+AC_MSG_ERROR([\
+
+  python3 was not found.
+
+  Mbed TLS v4 integration requires python3 + venv to generate PSA wrapper and
+  config-check sources in an isolated environment.
+
+  Please install python3 (including the venv module) and re-run build.sh/configure.
+
+   ])
+fi
+
+if ! "$PYTHON3" -c "import venv" >/dev/null 2>&1; then
+AC_MSG_ERROR([\
+
+  python3 module 'venv' is not available.
+
+  ModSecurity's mbedTLS v4 build creates an isolated Python environment
+  automatically and requires python3-venv support.
+
+  Please install python3-venv (or your platform equivalent) and re-run configure.
+
+   ])
+fi
+
+MBEDTLS_PYTHON_VENV_PROBE_DIR=`mktemp -d "${TMPDIR-/tmp}/modsecurity-python-venv.XXXXXX" 2>/dev/null`
+if test "x$MBEDTLS_PYTHON_VENV_PROBE_DIR" = "x" || test ! -d "$MBEDTLS_PYTHON_VENV_PROBE_DIR"; then
+AC_MSG_ERROR([\
+
+  Failed to create a temporary directory to validate python3 venv support.
+
+  Please ensure mktemp works and the temporary directory is writable, then re-run configure.
+
+   ])
+fi
+
+if ! "$PYTHON3" -m venv "$MBEDTLS_PYTHON_VENV_PROBE_DIR" >/dev/null 2>&1; then
+  rm -rf "$MBEDTLS_PYTHON_VENV_PROBE_DIR"
+AC_MSG_ERROR([\
+
+  python3 was found, but creating a virtual environment failed.
+
+  ModSecurity's mbedTLS v4 build requires a working python3 venv implementation.
+  On Debian/Ubuntu this usually means the package 'python3-venv' is missing.
+
+  Please install python3-venv (for example: apt install python3-venv) and re-run configure.
+
+   ])
+fi
+
+rm -rf "$MBEDTLS_PYTHON_VENV_PROBE_DIR"
+
+MBEDTLS_PYTHON_VENV_DIR="`pwd`/.build-venv"
+MBEDTLS_PYTHON="$MBEDTLS_PYTHON_VENV_DIR/bin/python"
+
+if test ! -x "$MBEDTLS_PYTHON"; then
+  AC_MSG_NOTICE([Creating Python virtual environment for mbedTLS v4 in $MBEDTLS_PYTHON_VENV_DIR])
+  if ! "$PYTHON3" -m venv "$MBEDTLS_PYTHON_VENV_DIR" >/dev/null 2>&1; then
+    AC_MSG_ERROR([Failed to create Python virtual environment in $MBEDTLS_PYTHON_VENV_DIR.
+Please verify that python3-venv is installed and that the build directory is writable.])
+  fi
+fi
+
+if ! "$MBEDTLS_PYTHON" -m pip --version >/dev/null 2>&1; then
+  if ! "$MBEDTLS_PYTHON" -m ensurepip --upgrade >/dev/null 2>&1; then
+    AC_MSG_ERROR([Failed to bootstrap pip inside $MBEDTLS_PYTHON_VENV_DIR.])
+  fi
+fi
+
+if ! "$MBEDTLS_PYTHON" -c "import jinja2, jsonschema" >/dev/null 2>&1; then
+  AC_MSG_NOTICE([Installing Python build dependencies (jinja2, jsonschema) into $MBEDTLS_PYTHON_VENV_DIR])
+  if ! "$MBEDTLS_PYTHON" -m pip install --disable-pip-version-check jinja2 jsonschema >/dev/null 2>&1; then
+AC_MSG_ERROR([\
+
+  Failed to install Python modules 'jinja2' and 'jsonschema' into:
+    $MBEDTLS_PYTHON_VENV_DIR
+
+  Please verify network/package access and re-run configure.
+
+   ])
+  fi
+fi
+
+AC_SUBST([MBEDTLS_PYTHON])
 # Mbed TLS version
 AC_DEFUN([MBEDTLS_VERSION], m4_esyscmd_s(cd "others/mbedtls" && git describe && cd ../..))
 
@@ -295,6 +382,23 @@ if test $buildParser = true; then
 
     AC_PATH_PROG([BISON], [bison])
     test "x$BISON" = "x" && AC_MSG_ERROR([bison is needed to build ModSecurity])
+
+    BISON_VERSION=`$BISON --version 2>/dev/null | head -n 1 | sed 's/.* //g'`
+    AC_SUBST([BISON_VERSION])
+    if ! awk 'BEGIN {
+        split(ARGV[1], current, ".");
+        split(ARGV[2], required, ".");
+        for (i = 1; i <= 3; ++i) {
+            c = (current[i] == "") ? 0 : current[i];
+            r = (required[i] == "") ? 0 : required[i];
+            if ((c + 0) > (r + 0)) exit 0;
+            if ((c + 0) < (r + 0)) exit 1;
+        }
+        exit 0;
+    }' "$BISON_VERSION" "3.0.2"; then
+        AC_MSG_ERROR([bison >= 3.0.2 is required for --enable-parser-generation.
+Install a newer bison or disable parser generation to use the checked-in parser sources.])
+    fi
 
     AC_PATH_PROG([YACC_INST], $YACC)
     if test ! -f "$srcdir/gram.c"; then
@@ -541,4 +645,3 @@ if test "$aflFuzzer" = "true"; then
     echo "  $ export CC=afl-clang-fast "
     echo " "
 fi
-
