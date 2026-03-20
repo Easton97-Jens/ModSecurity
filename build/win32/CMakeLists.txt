@@ -54,6 +54,8 @@ set(MBEDTLS_DIR ${BASE_DIR}/others/mbedtls)
 
 set(TF_PSA_CRYPTO_CORE_DIR ${MBEDTLS_DIR}/tf-psa-crypto/core)
 set(TF_PSA_CRYPTO_BUILTIN_DIR ${MBEDTLS_DIR}/tf-psa-crypto/drivers/builtin/src)
+set(TF_PSA_CRYPTO_INCLUDE_DIR ${MBEDTLS_DIR}/tf-psa-crypto/include)
+set(TF_PSA_CRYPTO_BUILTIN_INCLUDE_DIR ${MBEDTLS_DIR}/tf-psa-crypto/drivers/builtin/include)
 set(MBEDTLS_PSA_WRAPPERS_C ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/psa_crypto_driver_wrappers_no_static.c)
 set(MBEDTLS_PSA_WRAPPERS_H ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated/psa_crypto_driver_wrappers.h)
 set(MBEDTLS_TF_PSA_CONFIG_HEADERS
@@ -154,10 +156,10 @@ add_library(mbedcrypto STATIC
 
 target_include_directories(mbedcrypto PRIVATE
     ${MBEDTLS_DIR}/include
-    ${MBEDTLS_DIR}/tf-psa-crypto/include
+    ${TF_PSA_CRYPTO_INCLUDE_DIR}
     ${TF_PSA_CRYPTO_CORE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
-    ${MBEDTLS_DIR}/tf-psa-crypto/drivers/builtin/include
+    ${TF_PSA_CRYPTO_BUILTIN_INCLUDE_DIR}
     ${TF_PSA_CRYPTO_BUILTIN_DIR}
 )
 
@@ -244,7 +246,17 @@ file(GLOB_RECURSE libModSecuritySources ${BASE_DIR}/src/*.cc)
 add_library(libModSecurity SHARED ${libModSecuritySources})
 
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
-target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include)
+target_include_directories(libModSecurity PRIVATE
+    ${BASE_DIR}
+    ${BASE_DIR}/headers
+    ${BASE_DIR}/others
+    ${MBEDTLS_DIR}/include
+    ${TF_PSA_CRYPTO_INCLUDE_DIR}
+    ${TF_PSA_CRYPTO_CORE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    ${TF_PSA_CRYPTO_BUILTIN_INCLUDE_DIR}
+    ${TF_PSA_CRYPTO_BUILTIN_DIR}
+)
 target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
 
 macro(add_package_dependency project compile_definition link_library flag)
@@ -271,7 +283,17 @@ project(libModSecurityTests)
 
 function(setTestTargetProperties executable)
   target_compile_definitions(${executable} PRIVATE WITH_PCRE2)
-  target_include_directories(${executable} PRIVATE ${BASE_DIR} ${BASE_DIR}/headers)
+  target_include_directories(${executable} PRIVATE
+    ${BASE_DIR}
+    ${BASE_DIR}/headers
+    ${BASE_DIR}/others
+    ${MBEDTLS_DIR}/include
+    ${TF_PSA_CRYPTO_INCLUDE_DIR}
+    ${TF_PSA_CRYPTO_CORE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/mbedtls_generated
+    ${TF_PSA_CRYPTO_BUILTIN_INCLUDE_DIR}
+    ${TF_PSA_CRYPTO_BUILTIN_DIR}
+  )
   target_link_libraries(${executable} PRIVATE libModSecurity pcre2::pcre2 dirent::dirent)
   add_package_dependency(${executable} WITH_YAJL yajl::yajl HAVE_YAJL)
 endfunction()

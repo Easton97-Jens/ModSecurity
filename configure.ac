@@ -355,6 +355,23 @@ if test $buildParser = true; then
     AC_PATH_PROG([BISON], [bison])
     test "x$BISON" = "x" && AC_MSG_ERROR([bison is needed to build ModSecurity])
 
+    BISON_VERSION=`$BISON --version 2>/dev/null | head -n 1 | sed 's/.* //g'`
+    AC_SUBST([BISON_VERSION])
+    if ! awk 'BEGIN {
+        split(ARGV[1], current, ".");
+        split(ARGV[2], required, ".");
+        for (i = 1; i <= 3; ++i) {
+            c = (current[i] == "") ? 0 : current[i];
+            r = (required[i] == "") ? 0 : required[i];
+            if ((c + 0) > (r + 0)) exit 0;
+            if ((c + 0) < (r + 0)) exit 1;
+        }
+        exit 0;
+    }' "$BISON_VERSION" "3.0.2"; then
+        AC_MSG_ERROR([bison >= 3.0.2 is required for --enable-parser-generation.
+Install a newer bison or disable parser generation to use the checked-in parser sources.])
+    fi
+
     AC_PATH_PROG([YACC_INST], $YACC)
     if test ! -f "$srcdir/gram.c"; then
         if test -z "$YACC_INST"; then
