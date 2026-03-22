@@ -206,7 +206,7 @@ jobs:
 
       - name: Install cppcheck
         run: |
-          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua lmdb ssdeep
+          brew install autoconf automake libtool cppcheck libmaxminddb yajl lua lmdb ssdeep python3 python3-venv
 
       - name: Configure project
         run: |
@@ -256,7 +256,9 @@ jobs:
             libfuzzy-dev \
             pcre2-utils \
             bison \
-            flex
+            flex \
+            python3 \
+            python3-venv
 
       - name: Run build preparation script
         run: ./build.sh
