@@ -55,6 +55,12 @@ parser:
 
 
 
+CPPCHECK_EXCLUDES = \
+	src/parser/seclang-parser.cc \
+	src/parser/seclang-scanner.cc \
+	others \
+	.build-venv
+
 cppcheck:
 	@cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
 		-D MS_CPPCHECK_DISABLED_FOR_PARSER -U YY_USER_INIT \
@@ -65,8 +71,7 @@ cppcheck:
 		--template="warning: {file},{line},{severity},{id},{message}" \
 		-I headers -I . -I $(top_srcdir)/others -I $(top_srcdir)/src -I $(top_srcdir)/others/mbedtls/include \
 		--error-exitcode=1 \
-		-i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
-		-i others \
+		$(foreach path,$(CPPCHECK_EXCLUDES),-i "$(path)") \
 		--std=c++17 \
 		--force --verbose .
 
@@ -99,4 +104,3 @@ pkgconfig_DATA = modsecurity.pc
 EXTRA_DIST = modsecurity.pc.in \
              modsecurity.conf-recommended \
              unicode.mapping
-
