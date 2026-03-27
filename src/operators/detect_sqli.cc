@@ -18,8 +18,10 @@
 #include <string>
 #include <list>
 
+#include "src/operators/libinjection_utils.h"
 #include "src/operators/operator.h"
 #include "libinjection/src/libinjection.h"
+#include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity {
 namespace operators {
@@ -27,33 +29,38 @@ namespace operators {
 
 bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    char fingerprint[8];
-    int issqli;
+    char fingerprint[8] = { 0 };
+    const injection_result_t result =
+        libinjection_sqli(input.c_str(), input.length(), fingerprint);
 
-    issqli = libinjection_sqli(input.c_str(), input.length(), fingerprint);
-
-    if (!t) {
-        goto tisempty;
+    if (t == nullptr) {
+        return is_malicious(result);
     }
 
-    if (issqli) {
+    if (result == LIBINJECTION_RESULT_ERROR) {
+        ms_dbg_a(t, 3, "libinjection SQLi parser error on input: '" + input
+            + "'. Blocking request by fail-safe policy.");
+    } else if (result == LIBINJECTION_RESULT_TRUE) {
         t->m_matched.push_back(fingerprint);
-        ms_dbg_a(t, 4, "detected SQLi using libinjection with " \
-            "fingerprint '" + std::string(fingerprint) + "' at: '" +
-            input + "'");
+        ms_dbg_a(t, 4, "detected SQLi using libinjection with "
+            "fingerprint '" + std::string(fingerprint) + "' at: '"
+            + input + "'");
         if (rule && rule->hasCaptureAction()) {
             t->m_collections.m_tx_collection->storeOrUpdateFirst(
                 "0", std::string(fingerprint));
-            ms_dbg_a(t, 7, "Added DetectSQLi match TX.0: " + \
+            ms_dbg_a(t, 7, "Added DetectSQLi match TX.0: " +
                 std::string(fingerprint));
         }
     } else {
-        ms_dbg_a(t, 9, "detected SQLi: not able to find an " \
-            "inject on '" + input + "'");
+        if (input.empty()) {
+            ms_dbg_a(t, 9, "detected SQLi: empty input; no SQLi detected.");
+        } else {
+            ms_dbg_a(t, 9, "detected SQLi: not able to find an "
+                "inject on '" + input + "'");
+        }
     }
 
-tisempty:
-    return issqli != 0;
+    return is_malicious(result);
 }
 
 

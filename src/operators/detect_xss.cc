@@ -17,8 +17,10 @@
 
 #include <string>
 
+#include "src/operators/libinjection_utils.h"
 #include "src/operators/operator.h"
 #include "libinjection/src/libinjection.h"
+#include "libinjection/src/libinjection_error.h"
 
 
 namespace modsecurity {
@@ -27,25 +29,34 @@ namespace operators {
 
 bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
-    int is_xss;
+    const injection_result_t result =
+        libinjection_xss(input.c_str(), input.length());
 
-    is_xss = libinjection_xss(input.c_str(), input.length());
-
-    if (t) {
-        if (is_xss) {
-            ms_dbg_a(t, 5, "detected XSS using libinjection.");
-            if (rule && rule->hasCaptureAction()) {
-                t->m_collections.m_tx_collection->storeOrUpdateFirst(
-                    "0", std::string(input));
-                ms_dbg_a(t, 7, "Added DetectXSS match TX.0: " + \
-                    std::string(input));
-            }
-        } else {
-            ms_dbg_a(t, 9, "libinjection was not able to " \
-                "find any XSS in: " + input);
-            }
+    if (t == nullptr) {
+        return is_malicious(result);
     }
-    return is_xss != 0;
+
+    if (result == LIBINJECTION_RESULT_ERROR) {
+        ms_dbg_a(t, 3, "libinjection XSS parser error on input: '" + input
+            + "'. Blocking request by fail-safe policy.");
+    } else if (result == LIBINJECTION_RESULT_TRUE) {
+        ms_dbg_a(t, 5, "detected XSS using libinjection.");
+        if (rule && rule->hasCaptureAction()) {
+            t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                "0", std::string(input));
+            ms_dbg_a(t, 7, "Added DetectXSS match TX.0: " +
+                std::string(input));
+        }
+    } else {
+        if (input.empty()) {
+            ms_dbg_a(t, 9, "detected XSS: empty input; no XSS detected.");
+        } else {
+            ms_dbg_a(t, 9, "libinjection was not able to "
+                "find any XSS in: " + input);
+        }
+    }
+
+    return is_malicious(result);
 }
 
 
