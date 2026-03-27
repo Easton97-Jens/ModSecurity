@@ -40,6 +40,16 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     if (result == LIBINJECTION_RESULT_ERROR) {
         ms_dbg_a(t, 3, "libinjection SQLi parser error on input: '" + input
             + "'. Blocking request by fail-safe policy.");
+        if (rule && rule->hasCaptureAction()) {
+            /*
+             * Parser errors are treated as malicious by policy; TX.0 must be
+             * updated for this evaluation to avoid stale captures.
+             */
+            t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                "0", std::string(input));
+            ms_dbg_a(t, 7, "Added DetectSQLi parser-error match TX.0: " +
+                std::string(input));
+        }
     } else if (result == LIBINJECTION_RESULT_TRUE) {
         t->m_matched.push_back(fingerprint);
         ms_dbg_a(t, 4, "detected SQLi using libinjection with "
