@@ -19,7 +19,7 @@
 
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
-#include "libinjection/src/libinjection.h"
+#include "src/operators/libinjection_test.h"
 #include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity::operators {
@@ -28,7 +28,7 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
 
     const injection_result_t xss_result =
-        libinjection_xss(input.c_str(), input.length());
+        runLibinjectionXSS(input.c_str(), input.length());
 
     if (t == nullptr) {
         return isMaliciousLibinjectionResult(xss_result);

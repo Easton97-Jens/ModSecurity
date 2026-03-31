@@ -21,7 +21,7 @@
 
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
-#include "libinjection/src/libinjection.h"
+#include "src/operators/libinjection_test.h"
 #include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity::operators {
@@ -32,7 +32,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     std::array<char, 8> fingerprint{};
 
     const injection_result_t sqli_result =
-        libinjection_sqli(input.c_str(), input.length(), fingerprint.data());
+        runLibinjectionSQLi(input.c_str(), input.length(), fingerprint.data());
 
     if (t == nullptr) {
         return isMaliciousLibinjectionResult(sqli_result);
