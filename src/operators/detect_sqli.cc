@@ -21,7 +21,7 @@
 
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
-#include "src/operators/libinjection_test.h"
+#include "src/operators/libinjection_adapter.h"
 #include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity::operators {
@@ -71,6 +71,9 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
                     std::string("Added DetectSQLi error input TX.0: ")
                     + input);
             }
+
+            // Keep m_matched untouched for parser-error paths to avoid
+            // introducing synthetic fingerprints for non-TRUE results.
             break;
 
         case LIBINJECTION_RESULT_FALSE:

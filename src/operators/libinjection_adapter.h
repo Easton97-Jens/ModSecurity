@@ -2,8 +2,8 @@
  * ModSecurity, http://www.modsecurity.org/
  */
 
-#ifndef SRC_OPERATORS_LIBINJECTION_TEST_H_
-#define SRC_OPERATORS_LIBINJECTION_TEST_H_
+#ifndef SRC_OPERATORS_LIBINJECTION_ADAPTER_H_
+#define SRC_OPERATORS_LIBINJECTION_ADAPTER_H_
 
 #include <cstddef>
 
@@ -24,4 +24,4 @@ void clearLibinjectionOverridesForTesting();
 
 }  // namespace modsecurity::operators
 
-#endif  // SRC_OPERATORS_LIBINJECTION_TEST_H_
+#endif  // SRC_OPERATORS_LIBINJECTION_ADAPTER_H_

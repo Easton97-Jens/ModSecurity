@@ -2,7 +2,7 @@
  * ModSecurity, http://www.modsecurity.org/
  */
 
-#include "src/operators/libinjection_test.h"
+#include "src/operators/libinjection_adapter.h"
 
 #include <atomic>
 

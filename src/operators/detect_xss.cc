@@ -19,7 +19,7 @@
 
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
-#include "src/operators/libinjection_test.h"
+#include "src/operators/libinjection_adapter.h"
 #include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity::operators {

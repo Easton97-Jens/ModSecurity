@@ -29,7 +29,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/actions/action.h"
 #include "src/actions/capture.h"
-#include "src/operators/libinjection_test.h"
+#include "src/operators/libinjection_adapter.h"
 
 
 #include "test/common/modsecurity_test.h"
