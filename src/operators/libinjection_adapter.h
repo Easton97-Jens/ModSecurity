@@ -7,7 +7,7 @@
 
 #include <cstddef>
 
-#include "libinjection/src/libinjection_error.h"
+#include "libinjection/src/libinjection_error.h"  // matches detect_xss.cc, detect_sqli.cc, and libinjection_utils.h
 
 namespace modsecurity::operators {
 
