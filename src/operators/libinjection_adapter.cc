@@ -4,19 +4,18 @@
 
 #include "src/operators/libinjection_adapter.h"
 
-#include <atomic>
-
 #include "libinjection/src/libinjection.h"
 
 namespace modsecurity::operators {
 namespace {
-std::atomic<DetectSQLiFn> g_sqli_override{nullptr};
-std::atomic<DetectXSSFn> g_xss_override{nullptr};
+// Per-thread overrides avoid cross-thread interference during mtstress tests.
+thread_local DetectSQLiFn g_sqli_override = nullptr;
+thread_local DetectXSSFn g_xss_override = nullptr;
 }
 
 injection_result_t runLibinjectionSQLi(const char *input, size_t len,
     char *fingerprint) {
-    if (DetectSQLiFn fn = g_sqli_override.load(std::memory_order_acquire)) {
+    if (DetectSQLiFn fn = g_sqli_override) {
         return fn(input, len, fingerprint);
     }
 
@@ -24,7 +23,7 @@ injection_result_t runLibinjectionSQLi(const char *input, size_t len,
 }
 
 injection_result_t runLibinjectionXSS(const char *input, size_t len) {
-    if (DetectXSSFn fn = g_xss_override.load(std::memory_order_acquire)) {
+    if (DetectXSSFn fn = g_xss_override) {
         return fn(input, len);
     }
 
@@ -32,16 +31,16 @@ injection_result_t runLibinjectionXSS(const char *input, size_t len) {
 }
 
 void setLibinjectionSQLiOverrideForTesting(DetectSQLiFn fn) {
-    g_sqli_override.store(fn, std::memory_order_release);
+    g_sqli_override = fn;
 }
 
 void setLibinjectionXSSOverrideForTesting(DetectXSSFn fn) {
-    g_xss_override.store(fn, std::memory_order_release);
+    g_xss_override = fn;
 }
 
 void clearLibinjectionOverridesForTesting() {
-    g_sqli_override.store(nullptr, std::memory_order_release);
-    g_xss_override.store(nullptr, std::memory_order_release);
+    g_sqli_override = nullptr;
+    g_xss_override = nullptr;
 }
 
 }  // namespace modsecurity::operators
