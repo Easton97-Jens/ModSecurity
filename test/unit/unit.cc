@@ -28,6 +28,8 @@
 #include "src/actions/transformations/transformation.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/actions/action.h"
+#include "src/actions/capture.h"
+#include "src/operators/libinjection_adapter.h"
 
 
 #include "test/common/modsecurity_test.h"
@@ -57,6 +59,32 @@ void print_help() {
 }
 
 
+namespace {
+injection_result_t sqli_force_error(const char *, size_t, char *) {
+    return LIBINJECTION_RESULT_ERROR;
+}
+
+injection_result_t xss_force_error(const char *, size_t) {
+    return LIBINJECTION_RESULT_ERROR;
+}
+
+void configure_libinjection_override(const UnitTest &t) {
+    modsecurity::operators::clearLibinjectionOverridesForTesting();
+
+    if (t.libinjection_override != "error") {
+        return;
+    }
+
+    if (t.name == "detectSQLi") {
+        modsecurity::operators::setLibinjectionSQLiOverrideForTesting(
+            sqli_force_error);
+    } else if (t.name == "detectXSS") {
+        modsecurity::operators::setLibinjectionXSSOverrideForTesting(
+            xss_force_error);
+    }
+}
+}  // namespace
+
 struct OperatorTest {
     using ItemType = Operator;
 
@@ -71,13 +99,42 @@ struct OperatorTest {
     }
 
     static UnitTestResult eval(ItemType &op, const UnitTest &t, modsecurity::Transaction &transaction) {
-        modsecurity::RuleWithActions rule{nullptr, nullptr, "dummy.conf", -1};
+        configure_libinjection_override(t);
+
+        std::unique_ptr<modsecurity::Actions> actions;
+        if (t.capture) {
+            actions = std::make_unique<modsecurity::Actions>();
+            actions->push_back(new modsecurity::actions::Capture("capture"));
+        }
+
+        modsecurity::RuleWithActions rule{actions.release(), nullptr, "dummy.conf", -1};
         modsecurity::RuleMessage ruleMessage{rule, transaction};
-        return {op.evaluate(&transaction, &rule, t.input, ruleMessage), {}};
+
+        const bool matched = op.evaluate(&transaction, &rule, t.input, ruleMessage);
+
+        UnitTestResult result;
+        result.ret = matched;
+        if (t.capture) {
+            auto tx0 = transaction.m_collections.m_tx_collection->resolveFirst("0");
+            if (tx0 != nullptr) {
+                result.output = *tx0;
+            }
+        }
+
+        modsecurity::operators::clearLibinjectionOverridesForTesting();
+        return result;
     }
 
     static bool check(const UnitTestResult &result, const UnitTest &t) {
-        return result.ret != t.ret;
+        if (result.ret != t.ret) {
+            return true;
+        }
+
+        if (t.capture || t.output.empty() == false) {
+            return result.output != t.output;
+        }
+
+        return false;
     }
 };
 
