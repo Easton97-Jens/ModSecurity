@@ -173,7 +173,8 @@ UnitTestResult perform_unit_test_once(const UnitTest &t, modsecurity::Transactio
 
 
 template<typename TestType>
-UnitTestResult perform_unit_test_multithreaded(const UnitTest &t, modsecurity::Transaction &transaction) {
+UnitTestResult perform_unit_test_multithreaded(const UnitTest &t,
+    modsecurity_test::ModSecurityTestContext &context) {
 
     constexpr auto NUM_THREADS = 50;
     constexpr auto ITERATIONS = 5'000;
@@ -188,8 +189,9 @@ UnitTestResult perform_unit_test_multithreaded(const UnitTest &t, modsecurity::T
     {
         auto &result = results[i];
         threads[i] = std::thread(
-            [&item, &t, &result, &transaction]()
+            [&item, &t, &result, &context]()
             {
+                auto transaction = context.create_transaction();
                 for (auto j = 0; j != ITERATIONS; ++j)
                     result = TestType::eval(*item.get(), t, transaction);
             });
@@ -212,12 +214,13 @@ UnitTestResult perform_unit_test_multithreaded(const UnitTest &t, modsecurity::T
 
 template<typename TestType>
 void perform_unit_test_helper(const ModSecurityTest<UnitTest> &test, UnitTest &t,
-    ModSecurityTestResults<UnitTest> &res, modsecurity::Transaction &transaction) {
+    ModSecurityTestResults<UnitTest> &res, modsecurity::Transaction &transaction,
+    modsecurity_test::ModSecurityTestContext &context) {
 
     if (!test.m_test_multithreaded)
         t.result = perform_unit_test_once<TestType>(t, transaction);
     else
-        t.result = perform_unit_test_multithreaded<TestType>(t, transaction);
+        t.result = perform_unit_test_multithreaded<TestType>(t, context);
 
     if (TestType::check(t.result, t)) {
         res.push_back(&t);
@@ -257,9 +260,9 @@ void perform_unit_test(const ModSecurityTest<UnitTest> &test, UnitTest &t,
     }
 
     if (t.type == "op") {
-        perform_unit_test_helper<OperatorTest>(test, t, res, transaction);
+        perform_unit_test_helper<OperatorTest>(test, t, res, transaction, context);
     } else if (t.type == "tfn") {
-        perform_unit_test_helper<TransformationTest>(test, t, res, transaction);
+        perform_unit_test_helper<TransformationTest>(test, t, res, transaction, context);
     } else {
         std::cerr << "Failed. Test type is unknown: << " << t.type;
         std::cerr << std::endl;
