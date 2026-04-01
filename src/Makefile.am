@@ -296,6 +296,7 @@ libmodsecurity_la_CPPFLAGS = \
 	-g \
 	-I$(top_srcdir)/others \
 	-I$(top_srcdir)/others/mbedtls/include \
+	-I$(top_srcdir)/others/mbedtls/tf-psa-crypto/include \
 	-fPIC \
 	-O3 \
 	-I$(top_srcdir)/headers \
@@ -343,4 +344,3 @@ libmodsecurity_la_LIBADD = \
 	$(MAXMIND_LDADD) \
 	$(SSDEEP_LDADD) \
 	$(YAJL_LDADD)
-

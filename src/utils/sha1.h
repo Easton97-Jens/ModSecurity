@@ -20,15 +20,12 @@
 #include <cassert>
 
 #include "src/utils/string.h"
-#include "mbedtls/sha1.h"
+#include "mbedtls/md.h"
 
 namespace modsecurity::Utils {
 
 
-using DigestOp = int (*)(const unsigned char *, size_t, unsigned char []);
-
-
-template<DigestOp digestOp, int DigestSize>
+template<mbedtls_md_type_t DigestType, int DigestSize>
 class DigestImpl {
  public:
 
@@ -56,8 +53,11 @@ private:
     static auto digestHelper(const std::string &input,
         ConvertOp convertOp) -> auto {
         char digest[DigestSize];
+        const auto *mdInfo = mbedtls_md_info_from_type(DigestType);
+        assert(mdInfo != nullptr);
 
-        const auto ret = (*digestOp)(reinterpret_cast<const unsigned char *>(input.c_str()),
+        const auto ret = mbedtls_md(mdInfo,
+                 reinterpret_cast<const unsigned char *>(input.c_str()),
                  input.size(), reinterpret_cast<unsigned char *>(digest));
         assert(ret == 0);
 
@@ -66,7 +66,7 @@ private:
 };
 
 
-class Sha1 : public DigestImpl<&mbedtls_sha1, 20> {
+class Sha1 : public DigestImpl<MBEDTLS_MD_SHA1, 20> {
 };
 
 
