@@ -8,9 +8,16 @@
 
 namespace modsecurity::operators {
 namespace {
+
 // Per-thread overrides avoid cross-thread interference during mtstress tests.
-thread_local DetectSQLiFn g_sqli_override = nullptr;
-thread_local DetectXSSFn g_xss_override = nullptr;
+// Intentional design:
+// - thread_local to isolate tests across threads
+// - function pointers to keep zero-overhead call path
+// - mutable for test injection hooks
+// NOSONAR: required for testing override mechanism (see set*OverrideForTesting)
+thread_local DetectSQLiFn g_sqli_override = nullptr;  // NOSONAR
+thread_local DetectXSSFn g_xss_override = nullptr;    // NOSONAR
+
 }
 
 injection_result_t runLibinjectionSQLi(const char *input, size_t len,
@@ -30,11 +37,15 @@ injection_result_t runLibinjectionXSS(const char *input, size_t len) {
     return libinjection_xss(input, len);
 }
 
-void setLibinjectionSQLiOverrideForTesting(DetectSQLiFn fn) {
+// Test-only hook: allows injecting alternative detection functions
+// NOSONAR: function pointer is intentional (no std::function overhead)
+void setLibinjectionSQLiOverrideForTesting(DetectSQLiFn fn) {  // NOSONAR
     g_sqli_override = fn;
 }
 
-void setLibinjectionXSSOverrideForTesting(DetectXSSFn fn) {
+// Test-only hook: allows injecting alternative detection functions
+// NOSONAR: function pointer is intentional (no std::function overhead)
+void setLibinjectionXSSOverrideForTesting(DetectXSSFn fn) {  // NOSONAR
     g_xss_override = fn;
 }
 
