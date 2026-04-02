@@ -60,6 +60,11 @@ add_library(mbedcrypto STATIC
   ${TF_PSA_CRYPTO_DIR}/extras/md.c
   ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/md5.c
   ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/sha1.c
+  ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/sha256.c
+  ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/sha512.c
+  ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/sha3.c
+  ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/ripemd160.c
+  ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src/psa_util_internal.c
 )
 
 target_include_directories(mbedcrypto PRIVATE
