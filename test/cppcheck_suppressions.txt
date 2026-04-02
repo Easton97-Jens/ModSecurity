@@ -43,6 +43,7 @@ stlIfStrFind:src/collection/backend/collection_data.cc
 unusedFunction
 missingIncludeSystem
 useStlAlgorithm
+constParameterReference:test/unit/unit.cc
 preprocessorErrorDirective
 funcArgNamesDifferent
 missingInclude
@@ -61,4 +62,3 @@ uselessCallsSubstr
 
 // Examples
 memleak:examples/using_bodies_in_chunks/simple_request.cc
-
