@@ -15,6 +15,7 @@
 
 #include "src/audit_log/writer/writer.h"
 
+#include <random>
 #include <string>
 
 #include "modsecurity/audit_log.h"
@@ -23,14 +24,23 @@ namespace modsecurity {
 namespace audit_log {
 namespace writer {
 
-void Writer::generateBoundary(std::string *boundary) {
-    static const char alphanum[] =
+namespace {
+char randomBoundaryChar() {
+    static constexpr char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
 
+    static thread_local std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<size_t> dist(0, sizeof(alphanum) - 2);
+
+    return alphanum[dist(gen)];
+}
+}  // namespace
+
+void Writer::generateBoundary(std::string *boundary) {
     for (int i = 0; i < SERIAL_AUDIT_LOG_BOUNDARY_LENGTH; ++i) {
-        boundary->append(1, alphanum[rand() % (sizeof(alphanum) - 1)]);
+        boundary->append(1, randomBoundaryChar());
     }
 }
 

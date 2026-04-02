@@ -49,6 +49,7 @@
 #include "replace_comments.h"
 #include "replace_nulls.h"
 #include "sha1.h"
+#include "sha256.h"
 #include "sql_hex_decode.h"
 #include "trim.h"
 #include "trim_left.h"
@@ -85,6 +86,7 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(jsDecode) { return new JsDecode(a); }
     IF_MATCH(length) { return new Length(a); }
     IF_MATCH(lowercase) { return new LowerCase(a); }
+    /* Legacy digest transformation kept for backwards compatibility. */
     IF_MATCH(md5) { return new Md5(a); }
     IF_MATCH(none) { return new None(a); }
     IF_MATCH(normalizePathWin) { return new NormalisePathWin(a); }
@@ -101,6 +103,8 @@ Transformation* Transformation::instantiate(std::string a) {
     IF_MATCH(compressWhitespace) { return new CompressWhitespace(a); }
     IF_MATCH(replaceComments) { return new ReplaceComments(a); }
     IF_MATCH(replaceNulls) { return new ReplaceNulls(a); }
+    IF_MATCH(sha256) { return new Sha256(a); }
+    /* Legacy digest transformation kept for backwards compatibility. */
     IF_MATCH(sha1) { return new Sha1(a); }
     IF_MATCH(sqlHexDecode) { return new SqlHexDecode(a); }
     IF_MATCH(transformation) { return new Transformation(a); }

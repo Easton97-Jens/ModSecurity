@@ -30,7 +30,6 @@
 #endif
 
 
-#include <ctime>
 #include <iostream>
 
 #include "modsecurity/rule.h"
@@ -81,7 +80,6 @@ ModSecurity::ModSecurity()
     m_logCb(NULL),
     m_logProperties(0) {
     UniqueId::uniqueId();
-    srand(time(NULL));
 #ifdef MSC_WITH_CURL
     curl_global_init(CURL_GLOBAL_ALL);
 #endif

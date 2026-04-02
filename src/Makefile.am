@@ -167,6 +167,7 @@ ACTIONS = \
 	actions/transformations/replace_comments.cc \
 	actions/transformations/replace_nulls.cc \
 	actions/transformations/sha1.cc \
+	actions/transformations/sha256.cc \
 	actions/transformations/sql_hex_decode.cc \
 	actions/transformations/transformation.cc \
 	actions/transformations/trim.cc \

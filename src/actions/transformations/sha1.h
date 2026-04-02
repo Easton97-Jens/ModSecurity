@@ -20,6 +20,7 @@
 
 namespace modsecurity::actions::transformations {
 
+/* Legacy transformation retained for backwards compatibility. */
 class Sha1 : public Transformation {
  public:
     using Transformation::Transformation;

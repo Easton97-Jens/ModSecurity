@@ -49,6 +49,46 @@
   {
     "enabled": 1,
     "version_min": 300000,
+    "title": "Include remote rules - failed download (Default fail-closed)",
+    "resource": "curl",
+    "client": {
+      "ip": "",
+      "port": 0
+    },
+    "server": {
+      "ip": "",
+      "port": 0
+    },
+    "request": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "uri": "",
+      "method": "",
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "expected": {
+      "http_code": 200,
+      "parser_error": "Failed to download"
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRemoteRules key https://gist.githubusercontent.com/zimmerle/a4c1ec028999f7df71d0cc80f4f271ca/raw/4c74363bf4eae974180f1a82007196e58729dd16/modsecurity-regression-test-secremoterules-bonga.txt"
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
     "title": "Include remote rules - failed download (Abort)",
     "resource": "curl",
     "client": {

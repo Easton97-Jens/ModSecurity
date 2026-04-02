@@ -150,6 +150,7 @@ ACTION_TRANSFORMATION_JS_DECODE                 (?i:t:jsDecode)
 ACTION_TRANSFORMATION_LENGTH                    (?i:t:length)
 ACTION_TRANSFORMATION_LOWERCASE                 (?i:t:lowercase)
 ACTION_TRANSFORMATION_MD5                       (?i:t:md5)
+ACTION_TRANSFORMATION_SHA256                    (?i:t:sha256)
 ACTION_TRANSFORMATION_NONE                      (?i:t:none)
 ACTION_TRANSFORMATION_NORMALISE_PATH            (?i:t:(normalisePath|normalizePath))
 ACTION_TRANSFORMATION_NORMALISE_PATH_WIN        (?i:t:(normalisePathWin|normalizePathWin))
@@ -585,6 +586,7 @@ EQUALS_MINUS                            (?i:=\-)
 {ACTION_TRANSFORMATION_CMD_LINE}                                        { return p::make_ACTION_TRANSFORMATION_CMD_LINE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_SHA1}                                            { return p::make_ACTION_TRANSFORMATION_SHA1(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_MD5}                                             { return p::make_ACTION_TRANSFORMATION_MD5(yytext, *driver.loc.back()); }
+{ACTION_TRANSFORMATION_SHA256}                                          { return p::make_ACTION_TRANSFORMATION_SHA256(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE}                               { return p::make_ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_HEX_ENCODE}                                      { return p::make_ACTION_TRANSFORMATION_HEX_ENCODE(yytext, *driver.loc.back()); }
 {ACTION_TRANSFORMATION_HEX_DECODE}                                      { return p::make_ACTION_TRANSFORMATION_HEX_DECODE(yytext, *driver.loc.back()); }
@@ -1315,7 +1317,7 @@ EQUALS_MINUS                            (?i:=\-)
     std::string url;
 
     std::vector<std::string> conf = modsecurity::utils::string::split(yytext, ' ');
-    if (conf.size() < 2) {
+    if (conf.size() < 3) {
         driver.error (*driver.loc.back(), "", "SecRemoteRules demands a key and a URI");
         throw p::syntax_error(*driver.loc.back(), "");
     }
@@ -1335,8 +1337,11 @@ EQUALS_MINUS                            (?i:=\-)
         BEGIN(INITIAL);
         if (driver.m_remoteRulesActionOnFailed == RulesSet::OnFailedRemoteRulesAction::WarnOnFailedRemoteRulesAction) {
             /** TODO: Implement the server logging mechanism. */
-        }
-        if (driver.m_remoteRulesActionOnFailed == RulesSet::OnFailedRemoteRulesAction::AbortOnFailedRemoteRulesAction) {
+        } else {
+            /*
+             * Fail closed by default (PropertyNotSetRemoteRulesAction).
+             * Only explicit "Warn" keeps the legacy fail-open behavior.
+             */
             driver.error (*driver.loc.back(), "", yytext + std::string(" - Failed to download: ") + c.error);
             throw p::syntax_error(*driver.loc.back(), "");
         }
@@ -1366,4 +1371,3 @@ void Driver::scan_end () {
 }
 
 }
-

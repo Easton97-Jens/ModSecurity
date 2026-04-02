@@ -13,21 +13,25 @@
  *
  */
 
-#ifndef SRC_ACTIONS_TRANSFORMATIONS_MD5_H_
-#define SRC_ACTIONS_TRANSFORMATIONS_MD5_H_
+#ifndef SRC_ACTIONS_TRANSFORMATIONS_SHA256_H_
+#define SRC_ACTIONS_TRANSFORMATIONS_SHA256_H_
+
+#include <memory>
 
 #include "transformation.h"
 
 namespace modsecurity::actions::transformations {
 
-/* Legacy transformation retained for backwards compatibility. */
-class Md5 : public Transformation {
+
+class Sha256 : public Transformation {
  public:
-    using Transformation::Transformation;
+    explicit Sha256(const std::string &action)
+        : Transformation(action) { }
 
     bool transform(std::string &value, const Transaction *trans) const override;
 };
 
+
 }  // namespace modsecurity::actions::transformations
 
-#endif  // SRC_ACTIONS_TRANSFORMATIONS_MD5_H_
+#endif  // SRC_ACTIONS_TRANSFORMATIONS_SHA256_H_

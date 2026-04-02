@@ -97,6 +97,7 @@ class Driver;
 #include "src/actions/transformations/md5.h"
 #include "src/actions/transformations/length.h"
 #include "src/actions/transformations/sha1.h"
+#include "src/actions/transformations/sha256.h"
 #include "src/actions/transformations/compress_whitespace.h"
 #include "src/actions/transformations/normalise_path_win.h"
 #include "src/actions/transformations/remove_nulls.h"
@@ -558,6 +559,7 @@ using namespace modsecurity::operators;
   ACTION_TRANSFORMATION_LENGTH                 "ACTION_TRANSFORMATION_LENGTH"
   ACTION_TRANSFORMATION_LOWERCASE              "ACTION_TRANSFORMATION_LOWERCASE"
   ACTION_TRANSFORMATION_MD5                    "ACTION_TRANSFORMATION_MD5"
+  ACTION_TRANSFORMATION_SHA256                "ACTION_TRANSFORMATION_SHA256"
   ACTION_TRANSFORMATION_NONE                   "ACTION_TRANSFORMATION_NONE"
   ACTION_TRANSFORMATION_NORMALISE_PATH         "ACTION_TRANSFORMATION_NORMALISE_PATH"
   ACTION_TRANSFORMATION_NORMALISE_PATH_WIN     "ACTION_TRANSFORMATION_NORMALISE_PATH_WIN"
@@ -2987,6 +2989,10 @@ act:
     | ACTION_TRANSFORMATION_MD5
       {
         ACTION_CONTAINER($$, new actions::transformations::Md5($1));
+      }
+    | ACTION_TRANSFORMATION_SHA256
+      {
+        ACTION_CONTAINER($$, new actions::transformations::Sha256($1));
       }
     | ACTION_TRANSFORMATION_ESCAPE_SEQ_DECODE 
       {

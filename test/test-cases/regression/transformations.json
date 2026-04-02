@@ -118,5 +118,48 @@
       "SecRuleEngine On",
       "SecRule ARGS \"@contains test \" \"id:1,pass,t:trim,t:lowercase\""
     ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "version_max": 0,
+    "title": "Testing transformations :: pass,t:sha256,t:hexEncode",
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 2313
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "net.tutsplus.com",
+        "Content-Length": "0"
+      },
+      "uri": "/test.pl?param1=test",
+      "method": "GET",
+      "http_version": 1.1,
+      "body": [
+        ""
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain",
+        "Content-Length": "8"
+      },
+      "body": [
+        "no need."
+      ]
+    },
+    "expected": {
+      "debug_log": "Contains\" with param \"9f86d081884c7d659a2feaa0c55ad015\" against ARGS.",
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS \"@contains 9f86d081884c7d659a2feaa0c55ad015\" \"id:1,pass,t:sha256,t:hexEncode\""
+    ]
   }
 ]
