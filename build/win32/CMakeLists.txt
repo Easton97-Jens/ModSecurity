@@ -154,7 +154,7 @@ file(GLOB_RECURSE libModSecuritySources ${BASE_DIR}/src/*.cc)
 add_library(libModSecurity SHARED ${libModSecuritySources})
 
 target_compile_definitions(libModSecurity PRIVATE WITH_PCRE2)
-target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include ${TF_PSA_CRYPTO_DIR}/include)
+target_include_directories(libModSecurity PRIVATE ${BASE_DIR} ${BASE_DIR}/headers ${BASE_DIR}/others ${MBEDTLS_DIR}/include ${TF_PSA_CRYPTO_DIR}/include ${TF_PSA_CRYPTO_DIR}/drivers/builtin/include)
 target_link_libraries(libModSecurity PRIVATE pcre2::pcre2 libinjection mbedcrypto Poco::Poco Iphlpapi.lib)
 
 macro(add_package_dependency project compile_definition link_library flag)
