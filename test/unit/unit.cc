@@ -175,6 +175,7 @@ UnitTestResult perform_unit_test_once(const UnitTest &t, modsecurity::Transactio
 template<typename TestType>
 UnitTestResult perform_unit_test_multithreaded(const UnitTest &t,
     modsecurity_test::ModSecurityTestContext &context) {
+    (void)context;
 
     constexpr auto NUM_THREADS = 50;
     constexpr auto ITERATIONS = 5'000;
@@ -189,9 +190,11 @@ UnitTestResult perform_unit_test_multithreaded(const UnitTest &t,
     {
         auto &result = results[i];
         threads[i] = std::thread(
-            [&item, &t, &result, &context]()
+            [&item, &t, &result]()
             {
-                auto transaction = context.create_transaction();
+                modsecurity_test::ModSecurityTestContext thread_context(
+                    "ModSecurity-unit mtstress-thread");
+                auto transaction = thread_context.create_transaction();
                 for (auto j = 0; j != ITERATIONS; ++j)
                     result = TestType::eval(*item.get(), t, transaction);
             });

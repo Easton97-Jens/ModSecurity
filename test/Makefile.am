@@ -43,6 +43,7 @@ noinst_HEADERS = \
 
 
 unit_tests_LDADD = \
+	$(top_builddir)/src/.libs/libmodsecurity.a \
 	$(CURL_LDADD) \
 	$(GEOIP_LDADD) \
 	$(MAXMIND_LDADD) \
@@ -59,7 +60,6 @@ unit_tests_LDADD = \
 unit_tests_LDFLAGS = \
 	-L$(top_builddir)/src/.libs/ \
 	$(GEOIP_LDFLAGS) \
-	-lmodsecurity \
 	-lpthread \
 	-lm \
 	-lstdc++ \
@@ -195,4 +195,3 @@ rules_optimization_CPPFLAGS = \
 	$(PCRE2_CFLAGS) \
 	$(YAJL_CFLAGS) \
 	$(LIBXML2_CFLAGS)
-

@@ -22,12 +22,15 @@
 #include "src/operators/operator.h"
 #include "src/operators/libinjection_utils.h"
 #include "src/operators/libinjection_adapter.h"
+#include "src/utils/string.h"
 #include "libinjection/src/libinjection_error.h"
 
 namespace modsecurity::operators {
 
 bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
+    const std::string loggable_input =
+        utils::string::limitTo(80, utils::string::toHexIfNeeded(input));
 
     std::array<char, 8> fingerprint{};
 
@@ -44,7 +47,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
 
             ms_dbg_a(t, 4,
                 std::string("detected SQLi using libinjection with fingerprint '")
-                + fingerprint.data() + "' at: '" + input + "'");
+                + fingerprint.data() + "' at: '" + loggable_input + "'");
 
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
@@ -61,7 +64,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
                 std::string("libinjection parser error during SQLi analysis (")
                 + libinjectionResultToString(sqli_result)
                 + "); treating as match (fail-safe). Input: '"
-                + input + "'");
+                + loggable_input + "'");
 
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst(
@@ -79,7 +82,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
         case LIBINJECTION_RESULT_FALSE:
             ms_dbg_a(t, 9,
                 std::string("libinjection was not able to find any SQLi in: ")
-                + input);
+                + loggable_input);
             break;
     }
 
