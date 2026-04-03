@@ -26,8 +26,7 @@ namespace modsecurity::operators {
  * failures.
  */
 static inline bool isMaliciousLibinjectionResult(injection_result_t result) {
-    return result == LIBINJECTION_RESULT_TRUE
-        || result == LIBINJECTION_RESULT_ERROR;
+    return result != LIBINJECTION_RESULT_FALSE;
 }
 
 static inline const char *libinjectionResultToString(injection_result_t result) {
@@ -38,9 +37,9 @@ static inline const char *libinjectionResultToString(injection_result_t result) 
             return "no-attack";
         case LIBINJECTION_RESULT_ERROR:
             return "parser-error";
+        default:
+            return "unexpected-result";
     }
-
-    return "unexpected-result";
 }
 
 }  // namespace modsecurity::operators

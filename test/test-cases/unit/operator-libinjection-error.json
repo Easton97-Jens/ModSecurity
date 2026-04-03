@@ -23,6 +23,24 @@
     "type": "op",
     "name": "detectXSS",
     "param": "",
+    "input": "plain text",
+    "ret": 0,
+    "capture": 1,
+    "output": ""
+  },
+  {
+    "type": "op",
+    "name": "detectSQLi",
+    "param": "",
+    "input": "regular value",
+    "ret": 0,
+    "capture": 1,
+    "output": ""
+  },
+  {
+    "type": "op",
+    "name": "detectXSS",
+    "param": "",
     "input": "<script>alert(1)</script>",
     "ret": 1,
     "capture": 1,
