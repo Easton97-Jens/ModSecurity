@@ -17,7 +17,6 @@
 #define SRC_UTILS_SHA1_H_
 
 #include <string>
-#include <cassert>
 
 #include "src/utils/string.h"
 #include "mbedtls/md.h"
@@ -52,16 +51,21 @@ private:
     template<typename ConvertOp>
     static auto digestHelper(const std::string &input,
         ConvertOp convertOp) -> auto {
-        char digest[DigestSize];
+        unsigned char digest[DigestSize] = {};
         const auto *mdInfo = mbedtls_md_info_from_type(DigestType);
-        assert(mdInfo != nullptr);
+        if (mdInfo == nullptr) {
+            return convertOp(std::string_view());
+        }
 
         const auto ret = mbedtls_md(mdInfo,
-                 reinterpret_cast<const unsigned char *>(input.c_str()),
-                 input.size(), reinterpret_cast<unsigned char *>(digest));
-        assert(ret == 0);
+                 reinterpret_cast<const unsigned char *>(input.data()),
+                 input.size(), digest);
+        if (ret != 0) {
+            return convertOp(std::string_view());
+        }
 
-        return convertOp(std::string_view(digest, DigestSize));
+        return convertOp(std::string_view(
+            reinterpret_cast<const char *>(digest), DigestSize));
     }
 };
 
