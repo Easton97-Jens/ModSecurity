@@ -60,14 +60,16 @@ private:
         }
 
         if (const auto ret = mbedtls_md(mdInfo,
-                reinterpret_cast<const unsigned char *>(input.data()),
+                static_cast<const unsigned char *>(
+                    static_cast<const void *>(input.data())),
                 input.size(), digest.data()); ret != 0) {
             return convertOp(std::string_view());
         }
 
         // mbedtls uses unsigned char buffers, while string_view expects char.
-        return convertOp(std::string_view(
-            reinterpret_cast<const char *>(digest.data()), DigestSize));
+        const auto *digestChars = static_cast<const char *>(
+            static_cast<const void *>(digest.data()));
+        return convertOp(std::string_view(digestChars, DigestSize));
     }
 };
 
