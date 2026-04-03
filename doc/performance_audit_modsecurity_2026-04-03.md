@@ -2,6 +2,8 @@
 
 Dieses Dokument fasst eine tiefgehende, codebasierte Performance-Analyse von libmodsecurity zusammen, mit Fokus auf Hot Paths, Regel-Engine, Speicherverhalten und Skalierung.
 
+> English version: `doc/performance_audit_modsecurity_2026-04-03.en.md`
+
 ## Scope
 
 Analysierte Kernpfade:
