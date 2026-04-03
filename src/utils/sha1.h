@@ -16,7 +16,9 @@
 #ifndef SRC_UTILS_SHA1_H_
 #define SRC_UTILS_SHA1_H_
 
+#include <array>
 #include <string>
+#include <string_view>
 
 #include "src/utils/string.h"
 #include "mbedtls/md.h"
@@ -49,23 +51,23 @@ class DigestImpl {
 private:
 
     template<typename ConvertOp>
-    static auto digestHelper(const std::string &input,
+    static auto digestHelper(std::string_view input,
         ConvertOp convertOp) -> auto {
-        unsigned char digest[DigestSize] = {};
+        std::array<unsigned char, DigestSize> digest = {};
         const auto *mdInfo = mbedtls_md_info_from_type(DigestType);
         if (mdInfo == nullptr) {
             return convertOp(std::string_view());
         }
 
-        const auto ret = mbedtls_md(mdInfo,
-                 reinterpret_cast<const unsigned char *>(input.data()),
-                 input.size(), digest);
-        if (ret != 0) {
+        if (const auto ret = mbedtls_md(mdInfo,
+                reinterpret_cast<const unsigned char *>(input.data()),
+                input.size(), digest.data()); ret != 0) {
             return convertOp(std::string_view());
         }
 
+        // mbedtls uses unsigned char buffers, while string_view expects char.
         return convertOp(std::string_view(
-            reinterpret_cast<const char *>(digest), DigestSize));
+            reinterpret_cast<const char *>(digest.data()), DigestSize));
     }
 };
 
