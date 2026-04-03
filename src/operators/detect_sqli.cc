@@ -92,6 +92,24 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
                 + loggable_input);
 #endif
             break;
+
+        default:
+#ifndef NO_LOGS
+            ms_dbg_a(t, 4,
+                std::string("libinjection returned unexpected SQLi result (")
+                + libinjectionResultToString(sqli_result)
+                + "); treating as match (fail-safe). Input: '"
+                + loggable_input + "'");
+#endif
+            if (rule != nullptr && rule->hasCaptureAction()) {
+                t->m_collections.m_tx_collection->storeOrUpdateFirst(
+                    "0", input);
+
+                ms_dbg_a(t, 7,
+                    std::string("Added DetectSQLi unexpected input TX.0: ")
+                    + input);
+            }
+            break;
     }
 
     return isMaliciousLibinjectionResult(sqli_result);
