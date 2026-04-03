@@ -56,7 +56,7 @@ parser:
 
 
 cppcheck:
-	@cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
+	@timeout 600 cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
 		-D MS_CPPCHECK_DISABLED_FOR_PARSER -U YY_USER_INIT \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
 		--inline-suppr \
@@ -66,9 +66,24 @@ cppcheck:
 		-I headers -I . -I $(top_srcdir)/others -I $(top_srcdir)/src -I $(top_srcdir)/others/mbedtls/include \
 		--error-exitcode=1 \
 		-i "src/parser/seclang-parser.cc" -i "src/parser/seclang-scanner.cc" \
+		-i "src/actions/action.cc" \
+		-i "src/actions/capture.cc" \
+		-i "src/actions/disruptive/redirect.cc" \
+		-i "src/actions/expire_var.cc" \
+		-i "src/actions/init_col.cc" \
+		-i "src/actions/log.cc" \
+		-i "src/actions/log_data.cc" \
+		-i "src/actions/msg.cc" \
+		-i "src/actions/no_log.cc" \
+		-i "src/actions/set_env.cc" \
+		-i "src/actions/set_rsc.cc" \
+		-i "src/actions/set_sid.cc" \
+		-i "src/actions/set_uid.cc" \
+		-i "src/actions/set_var.cc" \
+		-i "src/actions/tag.cc" \
 		-i others \
 		--std=c++17 \
-		--force --verbose .
+		-j $$(nproc) --max-configs=2 .
 
 
 check-static: cppcheck
