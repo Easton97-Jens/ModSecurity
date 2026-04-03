@@ -23,6 +23,9 @@ CLEANFILES =
 
 ACLOCAL_AMFLAGS = -I build
 
+NPROC = $(shell nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+CPPCHECK_TIMEOUT = $(shell command -v timeout >/dev/null 2>&1 && echo "timeout 600" || echo "")
+
 # make maintainer-clean
 MAINTAINERCLEANFILES = \
 	aclocal.m4 \
@@ -56,7 +59,7 @@ parser:
 
 
 cppcheck:
-	@timeout 600 cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
+	@$(CPPCHECK_TIMEOUT) cppcheck -U YYSTYPE -U MBEDTLS_MD5_ALT -U MBEDTLS_SHA1_ALT \
 		-D MS_CPPCHECK_DISABLED_FOR_PARSER -U YY_USER_INIT \
 		--suppressions-list=./test/cppcheck_suppressions.txt \
 		--inline-suppr \
@@ -83,7 +86,7 @@ cppcheck:
 		-i "src/actions/tag.cc" \
 		-i others \
 		--std=c++17 \
-		-j $$(nproc) --max-configs=2 .
+		-j $(NPROC) --max-configs=2 .
 
 
 check-static: cppcheck
