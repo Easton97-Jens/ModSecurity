@@ -18,6 +18,7 @@
 #include <string>
 
 #include "src/operators/operator.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
 namespace operators {
@@ -82,14 +83,15 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *ru
         case 1 :
             /* Encoding is valid */
             if (transaction) {
-                ms_dbg_a(transaction, 7, "Valid URL Encoding at '" +input + "'");
+                ms_dbg_a(transaction, 7, "Valid URL Encoding at '"
+                    + utils::string::safeLogValue(input) + "'");
             }
             res = false;
             break;
         case -2 :
             if (transaction) {
                 ms_dbg_a(transaction, 7, "Invalid URL Encoding: Non-hexadecimal "
-                    "digits used at '" + input + "'");
+                    "digits used at '" + utils::string::safeLogValue(input) + "'");
                 logOffset(ruleMessage, offset, input.size());
             }
             res = true; /* Invalid match. */
@@ -97,7 +99,8 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *ru
         case -3 :
             if (transaction) {
                 ms_dbg_a(transaction, 7, "Invalid URL Encoding: Not enough " \
-                "characters at the end of input at '" + input + "'");
+                "characters at the end of input at '" \
+                + utils::string::safeLogValue(input) + "'");
                 logOffset(ruleMessage, offset, input.size());
             }
             res = true; /* Invalid match. */
@@ -107,7 +110,7 @@ bool ValidateUrlEncoding::evaluate(Transaction *transaction, RuleWithActions *ru
             if (transaction) {
                 ms_dbg_a(transaction, 7, "Invalid URL Encoding: Internal " \
                     "Error (rc = " + std::to_string(rc) + ") at '" +
-                    input + "'");
+                    utils::string::safeLogValue(input) + "'");
                 logOffset(ruleMessage, offset, input.size());
             }
             res = true;

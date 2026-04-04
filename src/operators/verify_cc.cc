@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "src/operators/operator.h"
+#include "src/utils/string.h"
 
 #ifdef WITH_PCRE
 #if PCRE_HAVE_JIT
@@ -186,7 +187,7 @@ bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
                         t->m_collections.m_tx_collection->storeOrUpdateFirst(
                             "0", std::string(match));
                         ms_dbg_a(t, 7, "Added VerifyCC match TX.0: " + \
-                            std::string(match));
+                            utils::string::safeLogValue(std::string(match)));
                     }
                     ms_dbg_a(t, 9, "CC# match \"" + m_param +
                         "\" at " + i + ". [offset " +
@@ -210,4 +211,3 @@ bool VerifyCC::evaluate(Transaction *t, RuleWithActions *rule,
 
 }  // namespace operators
 }  // namespace modsecurity
-

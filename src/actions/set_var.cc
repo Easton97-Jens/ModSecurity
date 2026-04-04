@@ -123,7 +123,8 @@ bool SetVar::evaluate(RuleWithActions *rule, Transaction *t) {
     }
 
     ms_dbg_a(t, 8, "Saving variable: " + m_variable->m_collectionName \
-        + ":" + m_variableNameExpanded + " with value: " + targetValue);
+        + ":" + m_variableNameExpanded + " with value: " \
+        + utils::string::safeLogValue(targetValue));
 
     if (tx) {
         tx->storeOrUpdateFirst(t, m_variableNameExpanded, targetValue);

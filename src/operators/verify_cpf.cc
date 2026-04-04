@@ -19,6 +19,7 @@
 #include <list>
 
 #include "src/operators/operator.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
 namespace operators {
@@ -128,7 +129,7 @@ bool VerifyCPF::evaluate(Transaction *t, RuleWithActions *rule,
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", m.str());
                     ms_dbg_a(t, 7, "Added VerifyCPF match TX.0: " + \
-                        m.str());
+                        utils::string::safeLogValue(m.str()));
                 }
 
                 goto out;

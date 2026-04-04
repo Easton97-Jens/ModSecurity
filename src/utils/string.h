@@ -120,6 +120,18 @@ inline std::string toHexIfNeeded(const std::string &str, bool escape_spec = fals
 }
 
 
+inline std::string safeLogValue(const std::string &input, int limit = 80) {
+    return limitTo(limit, toHexIfNeeded(input));
+}
+
+
+inline std::string safeLogMetadata(const std::string &label,
+    const std::string &input, int limit = 80) {
+    return label + " [len=" + std::to_string(input.size())
+        + " value=\"" + safeLogValue(input, limit) + "\"]";
+}
+
+
 inline std::vector<std::string> ssplit(const std::string &str, char delimiter) {
     std::vector<std::string> internal;
     std::stringstream ss(str);  // Turn the string into a stream.

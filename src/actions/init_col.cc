@@ -21,6 +21,7 @@
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "src/utils/string.h"
 
 
 namespace modsecurity {
@@ -68,7 +69,7 @@ bool InitCol::evaluate(RuleWithActions *rule, Transaction *t) {
     }
 
     ms_dbg_a(t, 5, "Collection `" + m_collection_key + "' initialized with " \
-        "value: " + collectionName);
+        "value: " + utils::string::safeLogValue(collectionName));
 
     return true;
 }

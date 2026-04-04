@@ -84,7 +84,8 @@ void MultipartPartTmpFile::Open() {
     m_tmp_file_fd = _open(path.c_str(), _O_CREAT | _O_EXCL | _O_RDWR);
 #endif
     m_tmp_file_name = path;
-    ms_dbg_a(m_transaction, 4, "MultipartPartTmpFile: Create filename= " + m_tmp_file_name);
+    ms_dbg_a(m_transaction, 4, "MultipartPartTmpFile: Create filename= "
+        + utils::string::safeLogValue(m_tmp_file_name));
 
     int mode = m_transaction->m_rules->m_uploadFileMode.m_value;
     if ((m_tmp_file_fd != -1) && (mode != 0)) {
@@ -976,7 +977,8 @@ int Multipart::process_boundary(int last_part) {
         for (const auto& header_line : m_mpp->m_header_lines) {
             m_transaction->m_variableMultipartPartHeaders.set(m_mpp->m_name,
                 header_line.second, header_line.first);
-            ms_dbg_a(m_transaction, 9, "Multipart: Added part header line:" + header_line.second );
+            ms_dbg_a(m_transaction, 9, "Multipart: Added part header line:"
+                + utils::string::safeLogValue(header_line.second));
         }
 
         /* close the temp file */
@@ -1465,7 +1467,7 @@ bool Multipart::init(std::string *error) {
         ms_dbg_a(m_transaction, 9, "Multipart: Boundary" +
             (m_flag_boundary_quoted ?
                 std::string(" (quoted)") : std::string("")) +
-            std::string(": ") + m_boundary);
+            std::string(": ") + utils::string::safeLogValue(m_boundary));
 
         if (m_boundary.size() == 0) {
             m_flag_error = 1;

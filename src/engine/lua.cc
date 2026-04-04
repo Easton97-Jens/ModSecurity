@@ -185,7 +185,7 @@ int Lua::run(Transaction *t, const std::string &str) { // cppcheck-suppress cons
 
     lua_getglobal(L, "main");
 
-    ms_dbg_a(t, 9, str);
+    ms_dbg_a(t, 9, utils::string::safeLogMetadata("Lua argument", str));
 
     /* Put the parameter on the stack. */
     if (!str.empty() ) {
@@ -211,7 +211,8 @@ int Lua::run(Transaction *t, const std::string &str) { // cppcheck-suppress cons
         luaRet.assign(a);
     }
 
-    ms_dbg_a(t, 9, "Returning from lua script: " + luaRet);
+    ms_dbg_a(t, 9, "Returning from lua script: "
+        + utils::string::safeLogValue(luaRet));
 
     if (luaRet.size() == 0) {
         ret = false;
@@ -474,4 +475,3 @@ void Lua::applyTransformations(lua_State *L, const Transaction *t,
 
 }  //  namespace engine
 }  //  namespace modsecurity
-

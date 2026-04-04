@@ -8,6 +8,7 @@
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
 #include "modsecurity/rules_set_properties.h"
+#include "src/utils/string.h"
 
 
 namespace modsecurity {
@@ -98,7 +99,7 @@ bool VerifySVNR::evaluate(Transaction *t, RuleWithActions *rule,
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", j.str());
                     ms_dbg_a(t, 7, "Added VerifySVNR match TX.0: " + \
-                        j.str());
+                        utils::string::safeLogValue(j.str()));
                 }
 
                 goto out;

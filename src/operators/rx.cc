@@ -22,6 +22,7 @@
 #include "src/operators/operator.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
 namespace operators {
@@ -91,7 +92,8 @@ bool Rx::evaluate(Transaction *transaction, RuleWithActions *rule,
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst(
                 std::to_string(capture.m_group), capture_substring);
             ms_dbg_a(transaction, 7, "Added regex subexpression TX." +
-                std::to_string(capture.m_group) + ": " + capture_substring);
+                std::to_string(capture.m_group) + ": " \
+                + utils::string::safeLogValue(capture_substring));
             transaction->m_matched.push_back(capture_substring);
         }
     }

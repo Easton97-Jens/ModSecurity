@@ -23,6 +23,7 @@
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
 #include "modsecurity/rule_message.h"
+#include "src/utils/string.h"
 
 /*
  * Description: Assigns a custom message to the rule or chain in which it
@@ -49,7 +50,7 @@ namespace actions {
 bool Msg::evaluate(RuleWithActions *rule, Transaction *transaction, RuleMessage &ruleMessage) {
     const auto msg = data(transaction);
     ruleMessage.m_message = msg;
-    ms_dbg_a(transaction, 9, "Saving msg: " + msg);
+    ms_dbg_a(transaction, 9, "Saving msg: " + utils::string::safeLogValue(msg));
 
     return true;
 }

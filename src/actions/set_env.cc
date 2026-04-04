@@ -31,7 +31,7 @@ bool SetENV::evaluate(RuleWithActions *rule, Transaction *t) {
 
     auto pair = utils::string::ssplit_pair(colNameExpanded, '=');
     ms_dbg_a(t, 8, "Setting environment variable: "
-        + pair.first + " to " + pair.second);
+        + pair.first + " to " + utils::string::safeLogValue(pair.second));
 #ifndef WIN32
     setenv(pair.first.c_str(), pair.second.c_str(), /*overwrite*/ 1);
 #else

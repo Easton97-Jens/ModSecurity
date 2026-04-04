@@ -20,6 +20,7 @@
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule.h"
+#include "src/utils/string.h"
 
 
 namespace modsecurity {
@@ -29,7 +30,7 @@ namespace actions {
 bool SetUID::evaluate(RuleWithActions *rule, Transaction *t) {
     std::string colNameExpanded(m_string->evaluate(t));
     ms_dbg_a(t, 8, "User collection initiated with value: \'"
-        + colNameExpanded + "\'.");
+        + utils::string::safeLogValue(colNameExpanded) + "\'.");
 
     t->m_collections.m_user_collection_key = colNameExpanded;
     t->m_variableUserID.set(colNameExpanded, t->m_variableOffset);

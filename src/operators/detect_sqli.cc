@@ -30,8 +30,7 @@ namespace modsecurity::operators {
 bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
 #ifndef NO_LOGS
-    const std::string loggable_input =
-        utils::string::limitTo(80, utils::string::toHexIfNeeded(input));
+    const std::string loggable_input = utils::string::safeLogValue(input);
 #endif
 
     std::array<char, 8> fingerprint{};
@@ -78,7 +77,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
 
                 ms_dbg_a(t, 7,
                     std::string("Added DetectSQLi error input TX.0: ")
-                    + input);
+                    + loggable_input);
             }
 
             // Keep m_matched untouched for parser-error paths to avoid
@@ -107,7 +106,7 @@ bool DetectSQLi::evaluate(Transaction *t, RuleWithActions *rule,
 
                 ms_dbg_a(t, 7,
                     std::string("Added DetectSQLi unexpected input TX.0: ")
-                    + input);
+                    + loggable_input);
             }
             break;
     }

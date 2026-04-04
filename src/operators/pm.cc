@@ -157,7 +157,7 @@ bool Pm::evaluate(Transaction *transaction, RuleWithActions *rule,
             transaction->m_collections.m_tx_collection->storeOrUpdateFirst("0",
                 match_);
             ms_dbg_a(transaction, 7, "Added pm match TX.0: " + \
-                match_);
+                utils::string::safeLogValue(match_));
         }
     }
 

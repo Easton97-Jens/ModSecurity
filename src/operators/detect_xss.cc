@@ -28,8 +28,7 @@ namespace modsecurity::operators {
 bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
     const std::string& input, RuleMessage &ruleMessage) {
 #ifndef NO_LOGS
-    const std::string loggable_input =
-        utils::string::limitTo(80, utils::string::toHexIfNeeded(input));
+    const std::string loggable_input = utils::string::safeLogValue(input);
 #endif
 
     const injection_result_t xss_result =
@@ -44,7 +43,7 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
             ms_dbg_a(t, 5, std::string("detected XSS using libinjection."));
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
-                ms_dbg_a(t, 7, std::string("Added DetectXSS match TX.0: ") + input);
+                ms_dbg_a(t, 7, std::string("Added DetectXSS match TX.0: ") + loggable_input);
             }
             break;
 
@@ -58,7 +57,7 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
 #endif
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
-                ms_dbg_a(t, 7, std::string("Added DetectXSS error input TX.0: ") + input);
+                ms_dbg_a(t, 7, std::string("Added DetectXSS error input TX.0: ") + loggable_input);
             }
             break;
 
@@ -81,7 +80,7 @@ bool DetectXSS::evaluate(Transaction *t, RuleWithActions *rule,
             if (rule != nullptr && rule->hasCaptureAction()) {
                 t->m_collections.m_tx_collection->storeOrUpdateFirst("0", input);
                 ms_dbg_a(t, 7,
-                    std::string("Added DetectXSS unexpected input TX.0: ") + input);
+                    std::string("Added DetectXSS unexpected input TX.0: ") + loggable_input);
             }
             break;
     }

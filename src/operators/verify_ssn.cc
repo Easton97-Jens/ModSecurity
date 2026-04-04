@@ -20,6 +20,7 @@
 #include <list>
 
 #include "src/operators/operator.h"
+#include "src/utils/string.h"
 
 namespace modsecurity {
 namespace operators {
@@ -130,7 +131,7 @@ bool VerifySSN::evaluate(Transaction *t, RuleWithActions *rule,
                     t->m_collections.m_tx_collection->storeOrUpdateFirst(
                         "0", j.str());
                     ms_dbg_a(t, 7, "Added VerifySSN match TX.0: " + \
-                        j.str());
+                        utils::string::safeLogValue(j.str()));
                 }
 
                 goto out;

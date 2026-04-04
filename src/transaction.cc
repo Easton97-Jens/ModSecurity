@@ -282,7 +282,8 @@ bool Transaction::extractArguments(const std::string &orig,
 bool Transaction::addArgument(const std::string& orig, const std::string& key,
     const std::string& value, size_t offset) {
     ms_dbg(4, "Adding request argument (" + orig + "): name \"" + \
-                key + "\", value \"" + value + "\"");
+                utils::string::safeLogValue(key) + "\", value \"" \
+                + utils::string::safeLogValue(value) + "\"");
 
     if (m_rules->m_argumentsLimit.m_set
             && m_variableArgs.size() >= m_rules->m_argumentsLimit.m_value) {
@@ -2326,4 +2327,3 @@ extern "C" int msc_set_request_hostname(Transaction *transaction,
 
 
 }  // namespace modsecurity
-
