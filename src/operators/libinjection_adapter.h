@@ -22,13 +22,6 @@
 
 namespace modsecurity::operators {
 
-// Keep testing override hooks out of the shared-library dynamic symbol table.
-#if defined(__GNUC__) || defined(__clang__)
-#define MODSEC_HIDDEN __attribute__((visibility("hidden")))
-#else
-#define MODSEC_HIDDEN
-#endif
-
 using DetectSQLiFn = injection_result_t (*)(const char *, size_t, char *);
 using DetectXSSFn = injection_result_t (*)(const char *, size_t);
 
@@ -36,11 +29,9 @@ injection_result_t runLibinjectionSQLi(const char *input, size_t len,
     char *fingerprint);
 injection_result_t runLibinjectionXSS(const char *input, size_t len);
 
-MODSEC_HIDDEN void setLibinjectionSQLiOverrideForTesting(DetectSQLiFn fn);
-MODSEC_HIDDEN void setLibinjectionXSSOverrideForTesting(DetectXSSFn fn);
-MODSEC_HIDDEN void clearLibinjectionOverridesForTesting();
-
-#undef MODSEC_HIDDEN
+void setLibinjectionSQLiOverrideForTesting(DetectSQLiFn fn);
+void setLibinjectionXSSOverrideForTesting(DetectXSSFn fn);
+void clearLibinjectionOverridesForTesting();
 
 }  // namespace modsecurity::operators
 
