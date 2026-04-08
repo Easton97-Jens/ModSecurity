@@ -5,6 +5,8 @@ noinst_PROGRAMS = test
 test_SOURCES = \
 	test.c
 
+CCLD = $(CXX)
+
 test_LDADD = \
 	$(GLOBAL_LDADD) \
 	$(LUA_LDADD) \

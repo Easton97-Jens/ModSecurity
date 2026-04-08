@@ -5,6 +5,8 @@ noinst_PROGRAMS = multi
 multi_SOURCES = \
 	multi.c
 
+CCLD = $(CXX)
+
 multi_LDADD = \
 	$(SSDEEP_LDADD) \
 	$(LUA_LDADD) \
