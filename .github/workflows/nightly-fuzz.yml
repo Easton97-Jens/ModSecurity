@@ -41,6 +41,9 @@ jobs:
           CXX: clang++
         run: ./configure --enable-afl-fuzz --enable-assertions=yes --without-lua
 
+      - name: Build core library
+        run: make -j "$(nproc)"
+
       - name: Build harnesses
         run: make -j "$(nproc)" -C test/fuzzer transaction_fuzzer rule_parser_fuzzer
 
