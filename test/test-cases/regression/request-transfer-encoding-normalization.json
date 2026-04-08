@@ -1,0 +1,82 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Transfer-Encoding token list containing chunked must not synthesize Content-Length",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12345
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Transfer-Encoding": "gzip, chunked"
+      },
+      "uri": "/upload",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "4\r\nname\r\n7\r\n=value!\r\n0\r\n\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": [
+        "ok"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS_NAMES \"@streq Content-Length\" \"id:310001,phase:1,deny,status:403,msg:'unexpected Content-Length for chunked body'\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "title": "Transfer-Encoding with surrounding whitespace and mixed-case chunked token",
+    "client": {
+      "ip": "127.0.0.1",
+      "port": 12346
+    },
+    "server": {
+      "ip": "127.0.0.1",
+      "port": 80
+    },
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "Transfer-Encoding": "\tchunked \t"
+      },
+      "uri": "/upload",
+      "method": "POST",
+      "http_version": 1.1,
+      "body": [
+        "4\r\ntest\r\n0\r\n\r\n"
+      ]
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "text/plain"
+      },
+      "body": [
+        "ok"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule REQUEST_HEADERS_NAMES \"@streq Content-Length\" \"id:310002,phase:1,deny,status:403,msg:'unexpected Content-Length for chunked body'\""
+    ]
+  }
+]

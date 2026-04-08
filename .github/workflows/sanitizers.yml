@@ -1,0 +1,58 @@
+name: Sanitizer Build and Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  asan-ubsan:
+    name: Linux clang (ASan+UBSan)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y \
+            clang \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            libpcre3-dev \
+            bison \
+            flex \
+            pkg-config
+
+      - name: Bootstrap autotools
+        run: ./build.sh
+
+      - name: Configure
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./configure --enable-assertions=yes --enable-asan --enable-ubsan --without-lua
+
+      - name: Build
+        run: make -j "$(nproc)"
+
+      - name: Run tests
+        run: make check
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanitizer-logs
+          path: |
+            config.log
+            test/test-suite.log
+            test/*.log
+          if-no-files-found: ignore

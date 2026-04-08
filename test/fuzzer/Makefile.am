@@ -1,14 +1,18 @@
 
-
 # make clean
-CLEANFILES = 
+CLEANFILES =
 
 # make maintainer-clean
 MAINTAINERCLEANFILES = \
 	Makefile.in
 
 
-noinst_PROGRAMS = afl_fuzzer
+noinst_PROGRAMS = afl_fuzzer transaction_fuzzer rule_parser_fuzzer
+
+EXTRA_DIST = \
+	README.md \
+	corpus/transaction/basic.bin \
+	corpus/rule_parser/basic_regex.bin
 
 afl_fuzzer_SOURCES = \
 	afl_fuzzer.cc
@@ -29,7 +33,6 @@ afl_fuzzer_LDADD = \
 	$(top_builddir)/others/libinjection.la \
 	$(top_builddir)/others/libmbedtls.la
 
-
 afl_fuzzer_CPPFLAGS = \
 	-Icommon \
 	-I../ \
@@ -47,3 +50,13 @@ afl_fuzzer_CPPFLAGS = \
 	$(PCRE_CFLAGS) \
 	$(PCRE2_CFLAGS) \
 	$(LIBXML2_CFLAGS)
+
+transaction_fuzzer_SOURCES = \
+	transaction_fuzzer.cc
+transaction_fuzzer_LDADD = $(afl_fuzzer_LDADD)
+transaction_fuzzer_CPPFLAGS = $(afl_fuzzer_CPPFLAGS)
+
+rule_parser_fuzzer_SOURCES = \
+	rule_parser_fuzzer.cc
+rule_parser_fuzzer_LDADD = $(afl_fuzzer_LDADD)
+rule_parser_fuzzer_CPPFLAGS = $(afl_fuzzer_CPPFLAGS)
