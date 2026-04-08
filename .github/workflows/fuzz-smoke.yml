@@ -41,7 +41,7 @@ jobs:
         run: ./configure --enable-afl-fuzz --enable-assertions=yes --without-lua
 
       - name: Build harnesses
-        run: make -j "$(nproc)" -C test/fuzzer
+        run: make -j "$(nproc)" -C test/fuzzer transaction_fuzzer rule_parser_fuzzer
 
       - name: Run seed corpus
         run: |

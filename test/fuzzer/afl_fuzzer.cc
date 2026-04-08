@@ -122,10 +122,21 @@ using namespace modsecurity;
 #include <signal.h>
 #include <string.h>
 
+#ifndef __AFL_LOOP
+#define __AFL_LOOP(_A) 1
+#endif
+
+inline void run_transformation_test(Transformation *transformation,
+    const std::string &input, const Transaction *transaction) {
+    std::string value = input;
+    transformation->transform(value, transaction);
+    delete transformation;
+}
+
 inline void op_test(const std::string &opName, const std::string &s) {
     Operator *op = Operator::instantiate(opName, "");
     op->init("", nullptr);
-    op->evaluate(nullptr, nullptr, s, nullptr);
+    op->evaluate(nullptr, nullptr, s);
     delete op;
 }
 
@@ -142,7 +153,7 @@ int main(int argc, char** argv) {
         memset(buf, 0, 128);
         read_bytes = read(STDIN_FILENO, buf, 128);
 
-        std::string currentString = std::string(read_bytes, 128);
+        std::string currentString(reinterpret_cast<const char *>(buf), read_bytes > 0 ? static_cast<size_t>(read_bytes) : 0);
         const std::string& s = currentString;
 #if 0
         std::string z = lastString;
@@ -161,43 +172,43 @@ int main(int argc, char** argv) {
         * for i in $(grep "class " -Ri src/actions/transformations/* | grep " :" | grep -v "InstantCache" | awk {'print $2'}); do echo $i *$(echo $i | awk '{print tolower($0)}') = new $i\(\"$i\"\)\; $(echo $i | awk '{print tolower($0)}')-\>evaluate\(s, NULL\)\; delete $(echo $i | awk '{print tolower($0)}')\;; done;
         *
         */
-Base64Decode *base64decode = new Base64Decode("Base64Decode"); base64decode->evaluate(s, NULL); delete base64decode;
-Base64DecodeExt *base64decodeext = new Base64DecodeExt("Base64DecodeExt"); base64decodeext->evaluate(s, NULL); delete base64decodeext;
-Base64Encode *base64encode = new Base64Encode("Base64Encode"); base64encode->evaluate(s, NULL); delete base64encode;
-CmdLine *cmdline = new CmdLine("CmdLine"); cmdline->evaluate(s, NULL); delete cmdline;
-CompressWhitespace *compresswhitespace = new CompressWhitespace("CompressWhitespace"); compresswhitespace->evaluate(s, NULL); delete compresswhitespace;
-CssDecode *cssdecode = new CssDecode("CssDecode"); cssdecode->evaluate(s, NULL); delete cssdecode;
-EscapeSeqDecode *escapeseqdecode = new EscapeSeqDecode("EscapeSeqDecode"); escapeseqdecode->evaluate(s, NULL); delete escapeseqdecode;
-HexDecode *hexdecode = new HexDecode("HexDecode"); hexdecode->evaluate(s, NULL); delete hexdecode;
-HexEncode *hexencode = new HexEncode("HexEncode"); hexencode->evaluate(s, NULL); delete hexencode;
-HtmlEntityDecode *htmlentitydecode = new HtmlEntityDecode("HtmlEntityDecode"); htmlentitydecode->evaluate(s, NULL); delete htmlentitydecode;
-JsDecode *jsdecode = new JsDecode("JsDecode"); jsdecode->evaluate(s, NULL); delete jsdecode;
-Length *length = new Length("Length"); length->evaluate(s, NULL); delete length;
-LowerCase *lowercase = new LowerCase("LowerCase"); lowercase->evaluate(s, NULL); delete lowercase;
-Md5 *md5 = new Md5("Md5"); md5->evaluate(s, NULL); delete md5;
-None *none = new None("None"); none->evaluate(s, NULL); delete none;
-NormalisePath *normalisepath = new NormalisePath("NormalisePath"); normalisepath->evaluate(s, NULL); delete normalisepath;
-NormalisePathWin *normalisepathwin = new NormalisePathWin("NormalisePathWin"); normalisepathwin->evaluate(s, NULL); delete normalisepathwin;
-ParityEven7bit *parityeven7bit = new ParityEven7bit("ParityEven7bit"); parityeven7bit->evaluate(s, NULL); delete parityeven7bit;
-ParityOdd7bit *parityodd7bit = new ParityOdd7bit("ParityOdd7bit"); parityodd7bit->evaluate(s, NULL); delete parityodd7bit;
-ParityZero7bit *parityzero7bit = new ParityZero7bit("ParityZero7bit"); parityzero7bit->evaluate(s, NULL); delete parityzero7bit;
-RemoveComments *removecomments = new RemoveComments("RemoveComments"); removecomments->evaluate(s, NULL); delete removecomments;
-RemoveCommentsChar *removecommentschar = new RemoveCommentsChar("RemoveCommentsChar"); removecommentschar->evaluate(s, NULL); delete removecommentschar;
-RemoveNulls *removenulls = new RemoveNulls("RemoveNulls"); removenulls->evaluate(s, NULL); delete removenulls;
-RemoveWhitespace *removewhitespace = new RemoveWhitespace("RemoveWhitespace"); removewhitespace->evaluate(s, NULL); delete removewhitespace;
-ReplaceComments *replacecomments = new ReplaceComments("ReplaceComments"); replacecomments->evaluate(s, NULL); delete replacecomments;
-ReplaceNulls *replacenulls = new ReplaceNulls("ReplaceNulls"); replacenulls->evaluate(s, NULL); delete replacenulls;
-Sha1 *sha1 = new Sha1("Sha1"); sha1->evaluate(s, NULL); delete sha1;
-SqlHexDecode *sqlhexdecode = new SqlHexDecode("SqlHexDecode"); sqlhexdecode->evaluate(s, NULL); delete sqlhexdecode;
-Transformation *transformation = new Transformation("Transformation"); transformation->evaluate(s, NULL); delete transformation;
-Trim *trim = new Trim("Trim"); trim->evaluate(s, NULL); delete trim;
-TrimLeft *trimleft = new TrimLeft("TrimLeft"); trimleft->evaluate(s, NULL); delete trimleft;
-TrimRight *trimright = new TrimRight("TrimRight"); trimright->evaluate(s, NULL); delete trimright;
-UpperCase *uppercase = new UpperCase("UpperCase"); uppercase->evaluate(s, NULL); delete uppercase;
-UrlDecode *urldecode = new UrlDecode("UrlDecode"); urldecode->evaluate(s, NULL); delete urldecode;
-UrlDecodeUni *urldecodeuni = new UrlDecodeUni("UrlDecodeUni"); urldecodeuni->evaluate(s, NULL); delete urldecodeuni;
-UrlEncode *urlencode = new UrlEncode("UrlEncode"); urlencode->evaluate(s, NULL); delete urlencode;
-Utf8ToUnicode *utf8tounicode = new Utf8ToUnicode("Utf8ToUnicode"); utf8tounicode->evaluate(s, NULL); delete utf8tounicode;
+run_transformation_test(new Base64Decode("Base64Decode"), s, t);
+run_transformation_test(new Base64DecodeExt("Base64DecodeExt"), s, t);
+run_transformation_test(new Base64Encode("Base64Encode"), s, t);
+run_transformation_test(new CmdLine("CmdLine"), s, t);
+run_transformation_test(new CompressWhitespace("CompressWhitespace"), s, t);
+run_transformation_test(new CssDecode("CssDecode"), s, t);
+run_transformation_test(new EscapeSeqDecode("EscapeSeqDecode"), s, t);
+run_transformation_test(new HexDecode("HexDecode"), s, t);
+run_transformation_test(new HexEncode("HexEncode"), s, t);
+run_transformation_test(new HtmlEntityDecode("HtmlEntityDecode"), s, t);
+run_transformation_test(new JsDecode("JsDecode"), s, t);
+run_transformation_test(new Length("Length"), s, t);
+run_transformation_test(new LowerCase("LowerCase"), s, t);
+run_transformation_test(new Md5("Md5"), s, t);
+run_transformation_test(new None("None"), s, t);
+run_transformation_test(new NormalisePath("NormalisePath"), s, t);
+run_transformation_test(new NormalisePathWin("NormalisePathWin"), s, t);
+run_transformation_test(new ParityEven7bit("ParityEven7bit"), s, t);
+run_transformation_test(new ParityOdd7bit("ParityOdd7bit"), s, t);
+run_transformation_test(new ParityZero7bit("ParityZero7bit"), s, t);
+run_transformation_test(new RemoveComments("RemoveComments"), s, t);
+run_transformation_test(new RemoveCommentsChar("RemoveCommentsChar"), s, t);
+run_transformation_test(new RemoveNulls("RemoveNulls"), s, t);
+run_transformation_test(new RemoveWhitespace("RemoveWhitespace"), s, t);
+run_transformation_test(new ReplaceComments("ReplaceComments"), s, t);
+run_transformation_test(new ReplaceNulls("ReplaceNulls"), s, t);
+run_transformation_test(new Sha1("Sha1"), s, t);
+run_transformation_test(new SqlHexDecode("SqlHexDecode"), s, t);
+run_transformation_test(new Transformation("Transformation"), s, t);
+run_transformation_test(new Trim("Trim"), s, t);
+run_transformation_test(new TrimLeft("TrimLeft"), s, t);
+run_transformation_test(new TrimRight("TrimRight"), s, t);
+run_transformation_test(new UpperCase("UpperCase"), s, t);
+run_transformation_test(new UrlDecode("UrlDecode"), s, t);
+run_transformation_test(new UrlDecodeUni("UrlDecodeUni"), s, t);
+run_transformation_test(new UrlEncode("UrlEncode"), s, t);
+run_transformation_test(new Utf8ToUnicode("Utf8ToUnicode"), s, t);
 
 
         /**
