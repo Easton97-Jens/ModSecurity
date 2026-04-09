@@ -123,7 +123,8 @@ using namespace modsecurity;
 #include <string.h>
 
 #ifndef __AFL_LOOP
-#define __AFL_LOOP(_A) 1
+static int __afl_loop_fallback_counter = 0;
+#define __AFL_LOOP(_A) ((__afl_loop_fallback_counter++ == 0) ? 1 : 0)
 #endif
 
 inline void run_transformation_test(Transformation *transformation,
@@ -291,4 +292,3 @@ op_test("Within", s);
     }
     return 0;
 }
-

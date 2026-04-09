@@ -142,10 +142,19 @@ int Driver::parse(const std::string &f, const std::string &ref) {
 
     buffer = f;
     scan_begin();
+    struct ScannerGuard {
+        explicit ScannerGuard(Driver *d) : m_driver(d) {}
+        ~ScannerGuard() {
+            if (m_driver != nullptr) {
+                m_driver->scan_end();
+            }
+        }
+        Driver *m_driver;
+    } scannerGuard(this);
+
     yy::seclang_parser parser(*this);
     parser.set_debug_level(trace_parsing);
     int res = parser.parse();
-    scan_end();
 
     /*
      * need to check for rules marked as chained but without

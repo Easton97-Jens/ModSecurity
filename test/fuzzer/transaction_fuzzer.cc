@@ -85,7 +85,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     std::string rulesText =
         "SecRuleEngine On\n"
         "SecRequestBodyAccess On\n"
-        "SecRule REQUEST_URI \"@rx [\\\\x00-\\\\x1f]\\\" \"id:1001,phase:1,deny,status:403\"\n"
+        "SecRule REQUEST_URI \"@rx [\\\\x00-\\\\x1f]\" \"id:1001,phase:1,deny,status:403\"\n"
         "SecRule REQUEST_HEADERS \"@contains ..\" \"id:1002,phase:1,log,pass,t:urlDecodeUni,t:lowercase\"\n"
         "SecRule REQUEST_BODY \"@rx (?i:select|union|<script)\" \"id:1003,phase:2,deny,status:403,t:none,t:compressWhitespace\"\n";
     rules.load(rulesText.c_str());

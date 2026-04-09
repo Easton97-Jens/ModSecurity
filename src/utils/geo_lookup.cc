@@ -59,6 +59,7 @@ void GeoLookup::cleanUp() {
 
 bool GeoLookup::setDataBase(const std::string& filePath,
     std::string *err) {
+    cleanUp();
 #ifdef WITH_MAXMIND
     std::string intMax;
 #endif
@@ -307,4 +308,3 @@ bool GeoLookup::lookup(const std::string& target, Transaction *trans,
 
 }  // namespace Utils
 }  // namespace modsecurity
-

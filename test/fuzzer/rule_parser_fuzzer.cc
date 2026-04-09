@@ -42,7 +42,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     t.addRequestHeader("Transfer-Encoding", "chunked");
     t.processRequestHeaders();
 
-    const std::string chunkedBody = "4\\r\\na=1&\\r\\n6\\r\\nb=%3C%3E\\r\\n0\\r\\n\\r\\n";
+    const std::string chunkedBody = "4\r\na=1&\r\n6\r\nb=%3C%3E\r\n0\r\n\r\n";
     t.appendRequestBody(reinterpret_cast<const unsigned char *>(chunkedBody.data()), chunkedBody.size());
     t.processRequestBody();
 
