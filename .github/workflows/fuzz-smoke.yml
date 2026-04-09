@@ -1,0 +1,69 @@
+name: Fuzz Smoke (PR)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  fuzz-smoke:
+    name: clang fuzz harness smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y \
+            clang \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            libpcre3-dev \
+            bison \
+            flex \
+            pkg-config
+
+      - name: Bootstrap autotools
+        run: ./build.sh
+
+      - name: Configure (afl-fuzz helpers)
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./configure --enable-afl-fuzz --enable-assertions=yes --without-lua
+
+      - name: Build core library
+        run: make -j "$(nproc)"
+
+      - name: Build harnesses
+        run: make -j "$(nproc)" -C test/fuzzer transaction_fuzzer rule_parser_fuzzer
+
+      - name: Run seed corpus
+        run: |
+          ./test/fuzzer/transaction_fuzzer < test/fuzzer/corpus/transaction/basic.bin
+          ./test/fuzzer/rule_parser_fuzzer < test/fuzzer/corpus/rule_parser/basic_regex.bin
+
+      - name: Run randomized smoke loops
+        run: |
+          for i in $(seq 1 100); do
+            head -c 256 /dev/urandom | ./test/fuzzer/transaction_fuzzer >/dev/null
+            head -c 256 /dev/urandom | ./test/fuzzer/rule_parser_fuzzer >/dev/null
+          done
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-smoke-logs
+          path: |
+            config.log
+            test/fuzzer/*.log
+          if-no-files-found: ignore

@@ -239,11 +239,38 @@ bool iequals_ascii(std::string_view a, std::string_view b) {
             });
 }
 
+static inline std::string trim_ascii(std::string_view value) {
+    const auto not_space = [](char c) {
+        return c != ' ' && c != '\t' && c != '\r' && c != '\n';
+    };
+
+    while (!value.empty() && !not_space(value.front())) {
+        value.remove_prefix(1);
+    }
+    while (!value.empty() && !not_space(value.back())) {
+        value.remove_suffix(1);
+    }
+
+    return std::string(value);
+}
+
 static bool has_chunked_header(const std::vector<std::pair<std::string, std::string>> &headers) {
     return std::any_of(std::begin(headers), std::end(headers),
         [](const auto &header) {
             const auto &[name, value]{header};
-            return iequals_ascii(name, "Transfer-Encoding") && iequals_ascii(value, "chunked");
+            if (!iequals_ascii(name, "Transfer-Encoding")) {
+                return false;
+            }
+
+            std::stringstream ss(value);
+            std::string coding;
+            while (std::getline(ss, coding, ',')) {
+                if (iequals_ascii(trim_ascii(coding), "chunked")) {
+                    return true;
+                }
+            }
+
+            return false;
         });
 }
 

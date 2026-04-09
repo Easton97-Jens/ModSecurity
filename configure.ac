@@ -285,7 +285,9 @@ MSC_ARG_ENABLE_BOOL([afl-fuzz], [Turn on the afl fuzzer compilation utilities], 
 MSC_ARG_ENABLE_BOOL([examples], [Turn on the examples compilation (default option)], [true], [buildExamples])
 MSC_ARG_ENABLE_BOOL([parser-generation], [Enables parser generation during the build], [false], [buildParser])
 MSC_ARG_ENABLE_BOOL([mutex-on-pm], [Treat pm operations as critical section], [false], [mutexPm])
-
+MSC_ARG_ENABLE_BOOL([asan], [Build with AddressSanitizer instrumentation], [false], [enableAsan])
+MSC_ARG_ENABLE_BOOL([ubsan], [Build with UndefinedBehaviorSanitizer instrumentation], [false], [enableUbsan])
+MSC_ARG_ENABLE_BOOL([tsan], [Build with ThreadSanitizer instrumentation], [false], [enableTsan])
 
 if test $buildParser = true; then
     AC_PROG_YACC
@@ -335,11 +337,19 @@ if test "$PLATFORM" != "MacOSX" -a "$PLATFORM" != "OpenBSD"; then
     GLOBAL_LDADD="-lrt  "
 fi
 
-if test "$aflFuzzer" == "true"; then
-    FUZZ_CPPCFLAGS="-fsanitize=address -fsanitize-coverage=4 "
-    GLOBAL_LDADD="$GLOBAL_LDADD -fsanitize=address "
+if test "$aflFuzzer" = "true"; then
+    case "${CC} ${CXX}" in
+        *clang*)
+            FUZZ_CPPCFLAGS="-fsanitize=address -fsanitize-coverage=trace-pc-guard,trace-cmp -fno-omit-frame-pointer"
+            ;;
+        *)
+            FUZZ_CPPCFLAGS="-fsanitize=address -fno-omit-frame-pointer"
+            ;;
+    esac
+
     GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $FUZZ_CPPCFLAGS"
-    $buildExamples = false
+    GLOBAL_LDADD="$GLOBAL_LDADD -fsanitize=address"
+    buildExamples=false
 fi
 
 case $assertions in
@@ -348,6 +358,27 @@ case $assertions in
     *) AC_MSG_ERROR(bad value ${assertions} for assertions) ;;
 esac
 GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $ASSERTIONS_CPPCFLAGS"
+
+SANITIZER_CPPFLAGS=""
+SANITIZER_LDFLAGS=""
+
+if test "$enableAsan" = "true"; then
+    SANITIZER_CPPFLAGS="$SANITIZER_CPPFLAGS -fsanitize=address -fno-omit-frame-pointer"
+    SANITIZER_LDFLAGS="$SANITIZER_LDFLAGS -fsanitize=address"
+fi
+
+if test "$enableUbsan" = "true"; then
+    SANITIZER_CPPFLAGS="$SANITIZER_CPPFLAGS -fsanitize=undefined"
+    SANITIZER_LDFLAGS="$SANITIZER_LDFLAGS -fsanitize=undefined"
+fi
+
+if test "$enableTsan" = "true"; then
+    SANITIZER_CPPFLAGS="$SANITIZER_CPPFLAGS -fsanitize=thread"
+    SANITIZER_LDFLAGS="$SANITIZER_LDFLAGS -fsanitize=thread"
+fi
+
+GLOBAL_CPPFLAGS="$GLOBAL_CPPFLAGS $SANITIZER_CPPFLAGS"
+GLOBAL_LDADD="$GLOBAL_LDADD $SANITIZER_LDFLAGS"
 
 AC_SUBST(GLOBAL_LDADD)
 AC_SUBST(GLOBAL_CPPFLAGS)
@@ -497,6 +528,21 @@ if test "$aflFuzzer" = "true"; then
     echo "    ($FUZZ_CPPCFLAGS)"
 else
     echo "   + afl fuzzer                                    ....disabled"
+fi
+if test "$enableAsan" = "true"; then
+    echo "   + AddressSanitizer                              ....enabled"
+else
+    echo "   + AddressSanitizer                              ....disabled"
+fi
+if test "$enableUbsan" = "true"; then
+    echo "   + UndefinedBehaviorSanitizer                    ....enabled"
+else
+    echo "   + UndefinedBehaviorSanitizer                    ....disabled"
+fi
+if test "$enableTsan" = "true"; then
+    echo "   + ThreadSanitizer                               ....enabled"
+else
+    echo "   + ThreadSanitizer                               ....disabled"
 fi
 
 if test "$buildExamples" = "true"; then

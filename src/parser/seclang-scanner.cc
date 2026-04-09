@@ -9515,11 +9515,23 @@ int yylex_destroy  (void)
 {
     
     /* Pop the buffer stack, destroying each element. */
-	while(YY_CURRENT_BUFFER){
-		yy_delete_buffer( YY_CURRENT_BUFFER  );
-		YY_CURRENT_BUFFER_LVALUE = NULL;
-		yypop_buffer_state();
-	}
+    if (yy_buffer_stack != NULL) {
+        size_t i = yy_buffer_stack_top + 1;
+        while (i > 0) {
+            YY_BUFFER_STATE to_delete = yy_buffer_stack[i - 1];
+            if (to_delete != NULL) {
+                yy_delete_buffer(to_delete);
+                for (size_t j = 0; j < i; j++) {
+                    if (yy_buffer_stack[j] == to_delete) {
+                        yy_buffer_stack[j] = NULL;
+                    }
+                }
+            }
+            i--;
+        }
+        yy_buffer_stack_top = 0;
+        YY_CURRENT_BUFFER_LVALUE = NULL;
+    }
 
 	/* Destroy the stack itself. */
 	yyfree((yy_buffer_stack) );
@@ -9611,5 +9623,3 @@ void Driver::scan_end () {
 }
 
 }
-
-

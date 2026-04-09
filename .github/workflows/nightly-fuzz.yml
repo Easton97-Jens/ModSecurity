@@ -1,0 +1,88 @@
+name: Nightly Fuzz Sweep
+
+on:
+  schedule:
+    - cron: '23 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  nightly-fuzz:
+    name: nightly clang harness sweep
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get install -y \
+            clang \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            libpcre3-dev \
+            bison \
+            flex \
+            pkg-config
+
+      - name: Bootstrap autotools
+        run: ./build.sh
+
+      - name: Configure (afl-fuzz helpers)
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./configure --enable-afl-fuzz --enable-assertions=yes --without-lua
+
+      - name: Build core library
+        run: make -j "$(nproc)"
+
+      - name: Build harnesses
+        run: make -j "$(nproc)" -C test/fuzzer transaction_fuzzer rule_parser_fuzzer
+
+      - name: Extended mutation loops
+        run: |
+          python3 - <<'PY'
+          import os
+          import random
+          import subprocess
+
+          harnesses = [
+              './test/fuzzer/transaction_fuzzer',
+              './test/fuzzer/rule_parser_fuzzer',
+          ]
+
+          seeds = [
+              open('test/fuzzer/corpus/transaction/basic.bin', 'rb').read(),
+              open('test/fuzzer/corpus/rule_parser/basic_regex.bin', 'rb').read(),
+          ]
+
+          for _ in range(2500):
+              base = bytearray(random.choice(seeds) or os.urandom(32))
+              for _ in range(random.randint(1, 16)):
+                  idx = random.randrange(len(base))
+                  base[idx] ^= random.randrange(256)
+              if random.random() < 0.5:
+                  base.extend(os.urandom(random.randint(1, 96)))
+
+              blob = bytes(base)
+              for harness in harnesses:
+                  subprocess.run([harness], input=blob, check=True)
+          PY
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-fuzz-logs
+          path: |
+            config.log
+            test/fuzzer/*.log
+          if-no-files-found: ignore

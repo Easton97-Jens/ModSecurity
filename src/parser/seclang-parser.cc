@@ -2443,32 +2443,36 @@ namespace yy {
 #line 1212 "seclang-parser.yy"
       {
         bool hasDisruptive = false;
-        std::vector<actions::Action *> *actions = new std::vector<actions::Action *>();
+        std::vector<std::unique_ptr<actions::Action>> parsedActions;
         for (auto &i : *yystack_[0].value.as < std::unique_ptr<std::vector<std::unique_ptr<actions::Action> > >  > ().get()) {
-            actions->push_back(i.release());
+            parsedActions.emplace_back(i.release());
         }
-        std::vector<actions::Action *> checkedActions;
+        std::vector<std::unique_ptr<actions::Action>> checkedActions;
         int definedPhase = -1;
         int secRuleDefinedPhase = -1;
-        for (actions::Action *a : *actions) {
-            actions::Phase *phase = dynamic_cast<actions::Phase *>(a);
-            if (a->isDisruptive() == true && dynamic_cast<actions::Block *>(a) == NULL) {
+        for (auto &a : parsedActions) {
+            actions::Action *rawAction = a.get();
+            if (rawAction == nullptr) {
+                continue;
+            }
+            actions::Phase *phase = dynamic_cast<actions::Phase *>(rawAction);
+            if (rawAction->isDisruptive() == true && dynamic_cast<actions::Block *>(rawAction) == NULL) {
                 hasDisruptive = true;
             }
             if (phase != NULL) {
                 definedPhase = phase->m_phase;
                 secRuleDefinedPhase = phase->m_secRulesPhase;
-                delete phase;
-            } else if (a->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind ||
-                a->action_kind == actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
-                                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(a);
+                a.reset();
+            } else if (rawAction->action_kind == actions::Action::Kind::RunTimeOnlyIfMatchKind ||
+                rawAction->action_kind == actions::Action::Kind::RunTimeBeforeMatchAttemptKind) {
+                                actions::transformations::None *none = dynamic_cast<actions::transformations::None *>(rawAction);
                 if (none != NULL) {
                     driver.error(yystack_[2].location, "The transformation none is not suitable to be part of the SecDefaultActions");
                     YYERROR;
                 }
-                checkedActions.push_back(a);
+                checkedActions.emplace_back(std::move(a));
             } else {
-                driver.error(yystack_[2].location, "The action '" + *a->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
+                driver.error(yystack_[2].location, "The action '" + *rawAction->m_name.get() + "' is not suitable to be part of the SecDefaultActions");
                 YYERROR;
             }
         }
@@ -2490,12 +2494,10 @@ namespace yy {
             YYERROR;
         }
 
-        for (actions::Action *a : checkedActions) {
+        for (auto &a : checkedActions) {
             driver.m_defaultActions[definedPhase].push_back(
-                std::unique_ptr<actions::Action>(a));
+                std::move(a));
         }
-
-        delete actions;
       }
 #line 2501 "seclang-parser.cc"
     break;
