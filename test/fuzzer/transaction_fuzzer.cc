@@ -24,9 +24,9 @@ std::string readString(const uint8_t *data, size_t size, size_t *offset, size_t 
         return {};
     }
 
-    const size_t remaining = size - *offset;
     const size_t requested = data[*offset];
     *offset += 1;
+    const size_t remaining = size - *offset;
 
     const size_t len = std::min({requested, maxLen, remaining});
     if (len == 0 || *offset + len > size) {
