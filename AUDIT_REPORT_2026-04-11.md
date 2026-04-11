@@ -1,180 +1,174 @@
 # Repo-Audit
 
 ## 1. Scope
-- Geprüftes Repo: `ModSecurity` (aktueller Branch-Stand).
-- Geprüfte Bereiche:
-  - Build-/Dependency-Integration: `configure.ac`, `src/Makefile.am`, `test/Makefile.am`
-  - Runtime-JSON-Parsing in Produktcode: `src/request_body_processor/json*.cc`, `src/request_body_processor/json_backend*.cc`, `src/request_body_processor/json_adapter.cc`
-  - Test-Hilfscode mit jsoncons: `test/common/json.h`
-- Wo simdjson/jsoncons in DIESEM Repo tatsächlich verwendet werden:
-  - simdjson: produktiv nur in `src/request_body_processor/json_backend_simdjson.cc`
-  - jsoncons: produktiv nur in `src/request_body_processor/json_backend_jsoncons.cc`; zusätzlich Test-Hilfscode in `test/common/json.h`
+- Geprüftes Repo: `ModSecurity` (aktueller Commit auf diesem Branch).
+- Geprüfte Integrationsstellen für simdjson/jsoncons:
+  - Build/Selection: `configure.ac`, `src/Makefile.am`, `src/request_body_processor/json_adapter.cc`
+  - Produktcode: `src/request_body_processor/json_backend_simdjson.cc`, `src/request_body_processor/json_backend_jsoncons.cc`, `src/request_body_processor/json.cc`, `src/request_body_processor/json.h`, `src/transaction.cc`
+  - Testcode: `test/common/json.h`
+- Externe Doku als Bewertungsmaßstab (nicht Hauptgegenstand):
+  - simdjson: `others/simdjson/doc/performance.md`, `others/simdjson/doc/basics.md`
+  - jsoncons: `others/jsoncons/doc/ref/corelib/basic_json_cursor.md`
 
 ## 2. Fundstellen im Repo
 ### simdjson
-- `configure.ac` / JSON-Backend-Auswahl (`--with-json-backend=simdjson|jsoncons`).
-- `src/Makefile.am` / Build-Einbindung `json_backend_simdjson.cc` + `others/simdjson/singleheader/simdjson.cpp`.
-- `src/request_body_processor/json_backend_simdjson.cc` / Symbol `parseDocumentWithSimdjson` + `JsonBackendWalker`.
-- `src/request_body_processor/json_adapter.cc` / Backend-Dispatch via `MSC_JSON_BACKEND_SIMDJSON`.
+- `configure.ac`: Backend-Auswahl und Simdjson-Präsenzprüfung.
+- `src/Makefile.am`: Kompiliert `json_backend_simdjson.cc` + `others/simdjson/singleheader/simdjson.cpp`.
+- `src/request_body_processor/json_backend_simdjson.cc`:
+  - `parseDocumentWithSimdjson`
+  - `JsonBackendWalker`
+- `src/request_body_processor/json_adapter.cc`: Dispatch auf simdjson via `MSC_JSON_BACKEND_SIMDJSON`.
 
 ### jsoncons
-- `configure.ac` / JSON-Backend-Auswahl (`--with-json-backend=simdjson|jsoncons`).
-- `src/Makefile.am` / Build-Einbindung `json_backend_jsoncons.cc` + Include-Pfad jsoncons.
-- `src/request_body_processor/json_backend_jsoncons.cc` / Symbol `parseDocumentWithJsoncons` + `RawJsonTokenCursor` + `emitEvent`.
-- `src/request_body_processor/json_adapter.cc` / Backend-Dispatch via `MSC_JSON_BACKEND_JSONCONS`.
-- `test/common/json.h` / Test-Parsing via `jsoncons::ojson`.
+- `configure.ac`: Backend-Auswahl und jsoncons-Präsenzprüfung.
+- `src/Makefile.am`: Kompiliert `json_backend_jsoncons.cc`.
+- `src/request_body_processor/json_backend_jsoncons.cc`:
+  - `parseDocumentWithJsoncons`
+  - `RawJsonTokenCursor`
+  - `emitEvent`
+- `src/request_body_processor/json_adapter.cc`: Dispatch auf jsoncons via `MSC_JSON_BACKEND_JSONCONS`.
+- `test/common/json.h`: jsoncons-basierter Test-JSON-Reader (`jsoncons::ojson`).
 
 ## 3. Korrektheitsprüfung im Repo
 
 - Stelle im Repo:
   - `src/request_body_processor/json_adapter.cc` (`JSONAdapter::parse`)
 - Verwendete Bibliothek:
-  - simdjson oder jsoncons (kompilierzeitabhängig)
+  - simdjson/jsoncons (compile-time selected)
 - Was der Code macht:
-  - Wählt genau ein Backend per Compile-Makro und normalisiert Backend-Resultate (`sink_status` -> `parse_status`).
+  - Wählt exakt ein Backend und normalisiert Sink-Status auf Parse-Status.
 - Relevante Doku-Regel:
-  - N/A (Repo-Integrationslogik).
+  - N/A (Repo-Adapterlogik).
 - Bewertung: Korrekt.
 - Evidenz:
-  - Backend-Dispatch und Result-Normalisierung sind explizit implementiert.
-
-- Stelle im Repo:
-  - `src/request_body_processor/json_backend_simdjson.cc` (`parseDocumentWithSimdjson`, `JsonBackendWalker`)
-- Verwendete Bibliothek:
-  - simdjson On-Demand
-- Was der Code macht:
-  - Parst Input mit `simdjson::ondemand::parser` und traversiert ereignisbasiert in eigenen Sink.
-  - Nutzt `get(...)`-Fehlerpfade systematisch (`getResult`), mappt simdjson-Errors auf interne Status.
-- Relevante Doku-Regel:
-  - simdjson On-Demand: Ergebniszugriffe liefern Fehlercodes; Document/Parser-Lifetime relevant.
-- Bewertung: Teilweise korrekt.
-- Evidenz:
-  - Korrekte Fehlerbehandlung vorhanden; Parser-Lifetime ist lokal konsistent.
-  - Aber Parser wird pro Aufruf neu erzeugt (s. Performance-Abschnitt, doku-relevante Reuse-Empfehlung).
+  - Null-Sink-Check, Empty-Input-Short-Circuit, Backend-Dispatch, `normalizeResult`.
 
 - Stelle im Repo:
   - `src/request_body_processor/json_backend_jsoncons.cc` (`parseDocumentWithJsoncons`)
 - Verwendete Bibliothek:
   - jsoncons `json_string_cursor`
 - Was der Code macht:
-  - Cursor-basiertes STAJ-Lesen (`current/next/done/check_done`), Fehler via `std::error_code`, eventweises Mapping in internen Sink.
+  - Verwendet Pull-Parsing (`done/current/next/check_done`) mit Fehlercodes.
 - Relevante Doku-Regel:
-  - jsoncons `basic_json_cursor`: Pull-Parser mit `current()/next()/done()` und Fehlercode-Overloads.
+  - jsoncons-Doku beschreibt genau diese Cursor-Schnittstelle und Source-Lifetime-Vorbedingung.
 - Bewertung: Korrekt.
 - Evidenz:
-  - Nutzung entspricht dokumentierter Pull-API.
+  - Cursor-Lebensdauer ist vollständig innerhalb der Funktion; `input` bleibt gültig während Cursor-Nutzung.
 
 - Stelle im Repo:
-  - `src/request_body_processor/json_backend_jsoncons.cc` (`json_string_cursor cursor(input, ...)`)
+  - `src/request_body_processor/json_backend_simdjson.cc` (`parseDocumentWithSimdjson`)
 - Verwendete Bibliothek:
-  - jsoncons
+  - simdjson On-Demand
 - Was der Code macht:
-  - Cursor wird mit `const std::string &input` erzeugt.
+  - Parsedokument + ereignisbasierter Walk; Fehler werden über `getResult` und Mapping behandelt.
 - Relevante Doku-Regel:
-  - jsoncons-Doku: Cursor hält Pointer auf Source; Source muss länger leben als Cursor.
-- Bewertung: Korrekt.
+  - simdjson On-Demand Fehlercode-/Iterator-Modell.
+- Bewertung: Korrekt (funktional), aber mit Integrationslücke bzgl. Optionen (siehe nächster Punkt).
 - Evidenz:
-  - `input` lebt für gesamten Funktionsscope; Cursor wird innerhalb dieses Scopes vollständig konsumiert.
+  - konsistente Fehlerpfade (`fromSimdjsonError`, `getResult`, `walk...`).
 
 - Stelle im Repo:
-  - `src/request_body_processor/json.cc` (`JSON::complete` + Sink-Callbacks)
+  - `src/request_body_processor/json_backend.h`, `json_backend_jsoncons.cc`, `json_backend_simdjson.cc`, `json.cc`
 - Verwendete Bibliothek:
-  - indirekt beide Backends über `JSONAdapter`
+  - beide
 - Was der Code macht:
-  - Führt Parsing auf gesamtem gesammeltem Body aus, mappt Backend-Status in Fehlermeldungen, erzwingt Depth-Limit über Sink.
+  - Es existiert `JsonBackendParseOptions::technical_max_depth`.
+  - jsoncons-Backend verwendet es (`cursor_options.max_nesting_depth(options.technical_max_depth)`).
+  - simdjson-Backend ignoriert `options` vollständig (`(void) options`).
+  - `JSON::complete()` ruft `adapter.parse(m_data, sink)` ohne explizite Optionen auf.
 - Relevante Doku-Regel:
-  - N/A (repoeigene Auswertungslogik).
-- Bewertung: Korrekt.
+  - N/A (repoeigene API-Konsistenz), indirekt relevant für „gleiche Semantik über Backends“.
+- Bewertung: Problematisch.
 - Evidenz:
-  - Fehlerpfad/Depth-Limit-Propagation implementiert.
+  - Option ist im Interface vorgesehen, wird aber backend-inkonsistent verwendet.
 
 - Stelle im Repo:
-  - `test/common/json.h` (`JsonDocument::parse`)
+  - `src/transaction.cc` + `src/request_body_processor/json.h` + `src/request_body_processor/json.cc`
 - Verwendete Bibliothek:
-  - jsoncons DOM (`ojson::parse`)
+  - indirekt beide
 - Was der Code macht:
-  - Test-Hilfsparser auf Basis DOM.
+  - Regelkonfigurierbarer JSON-Depth-Limit wird in `JSON`-Sink gesetzt (`setMaxDepth`) und bei Container-Events geprüft.
 - Relevante Doku-Regel:
-  - jsoncons DOM/Parse-API.
-- Bewertung: Korrekt (für Testcode).
+  - N/A (repoeigene Tiefenbegrenzungsschicht).
+- Bewertung: Teilweise korrekt.
 - Evidenz:
-  - Exception wird abgefangen; Fehlertext wird propagiert.
+  - Sink-Limit ist vorhanden, aber technische Backend-Depth-Option wird nicht einheitlich durchgereicht.
 
 ## 4. Performance-Optimierungen im Repo
 
 - Stelle im Repo:
   - `src/request_body_processor/json_backend_simdjson.cc` (`parseDocumentWithSimdjson`)
 - Aktuelles Verhalten:
-  - Pro Aufruf neue Instanzen: `ondemand::parser parser; simdjson::padded_string padded(input);`.
+  - Parser wird pro Aufruf neu erzeugt.
 - Warum konkret ineffizient:
-  - simdjson-Doku empfiehlt Parser-Reuse zur Reduktion von Reallokationen/Initialisierungskosten.
+  - simdjson-Doku empfiehlt explizit Parser-Reuse, um Allokations-/Initialisierungskosten zu reduzieren.
 - Bezug zur Bibliotheksdoku:
-  - simdjson `doc/performance.md` („make a parser once and reuse it“).
+  - `others/simdjson/doc/performance.md` („make a parser once and reuse it“).
 - Konkrete Verbesserung:
-  - Reuse eines Parser-Objekts im langlebigeren Kontext (z. B. pro `JSON`-Instanz/Transaktion), falls Threading/Lifetime sicher auflösbar.
+  - Parser-Reuse im langlebigeren Kontext (z. B. pro JSON-Processor-Instanz), mit klaren Thread-/Lifetime-Grenzen.
 - Erwarteter Effekt:
-  - Weniger Allokationen/Init-Kosten bei mehreren JSON-Bodies.
-- Evidenzgrad: Stark belegt (strukturell), aber ungemessen.
+  - Weniger Reallokationen und geringere Parse-Overhead-Kosten bei mehreren Requests.
+- Evidenzgrad: Stark belegt (strukturell), ungemessen.
 
 - Stelle im Repo:
-  - `src/request_body_processor/json_backend_jsoncons.cc` (`RawJsonTokenCursor` + `emitEvent`)
+  - `src/request_body_processor/json_backend_jsoncons.cc` (`RawJsonTokenCursor`)
 - Aktuelles Verhalten:
-  - Zusätzlich zum jsoncons-Cursor wird der Original-Input tokenweise erneut gescannt/synchronisiert, inkl. eigener Number/String-Lexik.
+  - Neben jsoncons-Event-Parsing wird derselbe Input erneut tokenweise gescannt.
 - Warum konkret ineffizient:
-  - Doppelte Arbeit: jsoncons parse events + zusätzlicher Rohtext-Scan über denselben Input.
-- Bezug zur Bibliotheksdoku:
-  - jsoncons-Cursor liefert bereits parse-events; Repo ergänzt eine zweite Tokenisierung zur Rohzahlmaterialisierung.
+  - Zusätzliche Tokenisierung + Validierung derselben Zeichenkette.
+- Bezug zur Bibliotheksdoku, falls relevant:
+  - jsoncons-Cursor liefert bereits STAJ-Events; Repo fügt eine zweite Scan-Schicht hinzu.
 - Konkrete Verbesserung:
-  - Falls Fachanforderung es erlaubt, Rohzahl-Extraktion ohne Voll-Rescan lösen (z. B. konsolidierte Pfade mit `context`-Offsets, Reduktion redundanter Token-Validierung).
+  - Falls fachlich zulässig, Rohzahlgewinnung enger an Cursor-Kontext koppeln und redundanten Voll-Rescan reduzieren.
 - Erwarteter Effekt:
-  - Geringere CPU-Kosten im jsoncons-Backend.
+  - Reduzierte CPU-Zeit im jsoncons-Backend.
 - Evidenzgrad: Plausibel aber ungemessen.
 
 ## 5. Speicher- und Speicherverwaltungs-Optimierungen im Repo
 
 - Stelle im Repo:
-  - `src/request_body_processor/json.cc` (`processChunk`, `complete`)
+  - `src/request_body_processor/json.cc` (`JSON::processChunk`, `JSON::complete`)
 - Aktuelles Verhalten:
-  - Vollständige Request-Body-Materialisierung in `m_data` vor Parsing.
+  - Vollständige Body-Materialisierung in `m_data` vor dem Parse.
 - Warum konkret speicherineffizient oder riskant:
-  - Peak-Memory mindestens `m_data` + backend-interne Strukturen; kein Streaming-Parse pro Chunk.
+  - Peak-Memory steigt mit Body-Größe; keine Streaming-Verarbeitung.
 - Ownership-/Lifetime-/Buffer-Bezug:
-  - `m_data` besitzt gesamten Body bis `complete()`.
+  - `m_data` hält Ownership bis Parseende.
 - Konkrete Verbesserung:
-  - Streaming-Strategie nur wenn semantisch mit `addArgument`/Pfadbildung kompatibel; sonst keine sichere Änderung behauptbar.
+  - Streaming-Ansatz nur bei gesichert gleicher Semantik (`addArgument`/Pfad-Logik) umsetzbar.
 - Erwarteter Effekt:
-  - Potenziell geringerer Peak-Memory bei großen Bodies.
+  - Potenziell geringerer Peak-Memory.
 - Evidenzgrad: Plausibel aber ungemessen.
 
 - Stelle im Repo:
   - `src/request_body_processor/json_backend_simdjson.cc` (`simdjson::padded_string padded(input)`)
 - Aktuelles Verhalten:
-  - Zusätzliche gepolsterte Kopie des gesamten Inputs.
+  - Zusätzliche gepolsterte Kopie des Inputs.
 - Warum konkret speicherineffizient oder riskant:
-  - Zusätzlicher Voll-Buffer im Parsepfad.
+  - zusätzlicher Vollbuffer pro Parse.
 - Ownership-/Lifetime-/Buffer-Bezug:
-  - Lokale Kopie pro Parse-Aufruf.
+  - lokale Besitzkopie je Aufruf.
 - Konkrete Verbesserung:
-  - Nicht pauschal ersetzbar ohne sichere Prüfung der Padding-/Mutabilitäts-Anforderungen im konkreten Callpath.
+  - Nicht pauschal ohne genaue Padding-/Mutabilitätsprüfung umstellbar.
 - Erwarteter Effekt:
   - Potenziell weniger temporärer Speicher.
 - Evidenzgrad: Plausibel aber ungemessen / Nicht verifizierbar für sichere Umstellung.
 
 ## 6. Probleme oder Fehlverwendungen
-- Nachweisbare Fehlverwendung von simdjson/jsoncons-APIs im Produktcode: **Keine Evidenz gefunden**.
-- Nachweisbare unsichere Source-Lifetime bei jsoncons-Cursor: **Keine Evidenz gefunden**.
-- Nachweisbare falsche Fehlerpfadbehandlung in den Backend-Adaptern: **Keine Evidenz gefunden**.
-- Repospezifischer Effizienzpunkt: simdjson-Parser-Reuse wird im aktuellen Produktpfad nicht genutzt (doku-konträr als Performance-Empfehlung, kein Korrektheitsfehler).
-- Repospezifischer Effizienzpunkt: jsoncons-Backend führt zusätzliche Rohtext-Synchronisierung durch (funktional nachvollziehbar, aber potenziell teuer).
+- Nachweisbare API-Fehlverwendung (simdjson/jsoncons): Keine Evidenz gefunden.
+- Nachweisbare Lifetime-Verletzung beim jsoncons-Cursor: Keine Evidenz gefunden.
+- Nachweisbare schwere Fehlerbehandlungslücke in Backend-Adaptern: Keine Evidenz gefunden.
+- Konkretes Repo-Problem:
+  - Backend-Option `technical_max_depth` wird inkonsistent genutzt (jsoncons ja, simdjson nein), obwohl gemeinsames Interface existiert.
 
 ## 7. Nicht gefundene oder nicht verifizierbare Punkte
-- Vollständiger semantischer Gleichheitsbeweis zwischen simdjson- und jsoncons-Backend-Ausgabe für alle JSON-Eckfälle: Nicht verifizierbar (im Repo nicht mit dedizierten Cross-Backend-Compliance-Tests belegt).
-- Quantifizierter Performance-Gewinn durch vorgeschlagene Optimierungen: Leistungsgewinn nicht belegt (keine Messung in diesem Audit durchgeführt).
-- Quantifizierter Speichergewinn: Keine Evidenz gefunden.
-- Aussagen wie „Backend X ist insgesamt schneller/besser“ dürfen ausdrücklich nicht gemacht werden.
+- Vollständiger Gleichheitsnachweis der Semantik beider Backends für alle JSON-Eckfälle: Nicht verifizierbar (im Repo keine dedizierten Cross-Backend-Compliance-Tests gefunden).
+- Quantifizierte Performance-/Speichergewinne der vorgeschlagenen Maßnahmen: Leistungsgewinn nicht belegt (keine Messläufe in diesem Audit).
+- Aussage „Backend A ist insgesamt schneller/besser“: Im Repo nicht nachweisbar.
 
 ## 8. Wichtigste Maßnahmen
-1. **Hohe Priorität (Performance, produktiv):** Parser-Reuse-Strategie im simdjson-Backend für wiederholte Parses im selben Lebenszyklus prüfen und bei sicherer Lifetime einführen.
-2. **Hohe Priorität (Performance, produktiv):** jsoncons-Backend auf Reduktion der doppelten Tokenisierung (`RawJsonTokenCursor`) prüfen, ohne Rohzahl-Semantik zu verlieren.
-3. **Mittlere Priorität (Korrektheit/Regression):** Repository-interne Cross-Backend-Tests ergänzen, die dieselben Inputs gegen beide Backends vergleichen (inkl. Zahlen, UTF-8, Tiefenlimit, Trunkierung).
-4. **Mittlere Priorität (Messbarkeit):** Reproduzierbare Benchmarks für JSON-Request-Body-Verarbeitung im ModSecurity-Repo ergänzen (gleiche Inputs, beide Backends, CPU + Peak-Memory).
+1. **Korrektheit/Konsistenz:** `JsonBackendParseOptions` backend-konsistent anwenden (simdjson-Pfad nicht ignorieren) oder Interface vereinfachen, wenn technisch nicht unterstützt.
+2. **Performance:** simdjson-Parser-Reuse in der ModSecurity-Integration prüfen und mit klaren Threading-Regeln umsetzen.
+3. **Performance:** Reduktion der doppelten Tokenisierung im jsoncons-Backend prüfen.
+4. **Verifizierbarkeit:** Cross-Backend-Compliance-Tests (gleiche Inputs, gleiche Events/Fehlerklassen) ergänzen.
+5. **Messbarkeit:** Reproduzierbare Benchmarks für JSON-Request-Body-Pfade im Repo ergänzen (CPU + Peak-Memory).
