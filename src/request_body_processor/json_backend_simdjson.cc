@@ -20,6 +20,7 @@
 #include "src/request_body_processor/json_backend.h"
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <memory>
@@ -89,6 +90,14 @@ JsonParseResult fromSimdjsonError(simdjson::error_code error) {
     }
 }
 
+/*
+ * The ondemand parser is reused per thread because simdjson benefits from
+ * keeping its internal buffers warm across parses. thread_local storage keeps
+ * the parser isolated to the calling thread, so no parser state is shared
+ * across transactions running on different threads. The parse and full
+ * document traversal both complete inside parseDocumentWithSimdjson(), so no
+ * parser-backed state escapes this function.
+ */
 simdjson::ondemand::parser &getReusableSimdjsonParser() {
     thread_local std::unique_ptr<simdjson::ondemand::parser> parser;
     if (parser == nullptr) {
@@ -413,15 +422,30 @@ JsonParseResult parseDocumentWithSimdjson(const std::string &input,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
     }
 
+    const char *const input_data = input.data();
+    const std::size_t input_size = input.size();
+
     simdjson::ondemand::parser &parser = getReusableSimdjsonParser();
-    if (auto error = prepareParser(&parser, input.size(), options); error) {
+    // This only prepares parser capacity and max-depth bookkeeping. It does
+    // not make the caller-provided string safe for zero-copy parsing.
+    if (auto error = prepareParser(&parser, input_size, options); error) {
         return fromSimdjsonError(error);
     }
 
+    // TODO: Revisit zero-copy only when the caller can guarantee a stable
+    // buffer whose allocation is at least len + SIMDJSON_PADDING bytes.
+    //
+    // We intentionally keep the padded_string copy here. The current input is
+    // a const std::string built from the request-body snapshot/append path, so
+    // it does not provide guaranteed padding for simdjson's direct iterate()
+    // overloads. In practice large request bodies often end up with
+    // size() == capacity(), making any direct path allocator- and stdlib-
+    // dependent. padded_string keeps this backend deterministic until the
+    // caller can provide guaranteed lifetime and padding.
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
     const auto padded_start = std::chrono::steady_clock::now();
     simdjson::padded_string padded(input);
-    recordSimdjsonPaddedCopy(input.size(), static_cast<std::uint64_t>(
+    recordSimdjsonPaddedCopy(input_size, static_cast<std::uint64_t>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - padded_start).count()));
 #else
@@ -447,7 +471,12 @@ JsonParseResult parseDocumentWithSimdjson(const std::string &input,
 #endif
 
     JsonBackendWalker walker(sink);
-    return walker.walk(&document);
+    assert(input.data() == input_data);
+    assert(input.size() == input_size);
+    JsonParseResult walk_result = walker.walk(&document);
+    assert(input.data() == input_data);
+    assert(input.size() == input_size);
+    return walk_result;
 }
 
 }  // namespace RequestBodyProcessor
