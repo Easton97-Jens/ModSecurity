@@ -146,6 +146,26 @@ std::string describeStringList(const std::vector<std::string> &values) {
     return description;
 }
 
+bool expectParseResult(const std::string &input, JsonParseStatus parse_status,
+    JsonSinkStatus sink_status, const char *expectation,
+    std::string *failure_detail) {
+    AcceptAllSink sink;
+    JSONAdapter adapter;
+    JsonParseResult result = adapter.parse(input, &sink, JsonBackendParseOptions());
+
+    if (result.parse_status != parse_status
+        || result.sink_status != sink_status) {
+        if (failure_detail != nullptr) {
+            *failure_detail = describeUnexpectedResult(result, expectation);
+            failure_detail->append(" Input: ");
+            failure_detail->append(input);
+        }
+        return false;
+    }
+
+    return true;
+}
+
 bool collectNumberLexemes(const std::string &input,
     std::vector<std::string> *numbers, std::string *failure_detail) {
     NumberCollectingSink sink;
@@ -157,6 +177,27 @@ bool collectNumberLexemes(const std::string &input,
             *failure_detail = describeUnexpectedResult(result, "Ok/Continue");
             failure_detail->append(" Input: ");
             failure_detail->append(input);
+        }
+        return false;
+    }
+
+    if (numbers != nullptr) {
+        *numbers = sink.numbers;
+    }
+    return true;
+}
+
+bool collectNumberLexemes(std::string *input, std::vector<std::string> *numbers,
+    std::string *failure_detail) {
+    NumberCollectingSink sink;
+    JSONAdapter adapter;
+    JsonParseResult result = adapter.parse(*input, &sink, JsonBackendParseOptions());
+
+    if (!result.ok()) {
+        if (failure_detail != nullptr) {
+            *failure_detail = describeUnexpectedResult(result, "Ok/Continue");
+            failure_detail->append(" Input: ");
+            failure_detail->append(*input);
         }
         return false;
     }
@@ -226,6 +267,21 @@ bool expectBackendDepthHeadroomSuccess(std::string *failure_detail) {
     return true;
 }
 
+bool expectEmptyInputSuccess(std::string *failure_detail) {
+    return expectParseResult("", JsonParseStatus::Ok,
+        JsonSinkStatus::Continue, "Ok/Continue", failure_detail);
+}
+
+bool expectMalformedInputParseError(std::string *failure_detail) {
+    return expectParseResult("a", JsonParseStatus::ParseError,
+        JsonSinkStatus::Continue, "ParseError/Continue", failure_detail);
+}
+
+bool expectTruncatedInputMapsToTruncatedInput(std::string *failure_detail) {
+    return expectParseResult("{\"key\":", JsonParseStatus::TruncatedInput,
+        JsonSinkStatus::Continue, "TruncatedInput/Continue", failure_detail);
+}
+
 bool expectExactRootScalarNumberLexemes(std::string *failure_detail) {
     struct NumberLexemeCase {
         const char *name;
@@ -274,6 +330,89 @@ bool expectExactContainerNumberLexemes(std::string *failure_detail) {
         }, failure_detail);
 }
 
+#if defined(MSC_JSON_BACKEND_SIMDJSON)
+bool isJsonWhitespace(char value) {
+    return value == ' ' || value == '\t' || value == '\n' || value == '\r';
+}
+
+bool expectMutableSimdjsonPathPreservesLogicalInput(
+    std::string *failure_detail) {
+    std::string input("{\"n\":1}");
+    const std::string original = input;
+    std::vector<std::string> numbers;
+
+    input.shrink_to_fit();
+    if (!collectNumberLexemes(&input, &numbers, failure_detail)) {
+        return false;
+    }
+
+    if (numbers != std::vector<std::string>{"1"}) {
+        if (failure_detail != nullptr) {
+            *failure_detail = std::string("Expected [\"1\"], got ")
+                + describeStringList(numbers) + ".";
+        }
+        return false;
+    }
+
+    if (input.size() <= original.size()) {
+        if (failure_detail != nullptr) {
+            *failure_detail = "Expected mutable simdjson input to grow after "
+                "in-place padding.";
+        }
+        return false;
+    }
+
+    if (input.compare(0, original.size(), original) != 0) {
+        if (failure_detail != nullptr) {
+            *failure_detail = "Mutable simdjson input changed its logical JSON "
+                "prefix.";
+        }
+        return false;
+    }
+
+    for (std::size_t i = original.size(); i < input.size(); i++) {
+        if (!isJsonWhitespace(input[i])) {
+            if (failure_detail != nullptr) {
+                *failure_detail = "Mutable simdjson input appended a non-"
+                    "whitespace padding byte.";
+            }
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool expectConstSimdjsonPathLeavesInputUntouched(std::string *failure_detail) {
+    const std::string original("{\"n\":1}");
+    std::string input = original;
+    std::vector<std::string> numbers;
+
+    input.shrink_to_fit();
+    if (!collectNumberLexemes(static_cast<const std::string &>(input), &numbers,
+            failure_detail)) {
+        return false;
+    }
+
+    if (numbers != std::vector<std::string>{"1"}) {
+        if (failure_detail != nullptr) {
+            *failure_detail = std::string("Expected [\"1\"], got ")
+                + describeStringList(numbers) + ".";
+        }
+        return false;
+    }
+
+    if (input != original) {
+        if (failure_detail != nullptr) {
+            *failure_detail = "Const simdjson input was mutated.";
+        }
+        return false;
+    }
+
+    return true;
+}
+#endif
+
 bool reportTestResult(const char *name, bool passed,
     const std::string &detail) {
     std::cout << ":test-result: " << (passed ? "PASS " : "FAIL ")
@@ -302,6 +441,24 @@ int runJsonBackendDepthTests() {
     }
 
     detail.clear();
+    if (!reportTestResult("empty_input_returns_ok",
+            expectEmptyInputSuccess(&detail), detail)) {
+        failures++;
+    }
+
+    detail.clear();
+    if (!reportTestResult("malformed_input_maps_to_parse_error",
+            expectMalformedInputParseError(&detail), detail)) {
+        failures++;
+    }
+
+    detail.clear();
+    if (!reportTestResult("truncated_input_maps_to_truncated_input",
+            expectTruncatedInputMapsToTruncatedInput(&detail), detail)) {
+        failures++;
+    }
+
+    detail.clear();
     if (!reportTestResult("number_lexemes_for_root_scalars_remain_exact",
             expectExactRootScalarNumberLexemes(&detail), detail)) {
         failures++;
@@ -312,6 +469,20 @@ int runJsonBackendDepthTests() {
             expectExactContainerNumberLexemes(&detail), detail)) {
         failures++;
     }
+
+#if defined(MSC_JSON_BACKEND_SIMDJSON)
+    detail.clear();
+    if (!reportTestResult("mutable_simdjson_input_keeps_logical_json_prefix",
+            expectMutableSimdjsonPathPreservesLogicalInput(&detail), detail)) {
+        failures++;
+    }
+
+    detail.clear();
+    if (!reportTestResult("const_simdjson_input_is_not_mutated",
+            expectConstSimdjsonPathLeavesInputUntouched(&detail), detail)) {
+        failures++;
+    }
+#endif
 
     return failures == 0 ? 0 : 1;
 }

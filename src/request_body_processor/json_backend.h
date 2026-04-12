@@ -71,6 +71,9 @@ class JsonEventSink {
 JsonParseResult parseDocumentWithSimdjson(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options);
 
+JsonParseResult parseDocumentWithSimdjson(std::string &input,
+    JsonEventSink *sink, const JsonBackendParseOptions &options);
+
 JsonParseResult parseDocumentWithJsoncons(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options);
 

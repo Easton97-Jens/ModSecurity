@@ -56,6 +56,28 @@ JsonParseResult normalizeResult(JsonParseResult result) {
 
 }  // namespace
 
+JsonParseResult JSONAdapter::parse(std::string &input,
+    JsonEventSink *sink, const JsonBackendParseOptions &options) const {
+    if (sink == nullptr) {
+        return makeResult(JsonParseStatus::InternalError,
+            JsonSinkStatus::InternalError, "JSON event sink is null.");
+    }
+
+    if (input.empty()) {
+        return makeResult(JsonParseStatus::Ok);
+    }
+
+#if defined(MSC_JSON_BACKEND_SIMDJSON)
+    return normalizeResult(parseDocumentWithSimdjson(input, sink, options));
+#elif defined(MSC_JSON_BACKEND_JSONCONS)
+    return normalizeResult(parseDocumentWithJsoncons(input, sink, options));
+#else
+    return makeResult(JsonParseStatus::InternalError,
+        JsonSinkStatus::InternalError,
+        "ModSecurity was built without a selected JSON backend.");
+#endif
+}
+
 JsonParseResult JSONAdapter::parse(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options) const {
     if (sink == nullptr) {
