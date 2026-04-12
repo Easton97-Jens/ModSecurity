@@ -53,11 +53,11 @@ JsonParseResult normalizeResult(JsonParseResult result) {
     return result;
 }
 
-template <typename StringType>
-JsonParseResult parseImpl(StringType &input,
+}  // namespace
+
+JsonParseResult JSONAdapter::parseImpl(const std::string &input,
     JsonEventSink *sink,
-    const JsonBackendParseOptions &options [[maybe_unused]],
-    const JSONAdapter *adapter) {
+    const JsonBackendParseOptions &options [[maybe_unused]]) const {
     if (sink == nullptr) {
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
@@ -68,9 +68,9 @@ JsonParseResult parseImpl(StringType &input,
     }
 
 #if defined(MSC_JSON_BACKEND_SIMDJSON)
-    return normalizeResult(adapter->parseDocumentWithSimdjson(input, sink, options));
+    return normalizeResult(parseDocumentWithSimdjson(input, sink, options));
 #elif defined(MSC_JSON_BACKEND_JSONCONS)
-    return normalizeResult(adapter->parseDocumentWithJsoncons(input, sink, options));
+    return normalizeResult(parseDocumentWithJsoncons(input, sink, options));
 #else
     return makeResult(JsonParseStatus::InternalError,
         JsonSinkStatus::InternalError,
@@ -78,18 +78,16 @@ JsonParseResult parseImpl(StringType &input,
 #endif
 }
 
-}  // namespace
-
 JsonParseResult JSONAdapter::parse(std::string &input,
     JsonEventSink *sink,
-    const JsonBackendParseOptions &options [[maybe_unused]]) const {
-    return parseImpl(input, sink, options, this);
+    const JsonBackendParseOptions &options) const {
+    return parseImpl(input, sink, options);
 }
 
 JsonParseResult JSONAdapter::parse(const std::string &input,
     JsonEventSink *sink,
-    const JsonBackendParseOptions &options [[maybe_unused]]) const {
-    return parseImpl(input, sink, options, this);
+    const JsonBackendParseOptions &options) const {
+    return parseImpl(input, sink, options);
 }
 
 }  // namespace modsecurity::RequestBodyProcessor
