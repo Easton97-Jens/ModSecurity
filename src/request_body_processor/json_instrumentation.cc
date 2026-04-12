@@ -114,5 +114,11 @@ void recordJsonconsTokenSyncStep() noexcept {
 #endif
 }
 
+void recordJsonconsTokenExactAdvanceStep() noexcept {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+    g_metrics.jsoncons_token_exact_advance_steps++;
+#endif
+}
+
 }  // namespace RequestBodyProcessor
 }  // namespace modsecurity

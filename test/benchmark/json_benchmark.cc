@@ -435,6 +435,8 @@ void printJson(const Options &options, const std::string &body,
         << instrumentation.jsoncons_event_loop_ns;
     std::cout << ",\"jsoncons_token_sync_steps\":"
         << instrumentation.jsoncons_token_sync_steps;
+    std::cout << ",\"jsoncons_token_exact_advance_steps\":"
+        << instrumentation.jsoncons_token_exact_advance_steps;
 #endif
     std::cout << "}" << std::endl;
 }
