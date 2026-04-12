@@ -31,6 +31,10 @@ class JSONAdapter {
     JsonParseResult parse(const std::string &input, JsonEventSink *sink,
         const JsonBackendParseOptions &options [[maybe_unused]]
             = JsonBackendParseOptions()) const;
+
+ private:
+    JsonParseResult parseImpl(const std::string &input, JsonEventSink *sink,
+        const JsonBackendParseOptions &options [[maybe_unused]]) const;
 };
 
 }  // namespace modsecurity::RequestBodyProcessor
