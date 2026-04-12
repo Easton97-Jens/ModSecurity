@@ -56,7 +56,8 @@ JsonParseResult normalizeResult(JsonParseResult result) {
 }  // namespace
 
 JsonParseResult JSONAdapter::parse(std::string &input,
-    JsonEventSink *sink, const JsonBackendParseOptions &options) const {
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options [[maybe_unused]]) const {
     if (sink == nullptr) {
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
@@ -78,7 +79,8 @@ JsonParseResult JSONAdapter::parse(std::string &input,
 }
 
 JsonParseResult JSONAdapter::parse(const std::string &input,
-    JsonEventSink *sink, const JsonBackendParseOptions &options) const {
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options [[maybe_unused]]) const {
     if (sink == nullptr) {
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::InternalError, "JSON event sink is null.");

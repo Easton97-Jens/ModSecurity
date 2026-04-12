@@ -372,7 +372,8 @@ class RawJsonTokenCursor {
 
         (*offset)++;
         while (*offset < m_input.size()) {
-            char current = m_input[(*offset)++];
+            char current = m_input[*offset];
+            (*offset)++;
             if (current == '\\') {
                 if (*offset >= m_input.size()) {
                     if (detail != nullptr) {
@@ -381,7 +382,9 @@ class RawJsonTokenCursor {
                     return false;
                 }
 
-                if (char escaped = m_input[(*offset)++]; escaped == 'u') {
+                char escaped = m_input[*offset];
+                (*offset)++;
+                if (escaped == 'u') {
                     for (int i = 0; i < 4; i++) {
                         if (*offset >= m_input.size()
                             || !isHexDigit(m_input[*offset])) {

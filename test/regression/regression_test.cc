@@ -76,7 +76,7 @@ std::vector<std::pair<std::string, std::string>> json_object_to_map(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -216,7 +216,7 @@ std::unique_ptr<RegressionTest> RegressionTest::from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -265,7 +265,7 @@ void RegressionTest::update_client_from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -292,7 +292,7 @@ void RegressionTest::update_server_from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -320,7 +320,7 @@ void RegressionTest::update_request_from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -355,7 +355,7 @@ void RegressionTest::update_response_from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -387,7 +387,7 @@ void RegressionTest::update_expected_from_json_value(
         std::string_view key;
         modsecurity_test::json::JsonValue child;
 
-        if (modsecurity_test::json::get(std::move(field_result), &field)
+        if (modsecurity_test::json::get(field_result, &field)
                 == false) {
             continue;
         }
@@ -493,14 +493,13 @@ std::unique_ptr<RegressionTests> RegressionTests::from_json_value(
                     == false) {
                 continue;
             }
-            tests->tests.emplace_back(
-                std::move(RegressionTest::from_json_value(test_value)));
+            tests->tests.emplace_back(RegressionTest::from_json_value(test_value));
         }
         return tests;
     }
 
     if (type == modsecurity_test::json::JsonType::Object) {
-        tests->tests.emplace_back(std::move(RegressionTest::from_json_value(value)));
+        tests->tests.emplace_back(RegressionTest::from_json_value(value));
     }
 
     return tests;
@@ -520,7 +519,7 @@ std::string RegressionTests::toJSON() const {
         writer.key(key);
         writer.string(value);
     };
-    const auto addStringIfNonEmpty = [&writer, &addString](
+    const auto addStringIfNonEmpty = [&addString](
         std::string_view key, const std::string &value) {
         if (value.empty() == false) {
             addString(key, value);

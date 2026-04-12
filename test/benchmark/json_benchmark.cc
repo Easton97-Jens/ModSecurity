@@ -66,7 +66,7 @@ struct Metrics {
     unsigned long long parse_error_count{0};
 };
 
-const char *usage_message =
+const char *const usage_message =
     "Usage: json_benchmark --scenario NAME [--iterations N] "
     "[--target-bytes N] [--depth N] [--include-invalid] [--output json]";
 
@@ -322,7 +322,7 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
             "ModSecurity-json-benchmark/1.0");
         transaction.addRequestHeader("Content-Type", "application/json");
         const std::string content_length = std::to_string(body.size());
-        transaction.addRequestHeader("Content-Length", content_length.c_str());
+        transaction.addRequestHeader("Content-Length", content_length);
         transaction.processRequestHeaders();
 
         const auto append_start = Clock::now();
