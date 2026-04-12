@@ -413,7 +413,7 @@ class RawJsonTokenCursor {
     std::size_t m_offset{0};
 };
 
-std::string rawNumberFromContext(const std::string &input,
+std::string_view rawNumberFromContext(const std::string &input,
     jsoncons::staj_event_type event_type, const jsoncons::ser_context &context,
     const jsoncons::staj_event &event, std::string_view scanned_token) {
     const std::size_t begin = context.begin_position();
@@ -422,33 +422,27 @@ std::string rawNumberFromContext(const std::string &input,
     if (begin < end && end <= input.size()) {
         std::string_view candidate(input.data() + begin, end - begin);
         if (tokenMatchesNumericEvent(event_type, candidate)) {
-            return std::string(candidate);
+            return candidate;
         }
     }
 
     if (tokenMatchesNumericEvent(event_type, scanned_token)) {
-        return std::string(scanned_token);
+        return scanned_token;
     }
 
     if (isNumericStringEvent(event)) {
         std::error_code error;
         jsoncons::string_view decoded = event.get<jsoncons::string_view>(error);
         if (error) {
-            return "";
+            return std::string_view();
         }
         if (isValidJsonNumber(std::string_view(decoded.data(), decoded.size()))) {
-            return std::string(decoded.data(), decoded.size());
+            return std::string_view(decoded.data(), decoded.size());
         }
-        return "";
+        return std::string_view();
     }
 
-    std::error_code error;
-    std::string fallback = event.get<std::string>(error);
-    if (error) {
-        return "";
-    }
-
-    return fallback;
+    return std::string_view();
 }
 
 JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
@@ -508,7 +502,7 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
                 return fromJsonconsError(error, context);
             }
             if (isNumericStringEvent(event)) {
-                std::string raw_number = rawNumberFromContext(input,
+                std::string_view raw_number = rawNumberFromContext(input,
                     jsoncons::staj_event_type::double_value, context, event,
                     raw_token);
                 if (raw_number.empty()) {
@@ -551,7 +545,7 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
         case jsoncons::staj_event_type::uint64_value:
         case jsoncons::staj_event_type::double_value:
         case jsoncons::staj_event_type::half_value: {
-            std::string raw_number = rawNumberFromContext(input,
+            std::string_view raw_number = rawNumberFromContext(input,
                 event.event_type(), context, event, raw_token);
             if (raw_number.empty()) {
                 return makeResult(JsonParseStatus::InternalError,

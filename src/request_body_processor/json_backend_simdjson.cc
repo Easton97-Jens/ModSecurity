@@ -19,8 +19,10 @@
 
 #include "src/request_body_processor/json_backend.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -85,6 +87,51 @@ JsonParseResult fromSimdjsonError(simdjson::error_code error) {
                 std::string("JSON backend failed: ")
                 + simdjson::error_message(error));
     }
+}
+
+simdjson::ondemand::parser &getReusableSimdjsonParser() {
+    thread_local std::unique_ptr<simdjson::ondemand::parser> parser;
+    if (parser == nullptr) {
+#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+        const auto parser_start = std::chrono::steady_clock::now();
+        parser.reset(new simdjson::ondemand::parser());
+        recordSimdjsonParserConstruction(static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now() - parser_start).count()));
+#else
+        parser.reset(new simdjson::ondemand::parser());
+#endif
+    }
+    return *parser;
+}
+
+std::size_t clampRequestedMaxDepth(std::size_t input_size,
+    const JsonBackendParseOptions &options) {
+    const std::size_t requested_depth = options.technical_max_depth > 0
+        ? static_cast<std::size_t>(options.technical_max_depth) : 1;
+    const std::size_t max_possible_depth = (input_size / 2) + 1;
+    return std::min(requested_depth, std::max<std::size_t>(1,
+        max_possible_depth));
+}
+
+simdjson::error_code prepareParser(simdjson::ondemand::parser *parser,
+    std::size_t input_size, const JsonBackendParseOptions &options) {
+    if (parser == nullptr) {
+        return simdjson::MEMALLOC;
+    }
+
+    const JsonBackendParseOptions default_options;
+    std::size_t required_max_depth = parser->max_depth();
+    if (options.technical_max_depth != default_options.technical_max_depth) {
+        required_max_depth = clampRequestedMaxDepth(input_size, options);
+    }
+
+    if (parser->capacity() >= input_size
+        && parser->max_depth() == required_max_depth) {
+        return simdjson::SUCCESS;
+    }
+
+    return parser->allocate(input_size, required_max_depth);
 }
 
 template <typename ResultType, typename TargetType>
@@ -361,26 +408,23 @@ class JsonBackendWalker {
 
 JsonParseResult parseDocumentWithSimdjson(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options) {
-    (void) options;
-
     if (sink == nullptr) {
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
     }
 
+    simdjson::ondemand::parser &parser = getReusableSimdjsonParser();
+    if (auto error = prepareParser(&parser, input.size(), options); error) {
+        return fromSimdjsonError(error);
+    }
+
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-    const auto parser_start = std::chrono::steady_clock::now();
-    simdjson::ondemand::parser parser;
-    recordSimdjsonParserConstruction(static_cast<std::uint64_t>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::steady_clock::now() - parser_start).count()));
     const auto padded_start = std::chrono::steady_clock::now();
     simdjson::padded_string padded(input);
     recordSimdjsonPaddedCopy(input.size(), static_cast<std::uint64_t>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now() - padded_start).count()));
 #else
-    simdjson::ondemand::parser parser;
     simdjson::padded_string padded(input);
 #endif
     simdjson::ondemand::document document;
