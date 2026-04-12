@@ -85,6 +85,8 @@ JsonParseResult fromJsonconsError(const std::error_code &error,
             return makeResult(JsonParseStatus::TruncatedInput,
                 JsonSinkStatus::Continue, detail);
         case jsoncons::json_errc::max_nesting_depth_exceeded:
+            return makeResult(JsonParseStatus::ParseError,
+                JsonSinkStatus::Continue, detail);
         case jsoncons::json_errc::source_error:
             return makeResult(JsonParseStatus::InternalError,
                 JsonSinkStatus::Continue, detail);

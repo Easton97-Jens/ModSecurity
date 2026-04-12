@@ -124,7 +124,7 @@ run_backend() {
 
     (
         cd "${build_dir}" && \
-        make -j "${jobs}" -C test regression_tests
+        make -j "${jobs}" -C test regression_tests json_backend_depth_tests
     ) >> "${raw_log}" 2>&1
     build_status=$?
     if [ "${build_status}" -ne 0 ]; then
@@ -140,6 +140,14 @@ run_backend() {
             test_status=1
         fi
     done
+
+    (
+        cd "${build_dir}/test" && \
+        ./json_backend_depth_tests
+    ) >> "${raw_log}" 2>&1
+    if [ "$?" -ne 0 ]; then
+        test_status=1
+    fi
 
     extract_summary "${backend}" "${raw_log}" "${summary_file}"
     if [ ! -s "${summary_file}" ]; then
