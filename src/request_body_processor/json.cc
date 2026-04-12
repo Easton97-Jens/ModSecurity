@@ -57,8 +57,7 @@ JsonSinkStatus endContainer(std::deque<JSONContainer *> *containers,
     delete container;
 
     if (containers->empty() == false) {
-        JSONContainerArray *array = dynamic_cast<JSONContainerArray *>(
-            containers->back());
+        auto *array = dynamic_cast<JSONContainerArray *>(containers->back());
         if (array != nullptr) {
             array->m_elementCounter++;
         }
