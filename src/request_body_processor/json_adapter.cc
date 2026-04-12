@@ -53,11 +53,11 @@ JsonParseResult normalizeResult(JsonParseResult result) {
     return result;
 }
 
-}  // namespace
-
-JsonParseResult JSONAdapter::parse(std::string &input,
+template <typename StringType>
+JsonParseResult parseImpl(StringType &input,
     JsonEventSink *sink,
-    const JsonBackendParseOptions &options [[maybe_unused]]) const {
+    const JsonBackendParseOptions &options [[maybe_unused]],
+    const JSONAdapter *adapter) {
     if (sink == nullptr) {
         return makeResult(JsonParseStatus::InternalError,
             JsonSinkStatus::InternalError, "JSON event sink is null.");
@@ -68,9 +68,9 @@ JsonParseResult JSONAdapter::parse(std::string &input,
     }
 
 #if defined(MSC_JSON_BACKEND_SIMDJSON)
-    return normalizeResult(parseDocumentWithSimdjson(input, sink, options));
+    return normalizeResult(adapter->parseDocumentWithSimdjson(input, sink, options));
 #elif defined(MSC_JSON_BACKEND_JSONCONS)
-    return normalizeResult(parseDocumentWithJsoncons(input, sink, options));
+    return normalizeResult(adapter->parseDocumentWithJsoncons(input, sink, options));
 #else
     return makeResult(JsonParseStatus::InternalError,
         JsonSinkStatus::InternalError,
@@ -78,27 +78,18 @@ JsonParseResult JSONAdapter::parse(std::string &input,
 #endif
 }
 
+}  // namespace
+
+JsonParseResult JSONAdapter::parse(std::string &input,
+    JsonEventSink *sink,
+    const JsonBackendParseOptions &options [[maybe_unused]]) const {
+    return parseImpl(input, sink, options, this);
+}
+
 JsonParseResult JSONAdapter::parse(const std::string &input,
     JsonEventSink *sink,
     const JsonBackendParseOptions &options [[maybe_unused]]) const {
-    if (sink == nullptr) {
-        return makeResult(JsonParseStatus::InternalError,
-            JsonSinkStatus::InternalError, "JSON event sink is null.");
-    }
-
-    if (input.empty()) {
-        return makeResult(JsonParseStatus::Ok);
-    }
-
-#if defined(MSC_JSON_BACKEND_SIMDJSON)
-    return normalizeResult(parseDocumentWithSimdjson(input, sink, options));
-#elif defined(MSC_JSON_BACKEND_JSONCONS)
-    return normalizeResult(parseDocumentWithJsoncons(input, sink, options));
-#else
-    return makeResult(JsonParseStatus::InternalError,
-        JsonSinkStatus::InternalError,
-        "ModSecurity was built without a selected JSON backend.");
-#endif
+    return parseImpl(input, sink, options, this);
 }
 
 }  // namespace modsecurity::RequestBodyProcessor
