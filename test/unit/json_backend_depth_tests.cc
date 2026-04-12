@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "src/request_body_processor/json_adapter.h"
 
@@ -64,6 +65,16 @@ class AcceptAllSink : public JsonEventSink {
     JsonSinkStatus on_null() override {
         return JsonSinkStatus::Continue;
     }
+};
+
+class NumberCollectingSink : public AcceptAllSink {
+ public:
+    JsonSinkStatus on_number(std::string_view raw_number) override {
+        numbers.emplace_back(raw_number.data(), raw_number.size());
+        return JsonSinkStatus::Continue;
+    }
+
+    std::vector<std::string> numbers;
 };
 
 const char *parseStatusName(JsonParseStatus status) {
@@ -119,6 +130,62 @@ std::string describeUnexpectedResult(const JsonParseResult &result,
     return detail;
 }
 
+std::string describeStringList(const std::vector<std::string> &values) {
+    std::string description = "[";
+
+    for (std::size_t i = 0; i < values.size(); i++) {
+        if (i != 0) {
+            description.append(", ");
+        }
+        description.push_back('"');
+        description.append(values[i]);
+        description.push_back('"');
+    }
+
+    description.push_back(']');
+    return description;
+}
+
+bool collectNumberLexemes(const std::string &input,
+    std::vector<std::string> *numbers, std::string *failure_detail) {
+    NumberCollectingSink sink;
+    JSONAdapter adapter;
+    JsonParseResult result = adapter.parse(input, &sink, JsonBackendParseOptions());
+
+    if (!result.ok()) {
+        if (failure_detail != nullptr) {
+            *failure_detail = describeUnexpectedResult(result, "Ok/Continue");
+            failure_detail->append(" Input: ");
+            failure_detail->append(input);
+        }
+        return false;
+    }
+
+    if (numbers != nullptr) {
+        *numbers = sink.numbers;
+    }
+    return true;
+}
+
+bool expectNumberLexemes(const char *case_name, const std::string &input,
+    const std::vector<std::string> &expected, std::string *failure_detail) {
+    std::vector<std::string> actual;
+    if (!collectNumberLexemes(input, &actual, failure_detail)) {
+        return false;
+    }
+
+    if (actual != expected) {
+        if (failure_detail != nullptr) {
+            *failure_detail = std::string("Case '") + case_name
+                + "' expected " + describeStringList(expected)
+                + ", got " + describeStringList(actual) + ".";
+        }
+        return false;
+    }
+
+    return true;
+}
+
 bool expectBackendDepthLimitParseError(std::string *failure_detail) {
     AcceptAllSink sink;
     JSONAdapter adapter;
@@ -159,6 +226,54 @@ bool expectBackendDepthHeadroomSuccess(std::string *failure_detail) {
     return true;
 }
 
+bool expectExactRootScalarNumberLexemes(std::string *failure_detail) {
+    struct NumberLexemeCase {
+        const char *name;
+        const char *input;
+    };
+
+    const NumberLexemeCase cases[] = {
+        {"zero", "0"},
+        {"negative_zero", "-0"},
+        {"decimal", "1.0"},
+        {"scientific", "1e3"},
+        {"negative_fraction_with_exponent", "-1.25e-4"},
+        {"uint64_max", "18446744073709551615"},
+        {"uint64_overflow", "18446744073709551616"},
+        {"large_integer", "123456789012345678901234567890"}
+    };
+
+    for (const auto &test_case : cases) {
+        if (!expectNumberLexemes(test_case.name, test_case.input,
+                std::vector<std::string>{test_case.input}, failure_detail)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool expectExactContainerNumberLexemes(std::string *failure_detail) {
+    const std::string input =
+        "{ \"arr\" : [ 0 , -0 , 1.0 , 1e3 ], "
+        "\"obj\" : { \"frac\" : -1.25e-4 , "
+        "\"max\" : 18446744073709551615 , "
+        "\"over\" : 18446744073709551616 , "
+        "\"big\" : 123456789012345678901234567890 } }";
+
+    return expectNumberLexemes("container_numbers_with_whitespace_and_boundaries",
+        input, std::vector<std::string>{
+            "0",
+            "-0",
+            "1.0",
+            "1e3",
+            "-1.25e-4",
+            "18446744073709551615",
+            "18446744073709551616",
+            "123456789012345678901234567890"
+        }, failure_detail);
+}
+
 bool reportTestResult(const char *name, bool passed,
     const std::string &detail) {
     std::cout << ":test-result: " << (passed ? "PASS " : "FAIL ")
@@ -183,6 +298,18 @@ int runJsonBackendDepthTests() {
     detail.clear();
     if (!reportTestResult("technical_depth_with_headroom_succeeds",
             expectBackendDepthHeadroomSuccess(&detail), detail)) {
+        failures++;
+    }
+
+    detail.clear();
+    if (!reportTestResult("number_lexemes_for_root_scalars_remain_exact",
+            expectExactRootScalarNumberLexemes(&detail), detail)) {
+        failures++;
+    }
+
+    detail.clear();
+    if (!reportTestResult("number_lexemes_in_containers_remain_exact",
+            expectExactContainerNumberLexemes(&detail), detail)) {
         failures++;
     }
 
