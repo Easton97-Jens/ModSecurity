@@ -1,103 +1,142 @@
-# Fakten-Audit
+# Bewertung simdjson
 
 ## 1. Fundstellen
-- `src/request_body_processor/json_backend_simdjson.cc` — Symbol: `parseDocumentWithSimdjson`, `JsonBackendWalker`, `fromSimdjsonError`. 
-- `src/request_body_processor/json_backend_jsoncons.cc` — Symbol: `parseDocumentWithJsoncons`, `emitEvent`, `RawJsonTokenCursor`, `fromJsonconsError`.
-- `src/request_body_processor/json_backend.h` — Symbol: `JsonEventSink`, `JsonParseStatus`, `JsonSinkStatus`.
-- `src/request_body_processor/json_adapter.cc` — Symbol: `JSONAdapter::parse`, `normalizeResult`.
-- `src/request_body_processor/json.cc` — Symbol: `JSON::on_string`, `JSON::on_number`, `JSON::complete`.
-- `configure.ac` — Symbol: `AC_ARG_WITH([json-backend])`, `MSC_JSON_BACKEND_SIMDJSON`, `MSC_JSON_BACKEND_JSONCONS`.
-- `src/Makefile.am` — Symbol: `JSON_BACKEND_SIMDJSON`, `JSON_BACKEND_JSONCONS` Build-Zweige.
-- `test/run-json-backend-matrix.sh` — Symbol: `for backend in simdjson jsoncons`.
-- Upstream-Doku/-Code im Repo:
-  - `others/simdjson/include/simdjson/generic/ondemand/parser.h`
-  - `others/simdjson/include/simdjson/generic/ondemand/value.h`
-  - `others/jsoncons/include/jsoncons/json_options.hpp`
-  - `others/jsoncons/include/jsoncons/json_cursor.hpp`
-  - `others/jsoncons/doc/Examples.md`
+- Datei: `src/request_body_processor/json_backend_simdjson.cc`  
+  Funktion: `parseDocumentWithSimdjson`  
+  Zweck: Parse-Einstieg, Parser-Vorbereitung, `padded_string`, Traversal-Start.
+- Datei: `src/request_body_processor/json_backend_simdjson.cc`  
+  Funktion: `fromSimdjsonError`  
+  Zweck: Mapping von simdjson-Fehlercodes auf `JsonParseStatus`.
+- Datei: `src/request_body_processor/json_backend_simdjson.cc`  
+  Funktion: `JsonBackendWalker::walk*`  
+  Zweck: Umwandlung der JSON-Tokens in `JsonEventSink`-Events.
+- Datei: `src/Makefile.am`  
+  Funktion/Symbol: `JSON_BACKEND_SIMDJSON` Block  
+  Zweck: Backend-spezifische Source/Include-Auswahl.
+- Datei: `configure.ac`  
+  Funktion/Symbol: `--with-json-backend=simdjson`, `MSC_JSON_BACKEND_SIMDJSON`  
+  Zweck: Build-Zeit-Auswahl und Aktivierung des simdjson-Backends.
 
-## 2. Korrektheit
+## 2. Ist die Implementierung korrekt?
+- Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `parseDocumentWithSimdjson`.
+- Bewertung: KORREKT
+- Kurzbegründung: Vor `iterate` wird `simdjson::padded_string` erstellt.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `parseDocumentWithSimdjson`, Zeile 447 und 458.
 
 - Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `parseDocumentWithSimdjson`.
-- Befund: Vor `parser.iterate(...)` wird `simdjson::padded_string padded(input)` erstellt.
-- Kategorie: BEWIESEN
-- Evidenz: Code `simdjson::padded_string padded(input);` und danach `parser.iterate(padded)` in derselben Funktion; simdjson-Doku verlangt Padding (`SIMDJSON_PADDING`) für iterate-Eingabe.
-
-- Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `parseDocumentWithSimdjson`.
-- Befund: `ondemand::document` wird lokal erstellt und vollständig innerhalb derselben Funktion traversiert (`walker.walk(&document)`), danach Rückkehr.
-- Kategorie: BEWIESEN
-- Evidenz: Lokale Variable `simdjson::ondemand::document document;`, direkter Aufruf `walker.walk(&document);`; simdjson-Doku fordert gültige Document/Parser-Lifetime während Zugriff.
+- Bewertung: KORREKT
+- Kurzbegründung: `ondemand::document` lebt bis zum Ende der kompletten Traversierung in derselben Funktion.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `parseDocumentWithSimdjson`, Zeile 454 und 476.
 
 - Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `JsonBackendWalker::walkString`.
-- Befund: Stringwerte werden über `get_string()` gelesen und an Sink als `std::string_view` weitergegeben.
-- Kategorie: BEWIESEN
-- Evidenz: `value.get_string()` -> `m_sink->on_string(decoded)`; simdjson-Doku: `get_string()` liefert UTF-8 String.
+- Bewertung: KORREKT
+- Kurzbegründung: String wird mit `get_string()` gelesen und an Sink weitergegeben.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `walkString`, Zeile 374 und 379.
 
-- Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `parseDocumentWithJsoncons`.
-- Befund: Optionen `max_nesting_depth`, `lossless_number(true)`, `lossless_bignum(true)` werden gesetzt.
-- Kategorie: BEWIESEN
-- Evidenz: Direkte Option-Setter-Aufrufe im Code; jsoncons-Header enthält diese Setter.
+- Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `JsonBackendWalker::walkNumber`.
+- Bewertung: KORREKT
+- Kurzbegründung: Zahl wird als Raw-Token an Sink weitergegeben.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `walkNumber`, Zeile 388 und 389.
 
-- Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `parseDocumentWithJsoncons`.
-- Befund: Event-Loop arbeitet mit `while (!cursor.done())`, `cursor.current()`, `cursor.next(error)`, abschließend `cursor.check_done(error)`.
-- Kategorie: BEWIESEN
-- Evidenz: Direkte Aufrufe im Code; jsoncons-Doku zeigt dieses Cursor-Muster.
+- Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `fromSimdjsonError`.
+- Bewertung: KORREKT
+- Kurzbegründung: Fehlercode-Mapping ist vollständig für die im Switch behandelten simdjson-Fälle.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `fromSimdjsonError`, Zeile 54 bis 90.
 
-- Stelle: `src/request_body_processor/json_backend_simdjson.cc` vs `src/request_body_processor/json_backend_jsoncons.cc`.
-- Befund: Tiefenfehler werden unterschiedlich klassifiziert.
-- Kategorie: INKONSISTENT
-- Evidenz: simdjson mappt `DEPTH_ERROR` auf `JsonParseStatus::ParseError`; jsoncons mappt `max_nesting_depth_exceeded` auf `JsonParseStatus::InternalError`.
+- Stelle: `others/simdjson/include/simdjson/generic/ondemand/parser.h` gegen Repo-Nutzung.
+- Bewertung: KORREKT
+- Kurzbegründung: Doku fordert Padding; Repo liefert Padding explizit über `padded_string`.
+- Evidenz: Datei `others/simdjson/include/simdjson/generic/ondemand/parser.h`, Zeile 81 bis 87; Datei `src/request_body_processor/json_backend_simdjson.cc`, Zeile 447.
 
-- Stelle: `src/request_body_processor/json_adapter.cc`, `normalizeResult`.
-- Befund: `JsonSinkStatus::DepthLimitExceeded` wird in `JsonParseStatus::ParseError` transformiert.
-- Kategorie: BEWIESEN
-- Evidenz: `case JsonSinkStatus::DepthLimitExceeded: result.parse_status = JsonParseStatus::ParseError;`.
-
-## 3. Performance (NUR reale Fälle)
-
+## 3. Performance
 - Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `parseDocumentWithSimdjson`.
-- Problem: Zusätzliche Vollkopie des gesamten Inputs in `simdjson::padded_string`.
-- Kategorie: BEWIESEN
-- Evidenz: `simdjson::padded_string padded(input);`.
+- Problem: Vollständige Zusatzkopie des Inputs in `simdjson::padded_string`.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `parseDocumentWithSimdjson`, Zeile 447.
+- Bewertung: PROBLEM
 
+## 4. Speicher / Speicherverwaltung
+- Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `parseDocumentWithSimdjson`.
+- Problem: Zusätzlicher Buffer `padded` hält Input-Kopie.
+- Evidenz: Datei `src/request_body_processor/json_backend_simdjson.cc`, Funktion `parseDocumentWithSimdjson`, Zeile 447.
+- Bewertung: PROBLEM
+
+## 5. Einfaches Fazit simdjson
+Die simdjson-Implementierung im Repo ist insgesamt KORREKT.  
+Die Nutzung laut simdjson-Doku zum Thema Padding ist KORREKT.  
+Das wichtigste Problem ist die zusätzliche Vollkopie pro Parse über `simdjson::padded_string`.  
+Die wichtigste Optimierung ist ein Parse-Pfad ohne diese Zusatzkopie.
+
+# Bewertung jsoncons
+
+## 1. Fundstellen
+- Datei: `src/request_body_processor/json_backend_jsoncons.cc`  
+  Funktion: `parseDocumentWithJsoncons`  
+  Zweck: Cursor-Initialisierung, Optionen, Event-Loop.
+- Datei: `src/request_body_processor/json_backend_jsoncons.cc`  
+  Funktion: `emitEvent`  
+  Zweck: Mapping von STAJ-Events auf `JsonEventSink`-Events.
+- Datei: `src/request_body_processor/json_backend_jsoncons.cc`  
+  Funktion: `RawJsonTokenCursor::*`  
+  Zweck: Roh-Token-Synchronisierung für Zahlen.
+- Datei: `src/request_body_processor/json_backend_jsoncons.cc`  
+  Funktion: `fromJsonconsError`  
+  Zweck: Mapping von jsoncons-Fehlern auf `JsonParseStatus`.
+- Datei: `src/Makefile.am`  
+  Funktion/Symbol: `JSON_BACKEND_JSONCONS` Block  
+  Zweck: Backend-spezifische Include-Auswahl.
+- Datei: `configure.ac`  
+  Funktion/Symbol: `--with-json-backend=jsoncons`, `MSC_JSON_BACKEND_JSONCONS`  
+  Zweck: Build-Zeit-Auswahl und Aktivierung des jsoncons-Backends.
+
+## 2. Ist die Implementierung korrekt?
+- Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `parseDocumentWithJsoncons`.
+- Bewertung: KORREKT
+- Kurzbegründung: `max_nesting_depth`, `lossless_number`, `lossless_bignum` werden gesetzt.
+- Evidenz: Datei `src/request_body_processor/json_backend_jsoncons.cc`, Funktion `parseDocumentWithJsoncons`, Zeile 721 bis 724.
+
+- Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `parseDocumentWithJsoncons`.
+- Bewertung: KORREKT
+- Kurzbegründung: Event-Loop nutzt `done/current/next/check_done` vollständig.
+- Evidenz: Datei `src/request_body_processor/json_backend_jsoncons.cc`, Funktion `parseDocumentWithJsoncons`, Zeile 756 bis 776.
+
+- Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `emitEvent`.
+- Bewertung: KORREKT
+- Kurzbegründung: Objekt/Array/String/Bool/Null/Number werden jeweils auf passende Sink-Methoden abgebildet.
+- Evidenz: Datei `src/request_body_processor/json_backend_jsoncons.cc`, Funktion `emitEvent`, Zeile 583 bis 704.
+
+- Stelle: `others/jsoncons/include/jsoncons/json_options.hpp` gegen Repo-Nutzung.
+- Bewertung: KORREKT
+- Kurzbegründung: Die verwendeten Option-Setter existieren in der jsoncons-API.
+- Evidenz: Datei `others/jsoncons/include/jsoncons/json_options.hpp`, Zeile 656 bis 665 und 717 bis 720; Datei `src/request_body_processor/json_backend_jsoncons.cc`, Zeile 722 bis 724.
+
+- Stelle: `others/jsoncons/doc/Examples.md` gegen Repo-Nutzung.
+- Bewertung: KORREKT
+- Kurzbegründung: Das im Repo verwendete Cursor-Muster entspricht dem dokumentierten Event-Loop-Muster.
+- Evidenz: Datei `others/jsoncons/doc/Examples.md`, Zeile 761 bis 779; Datei `src/request_body_processor/json_backend_jsoncons.cc`, Zeile 756 bis 767.
+
+- Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `fromJsonconsError`.
+- Bewertung: PROBLEM
+- Kurzbegründung: `max_nesting_depth_exceeded` wird als `InternalError` klassifiziert.
+- Evidenz: Datei `src/request_body_processor/json_backend_jsoncons.cc`, Funktion `fromJsonconsError`, Zeile 87 bis 90.
+
+## 3. Performance
 - Stelle: `src/request_body_processor/json_backend_jsoncons.cc`, `parseDocumentWithJsoncons` + `RawJsonTokenCursor`.
-- Problem: Numerische Tokens werden zusätzlich mit eigenem Cursor über den Originaltext gescannt, parallel zum Parser-Eventstrom.
-- Kategorie: BEWIESEN
-- Evidenz: `RawJsonTokenCursor token_cursor(input);`, Aufrufe `consumeNextNumberToken(...)`/`advanceExactNumber(...)` im Event-Handling.
+- Problem: Zusätzlicher Textscan für numerische Tokens parallel zum Parser-Eventstrom.
+- Evidenz: Datei `src/request_body_processor/json_backend_jsoncons.cc`, Funktion `parseDocumentWithJsoncons`, Zeile 742; Funktion `emitEvent`, Zeile 686 und 692; Klasse `RawJsonTokenCursor`, Zeile 240 bis 251.
+- Bewertung: PROBLEM
 
-- Stelle: `src/request_body_processor/json.cc`, `JSON::on_string` und `JSON::on_number`.
-- Problem: Für jeden String-/Number-Event wird ein neuer `std::string` erzeugt.
-- Kategorie: BEWIESEN
-- Evidenz: `addArgument(std::string(value.data(), value.size()))` in beiden Funktionen.
+## 4. Speicher / Speicherverwaltung
+- Stelle: `src/request_body_processor/json.cc`, `on_string` und `on_number`.
+- Problem: Für jedes String-/Number-Event wird aus `string_view` ein neuer `std::string` erzeugt.
+- Evidenz: Datei `src/request_body_processor/json.cc`, Funktion `on_string`, Zeile 248; Funktion `on_number`, Zeile 254.
+- Bewertung: PROBLEM
 
-## 4. Speicher (NUR reale Fälle)
+## 5. Einfaches Fazit jsoncons
+Die jsoncons-Implementierung im Repo ist insgesamt KORREKT.  
+Die Nutzung der jsoncons-Optionen und des Cursor-Event-Loops ist laut Doku KORREKT.  
+Das wichtigste Problem ist die Fehlerklassifikation `max_nesting_depth_exceeded` als `InternalError`.  
+Die wichtigste Optimierung ist die Reduktion des zusätzlichen Zahlentoken-Scans.
 
-- Stelle: `src/request_body_processor/json_backend_simdjson.cc`, `parseDocumentWithSimdjson`.
-- Problem: Zusätzliches Buffer-Objekt `padded` enthält Input-Kopie.
-- Kategorie: BEWIESEN
-- Evidenz: `simdjson::padded_string padded(input);`.
-
-- Stelle: `src/request_body_processor/json.cc`, `JSON::on_string` und `JSON::on_number`.
-- Problem: Pro Event temporäre `std::string`-Allokation durch Materialisierung aus `std::string_view`.
-- Kategorie: BEWIESEN
-- Evidenz: `std::string(value.data(), value.size())`.
-
-## 5. Backend-Unterschiede
-
-- Unterschied: simdjson nutzt `raw_json_token()` direkt für Zahlen; jsoncons nutzt `RawJsonTokenCursor` + Kontextdaten zur Token-Rekonstruktion.
-- Kategorie: BEWIESEN
-- Evidenz: `walkNumber` im simdjson-Backend vs `rawNumberFromContext` + `consumeNextNumberToken` im jsoncons-Backend.
-
-- Unterschied: Fehlerklasse bei Nesting-Limit (ParseError vs InternalError).
-- Kategorie: INKONSISTENT
-- Evidenz: `fromSimdjsonError` und `fromJsonconsError` Mapping.
-
-- Unterschied: Vollständige semantische Gleichheit der Eventfolgen für alle Inputs.
-- Kategorie: NICHT BEWIESEN
-- Evidenz: keine vollständige, ausgeführte Matrix-/Paritätsmessung im Auditlauf.
-
-## 6. Nicht beweisbare Punkte
-- Vollständige Backend-Parität über alle JSON-Randfälle: NICHT BEWIESEN.
-- Laufzeitgewinn einzelner Änderungen: NICHT BEWIESEN.
-- Peak-Memory-Gewinn einzelner Änderungen: NICHT BEWIESEN.
-- Vollständige Verifikation aller vorhandenen Regressionstests gegen beide Backends im Auditlauf: NICHT BEWIESEN.
+# Vergleich am Ende
+Der im Repo sicher belegte Unterschied ist die Fehlerklassifikation beim Nesting-Limit (`ParseError` in simdjson, `InternalError` in jsoncons).  
+Die vollständige Gleichheit der Event-Semantik für alle Eingaben ist NICHT BEWIESEN.
