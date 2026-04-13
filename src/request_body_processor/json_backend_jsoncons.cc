@@ -188,7 +188,7 @@ bool isNumericStringEvent(const jsoncons::staj_event &event) {
 
 class RawJsonTokenCursor {
  public:
-    explicit RawJsonTokenCursor(const std::string &input)
+    explicit RawJsonTokenCursor(std::string_view input)
         : m_input(input) { }
 
     bool consume(const jsoncons::staj_event &event, std::string_view *raw_token,
@@ -539,11 +539,11 @@ class RawJsonTokenCursor {
         }
     }
 
-    const std::string &m_input;
+    std::string_view m_input;
     std::size_t m_offset{0};
 };
 
-std::string_view rawNumberFromContext(const std::string &input,
+std::string_view rawNumberFromContext(std::string_view input,
     jsoncons::staj_event_type event_type, const jsoncons::ser_context &context,
     const jsoncons::staj_event &event, std::string_view scanned_token) {
     const std::size_t begin = context.begin_position();
@@ -574,50 +574,55 @@ std::string_view rawNumberFromContext(const std::string &input,
     return std::string_view();
 }
 
-JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
-    RawJsonTokenCursor *token_cursor, const jsoncons::staj_event &event,
-    const jsoncons::ser_context &context) {
-    JsonSinkStatus sink_status = JsonSinkStatus::Continue;
-    std::error_code error;
+JsonParseResult emitSink(JsonEventSink *sink, JsonSinkStatus sink_status,
+    std::string_view location) {
+    if (sink_status != JsonSinkStatus::Continue) {
+        return stopTraversal(sink_status, location);
+    }
+    return makeResult(JsonParseStatus::Ok);
+}
+
+JsonParseResult emitNumberFromRawToken(std::string_view input, JsonEventSink *sink,
+    RawJsonTokenCursor *token_cursor, jsoncons::staj_event_type event_type,
+    const jsoncons::ser_context &context, const jsoncons::staj_event &event) {
     std::string_view raw_token;
     std::string sync_detail;
+    if (!token_cursor->consumeNextNumberToken(&raw_token, &sync_detail)) {
+        return makeResult(JsonParseStatus::InternalError,
+            JsonSinkStatus::Continue, sync_detail);
+    }
+    recordJsonconsTokenSyncStep();
+    std::string_view raw_number = rawNumberFromContext(input,
+        event_type, context, event, raw_token);
+    if (raw_number.empty()) {
+        return makeResult(JsonParseStatus::InternalError,
+            JsonSinkStatus::Continue,
+            "Unable to materialize numeric JSON token from jsoncons backend.");
+    }
+    return emitSink(sink, sink->on_number(raw_number), "handling a number");
+}
+
+JsonParseResult emitEvent(std::string_view input, JsonEventSink *sink,
+    RawJsonTokenCursor *token_cursor, const jsoncons::staj_event &event,
+    const jsoncons::ser_context &context) {
+    std::error_code error;
 
     switch (event.event_type()) {
         case jsoncons::staj_event_type::begin_object:
-            sink_status = sink->on_start_object();
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "starting an object");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_start_object(), "starting an object");
         case jsoncons::staj_event_type::end_object:
-            sink_status = sink->on_end_object();
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "ending an object");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_end_object(), "ending an object");
         case jsoncons::staj_event_type::begin_array:
-            sink_status = sink->on_start_array();
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "starting an array");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_start_array(), "starting an array");
         case jsoncons::staj_event_type::end_array:
-            sink_status = sink->on_end_array();
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "ending an array");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_end_array(), "ending an array");
         case jsoncons::staj_event_type::key: {
             jsoncons::string_view decoded = event.get<jsoncons::string_view>(error);
             if (error) {
                 return fromJsonconsError(error, context);
             }
-            sink_status = sink->on_key(std::string_view(decoded.data(),
-                decoded.size()));
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "processing an object key");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_key(std::string_view(decoded.data(),
+                decoded.size())), "processing an object key");
         }
         case jsoncons::staj_event_type::string_value: {
             jsoncons::string_view decoded = event.get<jsoncons::string_view>(error);
@@ -625,85 +630,42 @@ JsonParseResult emitEvent(const std::string &input, JsonEventSink *sink,
                 return fromJsonconsError(error, context);
             }
             if (isNumericStringEvent(event)) {
+                std::string sync_detail;
                 if (const std::string_view decoded_number(decoded.data(),
                         decoded.size()); isValidJsonNumber(decoded_number)
                     && token_cursor->advanceExactNumber(decoded_number,
                         &sync_detail)) {
                     recordJsonconsTokenExactAdvanceStep();
-                    sink_status = sink->on_number(decoded_number);
-                    if (sink_status != JsonSinkStatus::Continue) {
-                        return stopTraversal(sink_status, "handling a number");
-                    }
-                    return makeResult(JsonParseStatus::Ok);
+                    return emitSink(sink, sink->on_number(decoded_number),
+                        "handling a number");
                 }
-                if (!token_cursor->consumeNextNumberToken(&raw_token,
-                    &sync_detail)) {
-                    return makeResult(JsonParseStatus::InternalError,
-                        JsonSinkStatus::Continue, sync_detail);
-                }
-                recordJsonconsTokenSyncStep();
-                std::string_view raw_number = rawNumberFromContext(input,
-                    jsoncons::staj_event_type::double_value, context, event,
-                    raw_token);
-                if (raw_number.empty()) {
-                    return makeResult(JsonParseStatus::InternalError,
-                        JsonSinkStatus::Continue,
-                        "Unable to materialize numeric JSON token from jsoncons backend.");
-                }
-                sink_status = sink->on_number(raw_number);
-                if (sink_status != JsonSinkStatus::Continue) {
-                    return stopTraversal(sink_status, "handling a number");
-                }
-                return makeResult(JsonParseStatus::Ok);
+                return emitNumberFromRawToken(input, sink, token_cursor,
+                    jsoncons::staj_event_type::double_value, context, event);
             }
-            sink_status = sink->on_string(std::string_view(decoded.data(),
-                decoded.size()));
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "handling a string");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_string(std::string_view(decoded.data(),
+                decoded.size())), "handling a string");
         }
         case jsoncons::staj_event_type::null_value:
-            sink_status = sink->on_null();
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "handling a null value");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_null(), "handling a null value");
         case jsoncons::staj_event_type::bool_value:
             {
             bool boolean_value = event.get<bool>(error);
             if (error) {
                 return fromJsonconsError(error, context);
             }
-            sink_status = sink->on_boolean(boolean_value);
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "handling a boolean");
-            }
-            return makeResult(JsonParseStatus::Ok);
+            return emitSink(sink, sink->on_boolean(boolean_value),
+                "handling a boolean");
             }
         case jsoncons::staj_event_type::int64_value:
         case jsoncons::staj_event_type::uint64_value:
         case jsoncons::staj_event_type::double_value:
-        case jsoncons::staj_event_type::half_value: {
-            if (!token_cursor->consumeNextNumberToken(&raw_token,
-                &sync_detail)) {
-                return makeResult(JsonParseStatus::InternalError,
-                    JsonSinkStatus::Continue, sync_detail);
-            }
-            recordJsonconsTokenSyncStep();
-            std::string_view raw_number = rawNumberFromContext(input,
-                event.event_type(), context, event, raw_token);
-            if (raw_number.empty()) {
-                return makeResult(JsonParseStatus::InternalError,
-                    JsonSinkStatus::Continue,
-                    "Unable to materialize numeric JSON token from jsoncons backend.");
-            }
-            sink_status = sink->on_number(raw_number);
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "handling a number");
-            }
-            return makeResult(JsonParseStatus::Ok);
-        }
+        case jsoncons::staj_event_type::half_value:
+            return emitNumberFromRawToken(input, sink, token_cursor,
+                event.event_type(), context, event);
+        case jsoncons::staj_event_type::byte_string_value:
+            return makeResult(JsonParseStatus::InternalError,
+                JsonSinkStatus::Continue,
+                "Unsupported byte-string event encountered in jsoncons backend.");
         default:
             return makeResult(JsonParseStatus::InternalError,
                 JsonSinkStatus::Continue,
