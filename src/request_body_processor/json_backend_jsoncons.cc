@@ -18,6 +18,7 @@
 #endif
 
 #include "src/request_body_processor/json_backend.h"
+#include "src/request_body_processor/json_backend_common.h"
 
 #include <cctype>
 #include <chrono>
@@ -35,23 +36,8 @@
 
 namespace modsecurity::RequestBodyProcessor {
 namespace {
-
-JsonParseResult makeResult(JsonParseStatus parse_status,
-    JsonSinkStatus sink_status = JsonSinkStatus::Continue,
-    std::string detail = "") {
-    return JsonParseResult{parse_status, sink_status, std::move(detail)};
-}
-
-JsonParseResult makeResult(JsonParseStatus parse_status, std::string detail) {
-    return makeResult(parse_status, JsonSinkStatus::Continue, std::move(detail));
-}
-
-JsonParseResult stopTraversal(JsonSinkStatus sink_status,
-    std::string_view location) {
-    return makeResult(JsonParseStatus::Ok, sink_status,
-        std::string("JSON traversal stopped while ") + std::string(location)
-        + ".");
-}
+using json_backend_common::finishSinkCall;
+using json_backend_common::makeResult;
 
 bool isUtf8RelatedError(const std::error_code &error) {
     switch (static_cast<jsoncons::json_errc>(error.value())) {
@@ -574,14 +560,6 @@ std::string_view rawNumberFromContext(std::string_view input,
     return std::string_view();
 }
 
-JsonParseResult emitSink(JsonEventSink *sink, JsonSinkStatus sink_status,
-    std::string_view location) {
-    if (sink_status != JsonSinkStatus::Continue) {
-        return stopTraversal(sink_status, location);
-    }
-    return makeResult(JsonParseStatus::Ok);
-}
-
 JsonParseResult emitNumberFromRawToken(std::string_view input, JsonEventSink *sink,
     RawJsonTokenCursor *token_cursor, jsoncons::staj_event_type event_type,
     const jsoncons::ser_context &context, const jsoncons::staj_event &event) {
@@ -599,7 +577,7 @@ JsonParseResult emitNumberFromRawToken(std::string_view input, JsonEventSink *si
             JsonSinkStatus::Continue,
             "Unable to materialize numeric JSON token from jsoncons backend.");
     }
-    return emitSink(sink, sink->on_number(raw_number), "handling a number");
+    return finishSinkCall(sink->on_number(raw_number), "handling a number");
 }
 
 JsonParseResult decodeStringEventValue(const jsoncons::staj_event &event,
@@ -619,20 +597,20 @@ JsonParseResult emitEvent(std::string_view input, JsonEventSink *sink,
 
     switch (event.event_type()) {
         case jsoncons::staj_event_type::begin_object:
-            return emitSink(sink, sink->on_start_object(), "starting an object");
+            return finishSinkCall(sink->on_start_object(), "starting an object");
         case jsoncons::staj_event_type::end_object:
-            return emitSink(sink, sink->on_end_object(), "ending an object");
+            return finishSinkCall(sink->on_end_object(), "ending an object");
         case jsoncons::staj_event_type::begin_array:
-            return emitSink(sink, sink->on_start_array(), "starting an array");
+            return finishSinkCall(sink->on_start_array(), "starting an array");
         case jsoncons::staj_event_type::end_array:
-            return emitSink(sink, sink->on_end_array(), "ending an array");
+            return finishSinkCall(sink->on_end_array(), "ending an array");
         case jsoncons::staj_event_type::key: {
             jsoncons::string_view decoded;
             if (JsonParseResult result = decodeStringEventValue(event, context,
                     &decoded); !result.ok()) {
                 return result;
             }
-            return emitSink(sink, sink->on_key(std::string_view(decoded.data(),
+            return finishSinkCall(sink->on_key(std::string_view(decoded.data(),
                 decoded.size())), "processing an object key");
         }
         case jsoncons::staj_event_type::string_value: {
@@ -648,24 +626,24 @@ JsonParseResult emitEvent(std::string_view input, JsonEventSink *sink,
                     && token_cursor->advanceExactNumber(decoded_number,
                         &sync_detail)) {
                     recordJsonconsTokenExactAdvanceStep();
-                    return emitSink(sink, sink->on_number(decoded_number),
+                    return finishSinkCall(sink->on_number(decoded_number),
                         "handling a number");
                 }
                 return emitNumberFromRawToken(input, sink, token_cursor,
                     jsoncons::staj_event_type::double_value, context, event);
             }
-            return emitSink(sink, sink->on_string(std::string_view(decoded.data(),
+            return finishSinkCall(sink->on_string(std::string_view(decoded.data(),
                 decoded.size())), "handling a string");
         }
         case jsoncons::staj_event_type::null_value:
-            return emitSink(sink, sink->on_null(), "handling a null value");
+            return finishSinkCall(sink->on_null(), "handling a null value");
         case jsoncons::staj_event_type::bool_value:
             {
             bool boolean_value = event.get<bool>(error);
             if (error) {
                 return fromJsonconsError(error, context);
             }
-            return emitSink(sink, sink->on_boolean(boolean_value),
+            return finishSinkCall(sink->on_boolean(boolean_value),
                 "handling a boolean");
             }
         case jsoncons::staj_event_type::int64_value:

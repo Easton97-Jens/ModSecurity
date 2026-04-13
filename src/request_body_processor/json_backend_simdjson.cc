@@ -18,6 +18,7 @@
 #endif
 
 #include "src/request_body_processor/json_backend.h"
+#include "src/request_body_processor/json_backend_common.h"
 
 #include <algorithm>
 #include <chrono>
@@ -31,31 +32,8 @@
 
 namespace modsecurity::RequestBodyProcessor {
 namespace {
-
-JsonParseResult makeResult(JsonParseStatus parse_status,
-    JsonSinkStatus sink_status = JsonSinkStatus::Continue,
-    std::string detail = "") {
-    return JsonParseResult{parse_status, sink_status, std::move(detail)};
-}
-
-JsonParseResult makeResult(JsonParseStatus parse_status, std::string detail) {
-    return makeResult(parse_status, JsonSinkStatus::Continue, std::move(detail));
-}
-
-JsonParseResult stopTraversal(JsonSinkStatus sink_status,
-    std::string_view location) {
-    return makeResult(JsonParseStatus::Ok, sink_status,
-        std::string("JSON traversal stopped while ") + std::string(location)
-        + ".");
-}
-
-JsonParseResult finishSinkCall(JsonSinkStatus sink_status,
-    std::string_view location) {
-    if (sink_status != JsonSinkStatus::Continue) {
-        return stopTraversal(sink_status, location);
-    }
-    return makeResult(JsonParseStatus::Ok);
-}
+using json_backend_common::finishSinkCall;
+using json_backend_common::makeResult;
 
 JsonParseResult fromSimdjsonError(simdjson::error_code error) {
     switch (error) {
