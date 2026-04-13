@@ -704,7 +704,7 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
                 std::chrono::steady_clock::now() - event_loop_start).count()));
     };
     const auto finish_with_event_loop = [&record_event_loop](
-        JsonParseResult result) {
+        const JsonParseResult &result) {
         record_event_loop();
         return result;
     };
@@ -717,8 +717,9 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
                 cursor.current(), cursor.context()); !result.ok()) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
             return finish_with_event_loop(result);
-#endif
+#else
             return result;
+#endif
         }
 
         cursor.next(error);
@@ -726,8 +727,9 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
             return finish_with_event_loop(
                 fromJsonconsError(error, cursor.context()));
-#endif
+#else
             return fromJsonconsError(error, cursor.context());
+#endif
         }
     }
 
@@ -736,8 +738,9 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
         return finish_with_event_loop(fromJsonconsError(error,
             cursor.context()));
-#endif
+#else
         return fromJsonconsError(error, cursor.context());
+#endif
     }
 
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION

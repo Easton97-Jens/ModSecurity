@@ -398,7 +398,7 @@ class JsonBackendWalker {
             "handling a boolean");
     }
 
-    JsonParseResult enforceTechnicalDepth(simdjson::ondemand::value value) {
+    JsonParseResult enforceTechnicalDepth(simdjson::ondemand::value value) const {
         const int32_t current_depth = value.current_depth();
         if (current_depth <= 0) {
             return makeResult(JsonParseStatus::InternalError,
