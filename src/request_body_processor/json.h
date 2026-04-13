@@ -32,22 +32,21 @@ namespace modsecurity::RequestBodyProcessor {
 class JSONContainer {
  public:
     explicit JSONContainer(const std::string &name) : m_name(name) { }
-    virtual ~JSONContainer() { }
+    virtual ~JSONContainer() = default;
     std::string m_name;
 };
 
 
 class JSONContainerArray : public JSONContainer {
  public:
-    explicit JSONContainerArray(const std::string &name) : JSONContainer(name),
-        m_elementCounter(0) { }
-    size_t m_elementCounter;
+    explicit JSONContainerArray(const std::string &name) : JSONContainer(name) { }
+    size_t m_elementCounter = 0;
 };
 
 
 class JSONContainerMap : public JSONContainer {
  public:
-     explicit JSONContainerMap(const std::string &name) : JSONContainer(name) { }
+    using JSONContainer::JSONContainer;
 };
 
 
