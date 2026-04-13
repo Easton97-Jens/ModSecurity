@@ -511,28 +511,29 @@ JsonParseResult parsePreparedDocumentWithSimdjson(
     return walker.walk(&document);
 }
 
+JsonParseResult validateSinkAndParsePreparedDocument(
+    simdjson::padded_string_view input, JsonEventSink *sink,
+    const JsonBackendParseOptions &options) {
+    if (sink == nullptr) {
+        return makeResult(JsonParseStatus::InternalError,
+            JsonSinkStatus::InternalError, "JSON event sink is null.");
+    }
+
+    return parsePreparedDocumentWithSimdjson(input, sink, options);
+}
+
 }  // namespace
 
 JsonParseResult parseDocumentWithSimdjson(std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options) {
-    if (sink == nullptr) {
-        return makeResult(JsonParseStatus::InternalError,
-            JsonSinkStatus::InternalError, "JSON event sink is null.");
-    }
-
     PreparedSimdjsonInput prepared = prepareMutableSimdjsonInput(&input);
-    return parsePreparedDocumentWithSimdjson(prepared.view, sink, options);
+    return validateSinkAndParsePreparedDocument(prepared.view, sink, options);
 }
 
 JsonParseResult parseDocumentWithSimdjson(const std::string &input,
     JsonEventSink *sink, const JsonBackendParseOptions &options) {
-    if (sink == nullptr) {
-        return makeResult(JsonParseStatus::InternalError,
-            JsonSinkStatus::InternalError, "JSON event sink is null.");
-    }
-
     PreparedSimdjsonInput prepared = prepareConstSimdjsonInput(input);
-    return parsePreparedDocumentWithSimdjson(prepared.view, sink, options);
+    return validateSinkAndParsePreparedDocument(prepared.view, sink, options);
 }
 
 }  // namespace modsecurity::RequestBodyProcessor
