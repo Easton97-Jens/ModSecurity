@@ -602,6 +602,16 @@ JsonParseResult emitNumberFromRawToken(std::string_view input, JsonEventSink *si
     return emitSink(sink, sink->on_number(raw_number), "handling a number");
 }
 
+JsonParseResult decodeStringEventValue(const jsoncons::staj_event &event,
+    const jsoncons::ser_context &context, jsoncons::string_view *decoded) {
+    std::error_code error;
+    *decoded = event.get<jsoncons::string_view>(error);
+    if (error) {
+        return fromJsonconsError(error, context);
+    }
+    return makeResult(JsonParseStatus::Ok);
+}
+
 JsonParseResult emitEvent(std::string_view input, JsonEventSink *sink,
     RawJsonTokenCursor *token_cursor, const jsoncons::staj_event &event,
     const jsoncons::ser_context &context) {
@@ -617,17 +627,19 @@ JsonParseResult emitEvent(std::string_view input, JsonEventSink *sink,
         case jsoncons::staj_event_type::end_array:
             return emitSink(sink, sink->on_end_array(), "ending an array");
         case jsoncons::staj_event_type::key: {
-            jsoncons::string_view decoded = event.get<jsoncons::string_view>(error);
-            if (error) {
-                return fromJsonconsError(error, context);
+            jsoncons::string_view decoded;
+            if (JsonParseResult result = decodeStringEventValue(event, context,
+                    &decoded); !result.ok()) {
+                return result;
             }
             return emitSink(sink, sink->on_key(std::string_view(decoded.data(),
                 decoded.size())), "processing an object key");
         }
         case jsoncons::staj_event_type::string_value: {
-            jsoncons::string_view decoded = event.get<jsoncons::string_view>(error);
-            if (error) {
-                return fromJsonconsError(error, context);
+            jsoncons::string_view decoded;
+            if (JsonParseResult result = decodeStringEventValue(event, context,
+                    &decoded); !result.ok()) {
+                return result;
             }
             if (isNumericStringEvent(event)) {
                 std::string sync_detail;
@@ -713,6 +725,11 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
             std::chrono::duration_cast<std::chrono::nanoseconds>(
                 std::chrono::steady_clock::now() - event_loop_start).count()));
     };
+    const auto finish_with_event_loop = [&record_event_loop](
+        JsonParseResult result) {
+        record_event_loop();
+        return result;
+    };
 #else
     RawJsonTokenCursor token_cursor(input);
 #endif
@@ -721,7 +738,7 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
         if (JsonParseResult result = emitEvent(input, sink, &token_cursor,
                 cursor.current(), cursor.context()); !result.ok()) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-            record_event_loop();
+            return finish_with_event_loop(result);
 #endif
             return result;
         }
@@ -729,7 +746,8 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
         cursor.next(error);
         if (error) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-            record_event_loop();
+            return finish_with_event_loop(
+                fromJsonconsError(error, cursor.context()));
 #endif
             return fromJsonconsError(error, cursor.context());
         }
@@ -738,7 +756,8 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
     cursor.check_done(error);
     if (error) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
-        record_event_loop();
+        return finish_with_event_loop(fromJsonconsError(error,
+            cursor.context()));
 #endif
         return fromJsonconsError(error, cursor.context());
     }
