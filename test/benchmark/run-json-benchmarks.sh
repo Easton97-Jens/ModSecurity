@@ -75,6 +75,8 @@ run_scenarios() {
             "${binary}" --scenario "${scenario}" --include-invalid --output json >> "${output_file}"
         done
     fi
+
+    return 0
 }
 
 : > "${output_file}"

@@ -68,6 +68,12 @@ struct Metrics {
     unsigned long long parse_error_count{0};
 };
 
+class JsonBenchmarkError : public std::runtime_error {
+ public:
+    explicit JsonBenchmarkError(const std::string &message)
+        : std::runtime_error(message) { }
+};
+
 const char *const usage_message =
     "Usage: json_benchmark --scenario NAME [--iterations N] "
     "[--target-bytes N] [--depth N] [--include-invalid] [--output json]";
@@ -99,7 +105,7 @@ unsigned long long parseUnsignedLongLong(const char *value,
     const unsigned long long parsed = std::strtoull(value, &end, 10);
     if (errno != 0 || end == value || *end != '\0'
             || (!allow_zero && parsed == 0)) {
-        throw std::runtime_error(std::string("invalid numeric value for ")
+        throw JsonBenchmarkError(std::string("invalid numeric value for ")
             + flag_name + ": " + value);
     }
     return parsed;
@@ -109,7 +115,7 @@ std::size_t parseSize(const char *value, const char *flag_name) {
     const unsigned long long parsed =
         parseUnsignedLongLong(value, flag_name, true);
     if (parsed > std::numeric_limits<std::size_t>::max()) {
-        throw std::runtime_error(std::string("value too large for ")
+        throw JsonBenchmarkError(std::string("value too large for ")
             + flag_name + ": " + value);
     }
     return static_cast<std::size_t>(parsed);
@@ -119,59 +125,62 @@ unsigned long long parseIterations(const char *value) {
     return parseUnsignedLongLong(value, "--iterations", false);
 }
 
+const char *requireOptionValue(int argc, const char *argv[], int *index,
+    const char *option_name) {
+    if (*index + 1 >= argc) {
+        throw JsonBenchmarkError(std::string("missing value for ")
+            + option_name);
+    }
+    *index += 1;
+    return argv[*index];
+}
+
 Options parseOptions(int argc, const char *argv[]) {
     Options options;
 
-    for (int i = 1; i < argc; i++) {
+    int i = 1;
+    while (i < argc) {
         const std::string current(argv[i]);
         if (current == "-h" || current == "-?" || current == "--help") {
             std::cout << usage_message << std::endl;
             std::exit(0);
         } else if (current == "--scenario") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --scenario");
-            }
-            options.scenario.assign(argv[++i]);
+            options.scenario.assign(
+                requireOptionValue(argc, argv, &i, "--scenario"));
         } else if (current == "--iterations") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --iterations");
-            }
-            options.iterations = parseIterations(argv[++i]);
+            options.iterations = parseIterations(
+                requireOptionValue(argc, argv, &i, "--iterations"));
         } else if (current == "--target-bytes") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --target-bytes");
-            }
-            options.target_bytes = parseSize(argv[++i], "--target-bytes");
+            options.target_bytes = parseSize(
+                requireOptionValue(argc, argv, &i, "--target-bytes"),
+                "--target-bytes");
         } else if (current == "--depth") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --depth");
-            }
-            options.depth = parseSize(argv[++i], "--depth");
+            options.depth = parseSize(
+                requireOptionValue(argc, argv, &i, "--depth"), "--depth");
         } else if (current == "--include-invalid") {
             options.include_invalid = true;
         } else if (current == "--output") {
-            if (i + 1 >= argc) {
-                throw std::runtime_error("missing value for --output");
-            }
-            if (const std::string output_format(argv[++i]);
+            if (const std::string output_format(
+                    requireOptionValue(argc, argv, &i, "--output"));
                 output_format != "json") {
-                throw std::runtime_error("unsupported output format: "
+                throw JsonBenchmarkError("unsupported output format: "
                     + output_format);
             }
             options.output_json = true;
         } else {
-            throw std::runtime_error("unknown option: " + current);
+            throw JsonBenchmarkError("unknown option: " + current);
         }
+        i++;
     }
 
     if (options.scenario.empty()) {
-        throw std::runtime_error("missing required --scenario");
+        throw JsonBenchmarkError("missing required --scenario");
     }
 
     if (const bool is_invalid_scenario = options.scenario == "truncated"
             || options.scenario == "malformed";
         is_invalid_scenario && !options.include_invalid) {
-        throw std::runtime_error(
+        throw JsonBenchmarkError(
             "invalid JSON scenarios require --include-invalid");
     }
 
@@ -301,7 +310,7 @@ std::string buildScenarioBody(const Options &options) {
         return body;
     }
 
-    throw std::runtime_error("unsupported scenario: " + options.scenario);
+    throw JsonBenchmarkError("unsupported scenario: " + options.scenario);
 }
 
 bool isResolvedZero(const std::unique_ptr<std::string> &value) {
@@ -332,13 +341,13 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
             reinterpret_cast<const unsigned char *>(body.data()), body.size());
         metrics.append_request_body_ns += elapsedNanos(append_start);
         if (append_ok == 0) {
-            throw std::runtime_error(
+            throw JsonBenchmarkError(
                 "appendRequestBody reported partial body processing");
         }
 
         const auto process_start = Clock::now();
         if (!transaction.processRequestBody()) {
-            throw std::runtime_error("processRequestBody returned false");
+            throw JsonBenchmarkError("processRequestBody returned false");
         }
         metrics.process_request_body_ns += elapsedNanos(process_start);
         metrics.total_transaction_ns += elapsedNanos(total_start);
@@ -349,7 +358,7 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
             transaction.m_variableReqbodyProcessorError.resolveFirst();
 
         if (!reqbody_error || !processor_error) {
-            throw std::runtime_error(
+            throw JsonBenchmarkError(
                 "unable to resolve JSON parse outcome variables");
         }
 
@@ -358,7 +367,7 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
         if (const bool parse_error = !isResolvedZero(reqbody_error)
                 || !isResolvedZero(processor_error);
             parse_success == parse_error) {
-            throw std::runtime_error(
+            throw JsonBenchmarkError(
                 "ambiguous JSON parse outcome observed in benchmark");
         }
 
