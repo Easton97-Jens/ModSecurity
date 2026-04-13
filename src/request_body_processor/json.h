@@ -88,7 +88,7 @@ class JSON : public JsonEventSink {
 
     std::string getCurrentKey(bool emptyIsNull = false) {
         std::string ret(m_current_key);
-        if (m_containers.size() == 0) {
+        if (m_containers.empty()) {
             return "json";
         }
         if (m_current_key.empty()) {

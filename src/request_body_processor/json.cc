@@ -31,7 +31,8 @@
 namespace modsecurity::RequestBodyProcessor {
 
 static const double json_depth_limit_default = 10000.0;
-static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceeded";
+static const char *const json_depth_limit_exceeded_msg =
+    ". Parsing depth limit exceeded";
 
 namespace {
 
@@ -189,7 +190,7 @@ int JSON::addArgument(const std::string& value) {
     std::string path;
 
     for (size_t i =  0; i < m_containers.size(); i++) {
-        const JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+        const auto *a = dynamic_cast<JSONContainerArray *>(
             m_containers[i].get());
         path = path + m_containers[i]->m_name;
         if (a != nullptr) {
@@ -199,8 +200,8 @@ int JSON::addArgument(const std::string& value) {
         }
     }
 
-    if (m_containers.size() > 0) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+    if (!m_containers.empty()) {
+        auto *a = dynamic_cast<JSONContainerArray *>(
             m_containers.back().get());
         if (a) {
             a->m_elementCounter++;
