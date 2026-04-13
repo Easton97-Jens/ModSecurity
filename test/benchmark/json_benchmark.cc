@@ -48,6 +48,8 @@ constexpr std::size_t kDefaultTargetBytes = 1048576;
 constexpr std::size_t kDefaultDepth = 512;
 constexpr unsigned long long kDefaultIterations = 100;
 constexpr const char *kRulesFileName = "json_benchmark_rules.conf";
+constexpr const char *kClientIp = "198.51.100.10";  // RFC 5737 documentation range
+constexpr const char *kServerIp = "198.51.100.20";  // RFC 5737 documentation range
 
 struct Options {
     std::string scenario;
@@ -315,8 +317,7 @@ Metrics runBenchmark(modsecurity::ModSecurity *modsec,
         iteration++) {
         const auto total_start = Clock::now();
         modsecurity::Transaction transaction(modsec, rules, nullptr);
-        transaction.processConnection("200.249.12.31", 12345,
-            "127.0.0.1", 80);
+        transaction.processConnection(kClientIp, 12345, kServerIp, 80);
         transaction.processURI("/json-benchmark", "POST", "1.1");
         transaction.addRequestHeader("Host", "localhost");
         transaction.addRequestHeader("User-Agent",
