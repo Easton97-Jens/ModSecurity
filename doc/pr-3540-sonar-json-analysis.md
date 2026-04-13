@@ -1,97 +1,292 @@
-# Analyse PR #3540 (SonarQubeCloud + JSON-Backend-Trennung)
+# PR #3540 Sonar-Befunde (vollständige API-Auslesung)
 
-Datum der Analyse: 2026-04-13 (UTC)
+Analysezeitpunkt: 2026-04-13 UTC
 
-## Verifizierte externe Quellen
+Issues-Quelle: `api/issues/search?componentKeys=owasp-modsecurity_ModSecurity&pullRequest=3540` (3 Seiten à 100/100/5).
 
-- GitHub Pull Request: https://github.com/owasp-modsecurity/ModSecurity/pull/3540
-- GitHub Checks API für Head-Commit `5dd7b3539977de85f0a2aebd2cb28b9ea1640211`
-- SonarCloud API (öffentlich):
-  - `api/qualitygates/project_status?projectKey=owasp-modsecurity_ModSecurity&pullRequest=3540`
-  - `api/measures/component?component=owasp-modsecurity_ModSecurity&pullRequest=3540&metricKeys=...`
-  - `api/hotspots/search?projectKey=owasp-modsecurity_ModSecurity&pullRequest=3540`
-  - `api/hotspots/show?hotspot=AZ2DWE24t-zbsGOGdN_L`
+Gesamt-Issues laut API: **205** (OPEN: 68, CLOSED: 137).
 
-## Relevante, lokal verifizierte Projektstellen
+## Tabelle A: Vollständige Liste aller abrufbaren Sonar-Befunde (Issues + Hotspots + Gate Conditions)
 
-- Backend-Selektion via Configure-Option und Compile-Defines: `configure.ac`.
-- Backend-spezifische Source-Auswahl in `src/Makefile.am`.
-- Adapter-Schicht und Ergebnis-Normalisierung in `src/request_body_processor/json_adapter.*`.
-- Gemeinsames Sink-Interface + Parse-Status in `src/request_body_processor/json_backend.h`.
-- JSON-Prozessor (Parser-Entry für Transaktion) in `src/request_body_processor/json.*`.
-- Backend-Implementierungen:
-  - `src/request_body_processor/json_backend_simdjson.cc`
-  - `src/request_body_processor/json_backend_jsoncons.cc`
-- Instrumentation in `src/request_body_processor/json_instrumentation.*`.
-- Matrix-Testskript über beide Backends in `test/run-json-backend-matrix.sh`.
-- Backend-spezifische Tiefe/Number-Lexeme-Tests in `test/unit/json_backend_depth_tests.cc`.
-- Regression-Edgecases in `test/test-cases/regression/request-body-parser-json-backend-edgecases.json`.
+|#|Kategorie|Regelcode|Severity|Typ/CleanCode|Status|Datei|Zeile|Kurztitel/Nachricht|Produktivcode/Test|Direkt behebbar?|Konkreter technischer Fix|
+|---|---|---|---|---|---|---|---|---|---|---|---|
+|1|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|OPEN|test/benchmark/json_benchmark.cc|120|Refactor this function to reduce its Cognitive Complexity from 33 to the 25 allowed.|Test/Benchmark|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|2|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|130|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|3|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|135|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|4|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|140|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|5|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|145|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|6|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|152|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|7|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|156|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|8|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|161|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|9|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|166|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|10|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|172|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|11|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|302|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|12|Issue|cpp:S4998|MAJOR|CODE_SMELL / CLEAR|OPEN|test/benchmark/json_benchmark.cc|305|Replace this use of "unique_ptr" by a raw pointer or a reference (possibly const).|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|13|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|334|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|14|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|340|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|15|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|351|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|16|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|360|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|17|Issue|cpp:S1188|MAJOR|CODE_SMELL / FOCUSED|OPEN|test/regression/regression_test.cc|235|This lambda has 23 lines, which is greater than the 20 lines authorized. Split it into several lambdas or functions, or make it a named function.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|18|Issue|cpp:S6009|MINOR|CODE_SMELL / EFFICIENT|OPEN|src/request_body_processor/json_adapter.cc|58|Replace this const reference to "std::string" by a "std::string_view".|Produktivcode|Ja|Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|19|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|src/request_body_processor/json_adapter.cc|59|Make the type of this parameter a pointer-to-const. The current type of "sink" is "class modsecurity::RequestBodyProcessor::JsonEventSink *".|Produktivcode|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|20|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|src/request_body_processor/json_adapter.cc|81|Make the type of this parameter a reference-to-const. The current type of "input" is "std::string &".|Produktivcode|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|21|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|CLOSED|src/request_body_processor/json_adapter.cc||Make the type of this parameter a pointer-to-const. The current type of "sink" is "class modsecurity::RequestBodyProcessor::JsonEventSink *".|Produktivcode|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|22|Issue|cpp:S1121|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Extract the assignment from this expression.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|23|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|CLOSED|src/request_body_processor/json_adapter.cc||Make the type of this parameter a reference-to-const. The current type of "input" is "std::string &".|Produktivcode|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|24|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|CLOSED|src/request_body_processor/json_adapter.cc||Make the type of this parameter a pointer-to-const. The current type of "sink" is "class modsecurity::RequestBodyProcessor::JsonEventSink *".|Produktivcode|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|25|Issue|cpp:S1172|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_adapter.cc||Remove the unused parameter "options", make it unnamed, or declare it "[[maybe_unused]]".|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|26|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "tail" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|27|Issue|cpp:S1117|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Declaration shadows a local variable "result" in the outer scope.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|28|Issue|cpp:S1117|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Declaration shadows a local variable "result" in the outer scope.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|29|Issue|cpp:S5817|MAJOR|CODE_SMELL / CLEAR|OPEN|src/request_body_processor/json_backend_simdjson.cc|450|This function should be declared "const".|Produktivcode|Ja|Methode als `const` deklarieren, wenn kein Objektzustand geändert wird.|
+|30|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Use the init-statement to declare "result" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|31|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Use the init-statement to declare "result" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|32|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Use the init-statement to declare "result" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|33|Issue|cpp:S5945|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/unit/json_backend_depth_tests.cc||Use "std::array" or "std::vector" instead of a C-style array.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|34|Issue|cpp:S3628|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Convert this string literal to a raw string literal.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|35|Issue|cpp:S6022|MAJOR|CODE_SMELL / CLEAR|OPEN|src/operators/validate_byte_range.cc|156|Use "std::byte" for byte-oriented data manipulation.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|36|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|37|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Concatenate this namespace with the nested one.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|38|Issue|cpp:S4144|MAJOR|CODE_SMELL / DISTINCT|OPEN|test/unit/json_backend_depth_tests.cc|50|Update this method so that its implementation is not identical to on_key.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|39|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Use the init-statement to declare "result" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|40|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/unit/json_backend_depth_tests.cc||Use the init-statement to declare "result" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|41|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|362|Refactor this function to reduce its Cognitive Complexity from 41 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|42|Issue|cpp:S1121|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Extract the assignment from this expression.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|43|Issue|cpp:S1121|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Extract the assignment from this expression.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|44|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|426|Refactor this function to reduce its Cognitive Complexity from 43 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|45|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Use the init-statement to declare "decoded_number" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|46|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|634|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|47|Issue|cpp:S1135|INFO|CODE_SMELL / COMPLETE|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Complete the task associated to this "TODO" comment.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|48|Issue|cpp:S5025|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|57|Rewrite the code so that you no longer need this "delete".|Produktivcode|Teilweise|Manuelles `delete` durch RAII (`std::unique_ptr`) ersetzen.|
+|49|Issue|cpp:S5827|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json.cc||Replace the redundant type with "auto".|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|50|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_instrumentation.cc||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|51|Issue|cpp:S5421|CRITICAL|CODE_SMELL / MODULAR|OPEN|src/request_body_processor/json_instrumentation.cc|12|Global variables should be const.|Produktivcode|Teilweise|Globalen Zustand kapseln (z. B. Funktions-scope static/thread_local Accessor) oder const machen.|
+|52|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_instrumentation.h||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|53|Issue|cpp:S4962|CRITICAL|CODE_SMELL / CONVENTIONAL|CLOSED|src/utils/msc_tree.cc||Use the "nullptr" literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|54|Issue|cpp:S5421|CRITICAL|CODE_SMELL / MODULAR|CLOSED|test/benchmark/json_benchmark.cc||Global pointers should be const at every level.|Test/Benchmark|Teilweise|Globalen Zustand kapseln (z. B. Funktions-scope static/thread_local Accessor) oder const machen.|
+|55|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|100|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|56|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|OPEN|test/benchmark/json_benchmark.cc|110|Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|57|Issue|cpp:S886|MINOR|CODE_SMELL / CLEAR|OPEN|test/benchmark/json_benchmark.cc|123|Refactor this loop so that it is less error-prone.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|58|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Use the init-statement to declare "output_format" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|59|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Use the init-statement to declare "is_invalid_scenario" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|60|Issue|cpp:S5945|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Use "std::array" or "std::vector" instead of a C-style array.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|61|Issue|cpp:S5945|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Use "std::array" or "std::vector" instead of a C-style array.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|62|Issue|cpp:S7127|CRITICAL|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Use "std::size" to get the size of this array.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|63|Issue|cpp:S6009|MINOR|CODE_SMELL / EFFICIENT|OPEN|test/benchmark/json_benchmark.cc|310|Replace this const reference to "std::string" by a "std::string_view".|Test/Benchmark|Ja|Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|64|Issue|cpp:S7121|MAJOR|CODE_SMELL / EFFICIENT|CLOSED|test/benchmark/json_benchmark.cc||Remove this redundant call to "c_str" when initializing a const "std::string" reference parameter.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|65|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Use the init-statement to declare "parse_error" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|66|Issue|cpp:S3628|MINOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Convert this string literal to a raw string literal.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|67|Issue|cpp:S3628|MINOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Convert this string literal to a raw string literal.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|68|Issue|cpp:S6009|MINOR|CODE_SMELL / EFFICIENT|OPEN|test/benchmark/json_benchmark.cc|409|Replace this const reference to "std::string" by a "std::string_view".|Test/Benchmark|Ja|Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|69|Issue|cpp:S6009|MINOR|CODE_SMELL / EFFICIENT|OPEN|test/benchmark/json_benchmark.cc|476|Replace this const reference to "std::string" by a "std::string_view".|Test/Benchmark|Ja|Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|70|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Use the init-statement to declare "rules_path" inside the if statement.|Test/Benchmark|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|71|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|72|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|CLOSED|test/benchmark/json_benchmark.cc||Refactor this function to reduce its Cognitive Complexity from 33 to the 25 allowed.|Test/Benchmark|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|73|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|74|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|75|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|76|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|77|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|78|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|79|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|80|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|81|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|82|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|83|Issue|cpp:S4998|MAJOR|CODE_SMELL / CLEAR|CLOSED|test/benchmark/json_benchmark.cc||Replace this use of "unique_ptr" by a raw pointer or a reference (possibly const).|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|84|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|85|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|86|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|87|Issue|cpp:S112|MAJOR|CODE_SMELL / COMPLETE|CLOSED|test/benchmark/json_benchmark.cc||Define and throw a dedicated exception instead of using a generic one.|Test/Benchmark|Ja|Spezifische Exception-Klasse statt generischer Exception verwenden.|
+|88|Issue|shelldre:S7682|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Add an explicit return statement at the end of the function.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|89|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|90|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|91|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|92|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|93|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|94|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|95|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/benchmark/run-json-benchmarks.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|96|Issue|shelldre:S7682|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/run-json-backend-matrix.sh||Add an explicit return statement at the end of the function.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|97|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|98|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|99|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|100|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|101|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|102|Issue|shelldre:S7682|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/run-json-backend-matrix.sh||Add an explicit return statement at the end of the function.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|103|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|104|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|105|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|106|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|107|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|108|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|109|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|110|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|111|Issue|shelldre:S7688|MAJOR|CODE_SMELL / CONVENTIONAL|CLOSED|test/run-json-backend-matrix.sh||Use '[[' instead of '[' for conditional tests. The '[[' construct is safer and more feature-rich.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|112|Issue|cpp:S6022|MAJOR|CODE_SMELL / CLEAR|OPEN|src/operators/validate_byte_range.cc|72|Use "std::byte" for byte-oriented data manipulation.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|113|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/operators/validate_byte_range.cc||Use the init-statement to declare "token" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|114|Issue|cpp:S3230|MAJOR|CODE_SMELL / COMPLETE|OPEN|src/request_body_processor/json.cc|79|Do not use the constructor's initializer list for data member "m_data". Use the in-class initializer instead.|Produktivcode|Ja|In-Class-Initializer verwenden und redundante Initialisierung in Initializer-Liste entfernen.|
+|115|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|121|Refactor this function to reduce its Cognitive Complexity from 37 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|116|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json.cc||Use the init-statement to declare "result" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|117|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|135|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|118|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|142|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|119|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|149|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|120|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|156|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|121|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json.cc|163|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|122|Issue|cpp:S4144|MAJOR|CODE_SMELL / DISTINCT|CLOSED|src/request_body_processor/json.cc||Update this method so that its implementation is not identical to on_end_object.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|123|Issue|cpp:S1155|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json.cc||Use "empty()" to check whether the container is empty or not.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|124|Issue|cpp:S1155|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json.cc||Use "empty()" to check whether the container is empty or not.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|125|Issue|cpp:S3624|CRITICAL|CODE_SMELL / COMPLETE|OPEN|src/request_body_processor/json.h|52|Customize this class' copy constructor to participate in resource management. Customize or delete its copy assignment operator. Also consider whether move operations should be customized.|Produktivcode|Teilweise|Copy-/Move-Semantik explizit definieren oder Copy deaktivieren (Rule of 5/0).|
+|126|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_adapter.cc||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|127|Issue|cpp:S1172|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_adapter.cc||Remove the unused parameter "options", make it unnamed, or declare it "[[maybe_unused]]".|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|128|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|CLOSED|src/request_body_processor/json_adapter.cc||Make the type of this parameter a pointer-to-const. The current type of "sink" is "class modsecurity::RequestBodyProcessor::JsonEventSink *".|Produktivcode|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|129|Issue|cpp:S6009|MINOR|CODE_SMELL / EFFICIENT|CLOSED|src/request_body_processor/json_adapter.cc||Replace this const reference to "std::string" by a "std::string_view".|Produktivcode|Ja|Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|130|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_adapter.h||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|131|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend.h||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|132|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|133|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|106|Refactor this function to reduce its Cognitive Complexity from 33 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|134|Issue|cpp:S3562|MAJOR|CODE_SMELL / COMPLETE|OPEN|src/request_body_processor/json_backend_jsoncons.cc|202|4 enumeration values not handled in switch: 'int64_value', 'uint64_value', 'half_value'...|Produktivcode|Ja|Fehlende enum-Zweige im switch ergänzen oder default gezielt begründen.|
+|135|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Refactor this function to reduce its Cognitive Complexity from 41 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|136|Issue|cpp:S1121|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Extract the assignment from this expression.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|137|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Use the init-statement to declare "current" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|138|Issue|cpp:S1121|MAJOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Extract the assignment from this expression.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|139|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Refactor this function to reduce its Cognitive Complexity from 43 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|140|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|379|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|141|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Use the init-statement to declare "escaped" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|142|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|388|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Produktivcode|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|143|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Use the init-statement to declare "sync_detail" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|144|Issue|cpp:S6009|MINOR|CODE_SMELL / EFFICIENT|OPEN|src/request_body_processor/json_backend_jsoncons.cc|546|Replace this const reference to "std::string" by a "std::string_view".|Produktivcode|Ja|Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|145|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Use the init-statement to declare "end" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|146|Issue|cpp:S3776|CRITICAL|CODE_SMELL / FOCUSED|OPEN|src/request_body_processor/json_backend_jsoncons.cc|577|Refactor this function to reduce its Cognitive Complexity from 48 to the 25 allowed.|Produktivcode|Ja|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.|
+|147|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_jsoncons.cc||Use the init-statement to declare "result" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|148|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|149|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|150|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|151|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|152|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|153|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "result" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|154|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|155|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "result" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|156|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|157|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|158|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "result" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|159|Issue|cpp:S6004|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json_backend_simdjson.cc||Use the init-statement to declare "sink_status" inside the if statement.|Produktivcode|Ja|if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|160|Issue|cpp:S7121|MAJOR|CODE_SMELL / EFFICIENT|CLOSED|src/transaction.cc||Remove this redundant call to "c_str" when initializing a const "std::string" reference parameter.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|161|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/utils/json_writer.cc||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|162|Issue|cpp:S3230|MAJOR|CODE_SMELL / COMPLETE|CLOSED|src/utils/json_writer.cc||Remove this use of the constructor's initializer list for data member "m_output". It is redundant with default initialization behavior.|Produktivcode|Ja|In-Class-Initializer verwenden und redundante Initialisierung in Initializer-Liste entfernen.|
+|163|Issue|cpp:S3230|MAJOR|CODE_SMELL / COMPLETE|CLOSED|src/utils/json_writer.cc||Remove this use of the constructor's initializer list for data member "m_stack". It is redundant with default initialization behavior.|Produktivcode|Ja|In-Class-Initializer verwenden und redundante Initialisierung in Initializer-Liste entfernen.|
+|164|Issue|cpp:S5945|MAJOR|CODE_SMELL / COMPLETE|OPEN|src/utils/json_writer.cc|155|Use "std::string" instead of a C-style char array.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|165|Issue|cpp:S3628|MINOR|CODE_SMELL / CLEAR|CLOSED|src/utils/json_writer.cc||Convert this string literal to a raw string literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|166|Issue|cpp:S3628|MINOR|CODE_SMELL / CLEAR|CLOSED|src/utils/json_writer.cc||Convert this string literal to a raw string literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|167|Issue|cpp:S6022|MAJOR|CODE_SMELL / CLEAR|OPEN|src/utils/json_writer.cc|183|Use "std::byte" for byte-oriented data manipulation.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|168|Issue|cpp:S6022|MAJOR|CODE_SMELL / CLEAR|OPEN|src/utils/json_writer.cc|184|Use "std::byte" for byte-oriented data manipulation.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|169|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/utils/json_writer.h||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|170|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|test/common/json.h||Concatenate this namespace with the nested one.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|171|Issue|cpp:S2807|MAJOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|78|Make this member overloaded operator a hidden friend.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|172|Issue|cpp:S2807|MAJOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|123|Make this member overloaded operator a hidden friend.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|173|Issue|cpp:S1181|MAJOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|219|Catch a more specific exception instead of a generic one.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|174|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|232|Make the type of this parameter a pointer-to-const. The current type of "error" is "std::string *".|Test/Benchmark|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|175|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|242|Make the type of this parameter a pointer-to-const. The current type of "error" is "std::string *".|Test/Benchmark|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|176|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|252|Make the type of this parameter a pointer-to-const. The current type of "error" is "std::string *".|Test/Benchmark|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|177|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|262|Make the type of this parameter a pointer-to-const. The current type of "error" is "std::string *".|Test/Benchmark|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|178|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|269|Make the type of this parameter a pointer-to-const. The current type of "error" is "std::string *".|Test/Benchmark|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|179|Issue|cpp:S995|MINOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|279|Make the type of this parameter a pointer-to-const. The current type of "error" is "std::string *".|Test/Benchmark|Ja|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.|
+|180|Issue|cpp:S1181|MAJOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|309|Catch a more specific exception instead of a generic one.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|181|Issue|cpp:S1181|MAJOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|321|Catch a more specific exception instead of a generic one.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|182|Issue|cpp:S1181|MAJOR|CODE_SMELL / CONVENTIONAL|OPEN|test/common/json.h|333|Catch a more specific exception instead of a generic one.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|183|Issue|cpp:S134|CRITICAL|CODE_SMELL / FOCUSED|OPEN|test/common/modsecurity_test.cc|89|Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.|Test/Benchmark|Ja|Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.|
+|184|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|185|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|186|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|187|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|188|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|189|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|190|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/regression/regression_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|191|Issue|cpp:S5817|MAJOR|CODE_SMELL / CLEAR|OPEN|test/regression/regression_test.cc|431|This function should be declared "const".|Test/Benchmark|Ja|Methode als `const` deklarieren, wenn kein Objektzustand geändert wird.|
+|192|Issue|cpp:S5274|MAJOR|CODE_SMELL / EFFICIENT|CLOSED|test/regression/regression_test.cc||moving a temporary object prevents copy elision|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|193|Issue|cpp:S5274|MAJOR|CODE_SMELL / EFFICIENT|CLOSED|test/regression/regression_test.cc||moving a temporary object prevents copy elision|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|194|Issue|cpp:S1481|MINOR|CODE_SMELL / CLEAR|CLOSED|test/regression/regression_test.cc||Remove the unused lambda capture "writer".|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|195|Issue|cpp:S5415|MAJOR|CODE_SMELL / LOGICAL|CLOSED|test/unit/unit_test.cc||The result of "std::move" should not be passed as a const reference.|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|196|Issue|cpp:S836|MAJOR|BUG / LOGICAL|CLOSED|test/unit/unit_test.h||Value assigned to field 'ret' in implicit constructor is garbage or undefined|Test/Benchmark|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|197|Issue|cpp:S886|MINOR|CODE_SMELL / CLEAR|OPEN|src/modsecurity.cc|232|Refactor this loop so that it is less error-prone.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|198|Issue|cpp:S886|MINOR|CODE_SMELL / CLEAR|OPEN|src/modsecurity.cc|288|Refactor this loop so that it is less error-prone.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|199|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json.cc||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|200|Issue|cpp:S5812|MINOR|CODE_SMELL / CLEAR|CLOSED|src/request_body_processor/json.h||Concatenate this namespace with the nested one.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|201|Issue|cpp:S4962|CRITICAL|CODE_SMELL / CONVENTIONAL|CLOSED|src/utils/msc_tree.cc||Use the "nullptr" literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|202|Issue|cpp:S4962|CRITICAL|CODE_SMELL / CONVENTIONAL|CLOSED|src/utils/msc_tree.cc||Use the "nullptr" literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|203|Issue|cpp:S4962|CRITICAL|CODE_SMELL / CONVENTIONAL|CLOSED|src/utils/msc_tree.cc||Use the "nullptr" literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|204|Issue|cpp:S4962|CRITICAL|CODE_SMELL / CONVENTIONAL|CLOSED|src/utils/msc_tree.cc||Use the "nullptr" literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|205|Issue|cpp:S4962|CRITICAL|CODE_SMELL / CONVENTIONAL|CLOSED|src/utils/msc_tree.cc||Use the "nullptr" literal.|Produktivcode|Teilweise|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|206|Security Hotspot|cpp:S1313|LOW|Security Hotspot|TO_REVIEW|test/benchmark/json_benchmark.cc|318|Make sure using this hardcoded IP address is safe here.|Test/Benchmark|Ja|Hardcoded IP aus Code entfernen und per Konfiguration/Parameter übergeben; alternativ dokumentiert als sicher reviewen.|
+|207|Gate Condition|n/a|n/a|Quality Gate Condition|OK|n/a|n/a|new_reliability_rating comparator GT threshold 1 actual 1|n/a|n/a|n/a|
+|208|Gate Condition|n/a|n/a|Quality Gate Condition|OK|n/a|n/a|new_security_rating comparator GT threshold 1 actual 1|n/a|n/a|n/a|
+|209|Gate Condition|n/a|n/a|Quality Gate Condition|OK|n/a|n/a|new_maintainability_rating comparator GT threshold 1 actual 1|n/a|n/a|n/a|
+|210|Gate Condition|n/a|n/a|Quality Gate Condition|OK|n/a|n/a|new_duplicated_lines_density comparator GT threshold 3 actual 1.3|n/a|n/a|n/a|
+|211|Gate Condition|n/a|n/a|Quality Gate Condition|ERROR|n/a|n/a|new_security_hotspots_reviewed comparator LT threshold 100 actual 0.0|n/a|Ja|Hotspot review durchführen|
 
-## SonarQubeCloud: verifizierter Gate-Status
+## Tabelle B: Summen
 
-`qualitygates/project_status` liefert:
+- Gesamtanzahl Issues: 205
+- Gesamtanzahl Hotspots: 1
+- Gesamtanzahl Gate-Conditions mit Fehler: 1
+- Blocker: 0
+- CRITICAL: 29
+- MAJOR: 104
+- MINOR: 71
+- INFO: 1
+- Produktivcode-Issues: 93
+- Test/Benchmark-Issues: 112
 
-- `status=ERROR`
-- `new_security_hotspots_reviewed = 0.0` bei Schwellwert `>= 100` (Gate-Fehler)
-- `new_duplicated_lines_density = 1.3` bei Schwellwert `<= 3` (Gate **nicht** verletzt)
+### Anzahl pro Regelcode
 
-Damit ist auf Basis der API der Quality-Gate-Fehler auf den nicht reviewten Security Hotspot zurückzuführen, nicht auf Duplikation.
+|Regelcode|Anzahl|
+|---|---:|
+|cpp:S112|31|
+|cpp:S6004|29|
+|shelldre:S7688|22|
+|cpp:S5812|13|
+|cpp:S995|12|
+|cpp:S134|9|
+|cpp:S3776|9|
+|cpp:S5415|8|
+|cpp:S4962|6|
+|cpp:S6009|6|
+|cpp:S1121|5|
+|cpp:S3628|5|
+|cpp:S1181|4|
+|cpp:S5945|4|
+|cpp:S6022|4|
+|cpp:S3230|3|
+|cpp:S886|3|
+|shelldre:S7682|3|
+|cpp:S1117|2|
+|cpp:S1155|2|
+|cpp:S1172|2|
+|cpp:S2807|2|
+|cpp:S4144|2|
+|cpp:S4998|2|
+|cpp:S5274|2|
+|cpp:S5421|2|
+|cpp:S5817|2|
+|cpp:S7121|2|
+|cpp:S1135|1|
+|cpp:S1188|1|
+|cpp:S1481|1|
+|cpp:S3562|1|
+|cpp:S3624|1|
+|cpp:S5025|1|
+|cpp:S5827|1|
+|cpp:S7127|1|
+|cpp:S836|1|
 
-## Security Hotspot (verifiziert)
+## Tabelle C: Sonar-Befunde nur in den JSON-Dateien
 
-- Datei: `test/benchmark/json_benchmark.cc`
-- Zeile: 318
-- Regel: `cpp:S1313` („Using hardcoded IP addresses is security-sensitive“)
-- Meldung: „Make sure using this hardcoded IP address is safe here.“
-- Sonar-Status: `TO_REVIEW`, `vulnerabilityProbability=LOW`
-
-Hinweis: Der Hotspot liegt in Test-/Benchmark-Code, nicht in den produktiven JSON-Backend-Dateien.
-
-## JSON-Backend-Trennung: verifizierte Architektur
-
-1. **Build-Time Auswahl (mutuell exklusiv)**
-   - `--with-json-backend=simdjson|jsoncons` in `configure.ac`.
-   - Definiert genau eines von `MSC_JSON_BACKEND_SIMDJSON` oder `MSC_JSON_BACKEND_JSONCONS`.
-   - `src/Makefile.am` fügt abhängig davon genau eine Backend-Datei (`json_backend_simdjson.cc` oder `json_backend_jsoncons.cc`) hinzu.
-
-2. **Gemeinsame Laufzeit-Abstraktion**
-   - Gemeinsames Event-/Status-Interface in `json_backend.h` (`JsonEventSink`, `JsonParseResult`, `JsonParseStatus`, `JsonSinkStatus`).
-   - `JSONAdapter::parseImpl()` dispatcht per Compile-Makro auf genau ein Backend.
-
-3. **Gemeinsame Verarbeitungsschicht oberhalb der Backends**
-   - `JSON` implementiert `JsonEventSink` und mappt Events auf `Transaction::addArgument(...)`.
-   - Dadurch teilen beide Backends denselben Semantikpfad für Argument-Erzeugung/Depth-Handling im Sink.
-
-## Verifizierte Überschneidungen / Kopplungen
-
-- **Gewollte Kopplung über gemeinsames Sink-Interface**: beide Backends liefern identische Event-Arten an dieselbe `JSON`-Klasse.
-- **Build-Kopplung in Tests**: `test/Makefile.am` enthält `-I$(top_srcdir)/others/jsoncons/include` in allgemeinen Test-CPPFLAGS, auch wenn simdjson als Backend gewählt ist.
-- **Teilweise duplizierte Helper-Logik** zwischen Backends (z. B. `makeResult(...)`, `stopTraversal(...)`, ähnliche Event-Dispatch-Strukturen), jedoch jeweils mit backend-spezifischen Parser-APIs.
-
-## Sonar-relevante Open-Issues in JSON-Dateien (Auszug)
-
-- `json_backend_jsoncons.cc`:
-  - hohe Cognitive Complexity (mehrere Funktionen)
-  - Nesting-Tiefe > 3 in mehreren Blöcken
-- `json.cc`:
-  - hohe Cognitive Complexity in `complete(...)`
-  - Nesting-Verstöße in `complete(...)`
-  - Rule zu manuellem `delete`
-- `json.h`:
-  - Rule zu Copy-/Move-Semantik (`JSON` besitzt rohe Pointer in Containern)
-- `json_instrumentation.cc`:
-  - Rule zu globaler Variable (`thread_local JsonInstrumentationMetrics g_metrics`)
-- `json_backend_simdjson.cc`:
-  - `enforceTechnicalDepth(...)` sollte laut Sonar `const` sein
-- `json_adapter.cc`:
-  - mehrere Minor-Hinweise zu `std::string_view`/`const`-Parametern
-
-## Minimal-invasive Refactoring-Ideen (direkt aus Code ableitbar)
-
-1. `json.cc::complete(...)` in kleine Mapper-Funktion für Fehlertext aufspalten.
-2. `json_backend_jsoncons.cc::emitEvent(...)` in Event-Handler-Funktionen splitten (`handleStringEvent`, `handleNumberEvent`, etc.).
-3. `json_backend_jsoncons.cc::consumeStringAt(...)` und `consumeNumberAt(...)` in kleinere Validator-Helfer extrahieren.
-4. `json.h/json.cc`: Ownership von `m_containers` auf `std::unique_ptr<JSONContainer>` umstellen, `delete` entfernen.
-5. `json_instrumentation.cc`: `g_metrics` in Funktion-scope kapseln (`metricsRef()`), Zugriffe zentralisieren.
-6. `json_backend_simdjson.cc`: `enforceTechnicalDepth(...) const` markieren (wenn API-Aufrufe const-korrekt bleiben).
-
+|Datei|Anzahl Befunde|Regelcodes|Kurzbeschreibung|Minimal-invasive Behebung|
+|---|---:|---|---|---|
+|src/request_body_processor/json.cc|14|cpp:S1155, cpp:S134, cpp:S3230, cpp:S3776, cpp:S4144, cpp:S5025, cpp:S5812, cpp:S5827, cpp:S6004|Concatenate this namespace with the nested one.; Do not use the constructor's initializer list for data member "m_data". Use the in-class initializer instead.; Refactor this code to not nest more than 3 if\|for\|do\|while\|switch statements.; ...|Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.; In-Class-Initializer verwenden und redundante Initialisierung in Initializer-Liste entfernen.; Manuelles `delete` durch RAII (`std::unique_ptr`) ersetzen.; Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.; Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.; if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|src/request_body_processor/json.h|2|cpp:S3624, cpp:S5812|Concatenate this namespace with the nested one.; Customize this class' copy constructor to participate in resource management. Customize or delete its copy assignment operator. Also consider whether move operations should be customized.|Copy-/Move-Semantik explizit definieren oder Copy deaktivieren (Rule of 5/0).; Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|src/request_body_processor/json_adapter.cc|11|cpp:S1172, cpp:S5812, cpp:S6009, cpp:S995|Concatenate this namespace with the nested one.; Make the type of this parameter a pointer-to-const. The current type of "sink" is "class modsecurity::RequestBodyProcessor::JsonEventSink *".; Make the type of this parameter a reference-to-const. The current type of "input" is "std::string &".; ...|Parameter const-korrekt machen (pointer/ref auf const), falls Funktionslogik kein Mutieren benötigt.; Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.; Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.|
+|src/request_body_processor/json_adapter.h|1|cpp:S5812|Concatenate this namespace with the nested one.|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|src/request_body_processor/json_backend.h|1|cpp:S5812|Concatenate this namespace with the nested one.|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|src/request_body_processor/json_backend_jsoncons.cc|23|cpp:S1121, cpp:S134, cpp:S3562, cpp:S3776, cpp:S5812, cpp:S6004, cpp:S6009|4 enumeration values not handled in switch: 'int64_value', 'uint64_value', 'half_value'...; Concatenate this namespace with the nested one.; Extract the assignment from this expression.; ...|Fehlende enum-Zweige im switch ergänzen oder default gezielt begründen.; Funktion in kleinere Helper aufteilen (je klarer Verantwortungsbereich), um Cognitive Complexity zu senken.; Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.; Signatur von `const std::string&` auf `std::string_view` umstellen, sofern Ownership nicht benötigt wird.; Verschachtelte Blöcke in Guard-Clauses/Helperfunktionen zerlegen.; if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|src/request_body_processor/json_backend_simdjson.cc|17|cpp:S1117, cpp:S1135, cpp:S5812, cpp:S5817, cpp:S6004|Complete the task associated to this "TODO" comment.; Concatenate this namespace with the nested one.; Declaration shadows a local variable "result" in the outer scope.; ...|Methode als `const` deklarieren, wenn kein Objektzustand geändert wird.; Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.; if/switch Init-Statement verwenden, lokale Variable im Statement deklarieren.|
+|src/request_body_processor/json_instrumentation.cc|2|cpp:S5421, cpp:S5812|Concatenate this namespace with the nested one.; Global variables should be const.|Globalen Zustand kapseln (z. B. Funktions-scope static/thread_local Accessor) oder const machen.; Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
+|src/request_body_processor/json_instrumentation.h|1|cpp:S5812|Concatenate this namespace with the nested one.|Regelspezifisch beheben; aus den verfügbaren Feldern ist kein präziserer Einzelschritt ableitbar.|
