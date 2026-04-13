@@ -75,7 +75,6 @@ int main(int argc, const char *argv[]) {
         }
     }
     std::cout << "Doing " << NUM_REQUESTS << " transactions...\n";
-    const auto benchmark_start = std::chrono::steady_clock::now();
     modsecurity::ModSecurity *modsec;
     modsecurity::RulesSet *rules;
     modsecurity::ModSecurityIntervention it;
@@ -90,6 +89,9 @@ int main(int argc, const char *argv[]) {
         std::cout << rules->m_parserError.str() << std::endl;
         return -1;
     }
+
+    // Start timing after one-time setup to measure only transaction processing.
+    const auto benchmark_start = std::chrono::steady_clock::now();
 
     for (unsigned long long i = 0; i < NUM_REQUESTS; i++) {
         //std::cout << "Proceeding with request " << i << std::endl;
