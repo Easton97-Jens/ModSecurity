@@ -33,6 +33,9 @@ class JSONAdapter {
             = JsonBackendParseOptions()) const;
 
  private:
+    JsonParseResult parseImpl(std::string &input, JsonEventSink *sink,
+        const JsonBackendParseOptions &options [[maybe_unused]]) const;
+
     JsonParseResult parseImpl(const std::string &input, JsonEventSink *sink,
         const JsonBackendParseOptions &options [[maybe_unused]]) const;
 };

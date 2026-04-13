@@ -49,6 +49,14 @@ JsonParseResult stopTraversal(JsonSinkStatus sink_status,
         + ".");
 }
 
+JsonParseResult finishSinkCall(JsonSinkStatus sink_status,
+    std::string_view location) {
+    if (sink_status != JsonSinkStatus::Continue) {
+        return stopTraversal(sink_status, location);
+    }
+    return makeResult(JsonParseStatus::Ok);
+}
+
 JsonParseResult fromSimdjsonError(simdjson::error_code error) {
     switch (error) {
         case simdjson::UTF8_ERROR:
@@ -219,11 +227,8 @@ class JsonBackendWalker {
                     return result;
                 }
 
-                if (JsonSinkStatus sink_status = m_sink->on_string(decoded);
-                    sink_status != JsonSinkStatus::Continue) {
-                    return stopTraversal(sink_status, "handling a root string");
-                }
-                return makeResult(JsonParseStatus::Ok);
+                return finishSinkCall(m_sink->on_string(decoded),
+                    "handling a root string");
             }
             case simdjson::ondemand::json_type::number: {
                 std::string_view raw_number;
@@ -232,12 +237,9 @@ class JsonBackendWalker {
                     return result;
                 }
 
-                if (JsonSinkStatus sink_status = m_sink->on_number(
-                        trimTrailingJsonWhitespace(raw_number));
-                    sink_status != JsonSinkStatus::Continue) {
-                    return stopTraversal(sink_status, "handling a root number");
-                }
-                return makeResult(JsonParseStatus::Ok);
+                return finishSinkCall(m_sink->on_number(
+                    trimTrailingJsonWhitespace(raw_number)),
+                    "handling a root number");
             }
             case simdjson::ondemand::json_type::boolean: {
                 bool boolean_value = false;
@@ -246,12 +248,8 @@ class JsonBackendWalker {
                     return result;
                 }
 
-                if (JsonSinkStatus sink_status = m_sink->on_boolean(
-                        boolean_value);
-                    sink_status != JsonSinkStatus::Continue) {
-                    return stopTraversal(sink_status, "handling a root boolean");
-                }
-                return makeResult(JsonParseStatus::Ok);
+                return finishSinkCall(m_sink->on_boolean(boolean_value),
+                    "handling a root boolean");
             }
             case simdjson::ondemand::json_type::null: {
                 bool is_null = false;
@@ -264,11 +262,8 @@ class JsonBackendWalker {
                         "Root scalar classified as null but failed validation.");
                 }
 
-                if (JsonSinkStatus sink_status = m_sink->on_null();
-                    sink_status != JsonSinkStatus::Continue) {
-                    return stopTraversal(sink_status, "handling a root null");
-                }
-                return makeResult(JsonParseStatus::Ok);
+                return finishSinkCall(m_sink->on_null(),
+                    "handling a root null");
             }
             case simdjson::ondemand::json_type::unknown:
                 return makeResult(JsonParseStatus::ParseError,
@@ -309,11 +304,8 @@ class JsonBackendWalker {
             case simdjson::ondemand::json_type::boolean:
                 return walkBoolean(value);
             case simdjson::ondemand::json_type::null: {
-                if (JsonSinkStatus sink_status = m_sink->on_null();
-                    sink_status != JsonSinkStatus::Continue) {
-                    return stopTraversal(sink_status, "handling a null value");
-                }
-                return makeResult(JsonParseStatus::Ok);
+                return finishSinkCall(m_sink->on_null(),
+                    "handling a null value");
             }
             case simdjson::ondemand::json_type::unknown:
                 return makeResult(JsonParseStatus::ParseError,
@@ -332,8 +324,9 @@ class JsonBackendWalker {
         }
 
         JsonSinkStatus sink_status = m_sink->on_start_object();
-        if (sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "starting an object");
+        if (JsonParseResult sink_result = finishSinkCall(
+                sink_status, "starting an object"); !sink_result.ok()) {
+            return sink_result;
         }
 
         for (auto field_result : object) {
@@ -352,8 +345,10 @@ class JsonBackendWalker {
             }
 
             sink_status = m_sink->on_key(key);
-            if (sink_status != JsonSinkStatus::Continue) {
-                return stopTraversal(sink_status, "processing an object key");
+            if (JsonParseResult sink_result = finishSinkCall(
+                    sink_status, "processing an object key");
+                !sink_result.ok()) {
+                return sink_result;
             }
 
             child = field.value();
@@ -364,12 +359,7 @@ class JsonBackendWalker {
             }
         }
 
-        sink_status = m_sink->on_end_object();
-        if (sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "ending an object");
-        }
-
-        return makeResult(JsonParseStatus::Ok);
+        return finishSinkCall(m_sink->on_end_object(), "ending an object");
     }
 
     JsonParseResult walkArray(simdjson::ondemand::value value) {
@@ -380,8 +370,9 @@ class JsonBackendWalker {
         }
 
         JsonSinkStatus sink_status = m_sink->on_start_array();
-        if (sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "starting an array");
+        if (JsonParseResult sink_result = finishSinkCall(
+                sink_status, "starting an array"); !sink_result.ok()) {
+            return sink_result;
         }
 
         for (auto element_result : array) {
@@ -398,12 +389,7 @@ class JsonBackendWalker {
             }
         }
 
-        sink_status = m_sink->on_end_array();
-        if (sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "ending an array");
-        }
-
-        return makeResult(JsonParseStatus::Ok);
+        return finishSinkCall(m_sink->on_end_array(), "ending an array");
     }
 
     JsonParseResult walkString(simdjson::ondemand::value value) {
@@ -413,23 +399,14 @@ class JsonBackendWalker {
             return result;
         }
 
-        if (JsonSinkStatus sink_status = m_sink->on_string(decoded);
-            sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "handling a string");
-        }
-
-        return makeResult(JsonParseStatus::Ok);
+        return finishSinkCall(m_sink->on_string(decoded), "handling a string");
     }
 
     JsonParseResult walkNumber(simdjson::ondemand::value value) {
         std::string_view raw_number = trimTrailingJsonWhitespace(
             value.raw_json_token());
-        if (JsonSinkStatus sink_status = m_sink->on_number(raw_number);
-            sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "handling a number");
-        }
-
-        return makeResult(JsonParseStatus::Ok);
+        return finishSinkCall(m_sink->on_number(raw_number),
+            "handling a number");
     }
 
     JsonParseResult walkBoolean(simdjson::ondemand::value value) {
@@ -439,12 +416,8 @@ class JsonBackendWalker {
             return result;
         }
 
-        if (JsonSinkStatus sink_status = m_sink->on_boolean(boolean_value);
-            sink_status != JsonSinkStatus::Continue) {
-            return stopTraversal(sink_status, "handling a boolean");
-        }
-
-        return makeResult(JsonParseStatus::Ok);
+        return finishSinkCall(m_sink->on_boolean(boolean_value),
+            "handling a boolean");
     }
 
     JsonParseResult enforceTechnicalDepth(simdjson::ondemand::value value) {
@@ -463,7 +436,7 @@ class JsonBackendWalker {
     }
 
     JsonEventSink *m_sink;
-    std::size_t m_technical_max_depth;
+    const std::size_t m_technical_max_depth;
 };
 
 struct PreparedSimdjsonInput {
