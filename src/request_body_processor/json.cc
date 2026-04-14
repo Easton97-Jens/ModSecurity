@@ -183,7 +183,7 @@ bool JSON::complete(std::string *err) {
 
 
 int JSON::addArgument(const std::string& value) {
-    std::string data("");
+    std::string data;
     std::string path;
 
     for (size_t i =  0; i < m_containers.size(); i++) {
