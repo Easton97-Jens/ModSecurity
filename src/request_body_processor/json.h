@@ -16,6 +16,7 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 #define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <memory>
