@@ -26,6 +26,24 @@
 namespace modsecurity::RequestBodyProcessor {
 
 #ifdef WITH_LIBXML2
+namespace {
+bool finalizeArgsParsingContext(xml_data *data, std::string *error) {
+    if (xmlParseChunk(data->parsing_ctx_arg, nullptr, 0, 1) == 0) {
+        xmlFreeParserCtxt(data->parsing_ctx_arg);
+        data->parsing_ctx_arg = nullptr;
+        return true;
+    }
+
+    if (!data->xml_error.empty()) {
+        error->assign(data->xml_error);
+    } else {
+        error->assign("XML: Failed to parse document for ARGS.");
+    }
+    xmlFreeParserCtxt(data->parsing_ctx_arg);
+    data->parsing_ctx_arg = nullptr;
+    return false;
+}
+}  // namespace
 
 /*
 * NodeData for parsing XML into args
@@ -310,19 +328,9 @@ bool XML::complete(std::string *error) {
                   == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs)
             ) {
             /* This is how we signale the end of parsing to libxml. */
-            if (xmlParseChunk(m_data.parsing_ctx_arg, nullptr, 0, 1) != 0) {
-                if (!m_data.xml_error.empty()) {
-                    error->assign(m_data.xml_error);
-                }
-                else {
-                    error->assign("XML: Failed to parse document for ARGS.");
-                }
-                xmlFreeParserCtxt(m_data.parsing_ctx_arg);
-                m_data.parsing_ctx_arg = nullptr;
+            if (!finalizeArgsParsingContext(&m_data, error)) {
                 return false;
             }
-            xmlFreeParserCtxt(m_data.parsing_ctx_arg);
-            m_data.parsing_ctx_arg = nullptr;
         }
     }
 
