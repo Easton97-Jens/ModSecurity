@@ -1,184 +1,282 @@
-# libxml2- und JSON-Review (Stand: 2026-04-14)
+# libxml2 / JSON Architektur- und Dependency-Review (Stand: 2026-04-14)
 
-Dieses Dokument fasst den technischen Befund im Repository und den Abgleich mit aktuellen öffentlichen Quellen zusammen.
+Ziel dieses Dokuments ist eine belastbare Bewertung von Nutzung, Sicherheitslage, Wartbarkeit und Integrationsfähigkeit von **libxml2** im Projekt – inklusive Vergleich mit dem aktuellen öffentlichen Stand sowie expliziter Bewertung einer **Modularisierung von libxml2 analog zur JSON-Architektur**.
+
+---
 
 ## 1) Executive Summary
 
-- **Repo-Befund:** libxml2 ist in ModSecurity funktional relevant für XML-Request-Body-Parsing, XPath-Variablenzugriff sowie DTD/XSD-Validierungsoperatoren. Build-seitig ist die Abhängigkeit optional, aber breit integriert (Autotools, Windows-CMake/Conan, Tests/Fuzzer).
-- **Version-Lage im Repo:**
-  - Autotools-Mindestversion ist historisch niedrig (**2.6.29**).
-  - Windows/Conan pinnt **2.12.6**.
-- **Externer Stand (öffentlich):** Aktuelle Release-Linie ist **2.15.x**, mit **2.15.2** als neuestem Stand (März 2026), inkl. mehrerer Security-Fixes.
-- **Kernlücke:** Keine harte, moderne Mindestversion im Haupt-Build; die Security-Härtung erfolgt nicht über `XML_PARSE_NO_XXE`, sondern über einen global registrierten I/O-Callback (`xmlParserInputBufferCreateFilenameDefault`), der upstream als deprecated dokumentiert ist.
-- **JSON-Integration:** JSON ist bereits über eine eigene Backend-Abstraktion (simdjson/jsoncons) von XML getrennt. libxml2 ist **nicht** der primäre Engpass für die Integration einer weiteren JSON-Bibliothek.
+### Belegt im Repo
+- libxml2 wird für XML-Request-Body-Parsing, XPath-basierte Variablen, DTD-Validierung und XSD-Validierung genutzt.
+- Die Einbindung ist optional (`WITH_LIBXML2`), aber funktional tief in XML-Features integriert.
+- Autotools fordert nur `libxml2 >= 2.6.29`; Windows-Conan pinnt `2.12.6`.
+- XML-Sicherheitssteuerung erfolgt aktuell über globalen Loader-Callback (`xmlParserInputBufferCreateFilenameDefault`), während JSON über eine klarere Backend-Abstraktion (`JSONAdapter` + `JsonEventSink`) geführt wird.
 
-## 2) Befunde im Repo
+### Belegt durch externe Quellen
+- Upstream-Stand ist 2.15.x (aktueller Index: 2.15.2 in März 2026).
+- 2.14/2.15 enthalten API/ABI- und Sicherheitsrelevanz (u. a. SONAME-Änderung in 2.14.0, Security-Fixes in neueren Releases).
+- Offizielle API-Doku markiert `xmlParserInputBufferCreateFilenameDefault` als deprecated und empfiehlt kontextbezogene Loader-Mechanismen.
 
-### 2.1 Belegt im Repo
+### Schlussfolgerung
+- **Update/Modernisierung von libxml2-Einbindung ist sinnvoll** (Security + Wartbarkeit + Zukunftsfähigkeit).
+- **libxml2 ist nicht der primäre Blocker für neue JSON-Bibliothek**.
+- **Modularisierung von libxml2 ist teilweise sinnvoll bis empfohlen**: nicht zwingend für Funktionalität heute, aber klar vorteilhaft für Konsistenz, Testbarkeit und künftige Parser-Vereinheitlichung.
 
-#### Nutzungspunkte von libxml2
+### Unsicherheit / nicht verifizierbar
+- Reale Produktionsversionen je Zielumgebung sind aus dem Repo allein nicht bestimmbar. **Nicht verifizierbar.**
 
-- Initialisierung/Shutdown zentral in `ModSecurity`:
-  - `xmlInitParser()` im Konstruktor, `xmlCleanupParser()` im Destruktor.
-- XML-Request-Body-Parsing via Push-Parser (`xmlCreatePushParserCtxt`, `xmlParseChunk`) in `src/request_body_processor/xml.cc`.
-- XPath-Auswertung für `XML`-Variablenzugriffe in `src/variables/xml.cc`.
-- DTD-Validierung (`xmlParseDTD`, `xmlValidateDtd`) in `src/operators/validate_dtd.cc`.
-- XSD-Validierung (`xmlSchema*`) in `src/operators/validate_schema.cc`.
+---
 
-#### Build-/Dependency-Einbindung
+## 2) Repo-Befunde
 
-- Autotools-Makro `CHECK_LIBXML2` mit Mindestversion `2.6.29`.
-- Windows-Conan pinnt `libxml2/2.12.6`.
-- Windows-Doku nennt ebenfalls `libxml2 2.12.6`.
-
-#### Security-relevantes Parser-Verhalten
-
-- Externe Entity-Ladung wird in `XML::init()` über globale Callback-Registrierung gesteuert:
-  - bei `SecXMLExternalEntity On`: Default-Lader aktiv,
-  - sonst Callback, der immer `nullptr` liefert (blockiert externe Entitäten).
-- Parseroptionen setzen aktuell primär `XML_PARSE_NOWARNING | XML_PARSE_NOERROR`.
-- Es wird **nicht** sichtbar `XML_PARSE_NO_XXE` gesetzt.
-
-#### Tests/Fuzzing
-
-- Regression-Tests referenzieren `libxml2` explizit als benötigte Resource.
-- Ein dedizierter XXE-Testfall (`config-xml_external_entity.json`) existiert.
-- Fuzzer-Build linkt `$(LIBXML2_LDADD)`.
-
-#### JSON-Befund im Repo
-
-- JSON-Backend ist wählbar (`simdjson` oder `jsoncons`) via `--with-json-backend`.
-- `JSONAdapter` kapselt Backendwahl über Compile-Defines.
-- JSON-Verarbeitung läuft in eigener RequestBodyProcessor-Klasse (`JSON`), getrennt vom XML-Prozessor (`XML`).
-
-### 2.2 Schlussfolgerung aus Repo-Befund
-
-- libxml2 ist für XML-Features **kritisch**, aber **modular optional** (Compile-Flag `WITH_LIBXML2`).
-- JSON-Pfad ist technisch bereits entkoppelt; XML und JSON teilen sich primär nur den Dispatcher in `Transaction::processRequestBody`.
-- Der heikelste Punkt in der aktuellen XML-Härtung ist die Nutzung einer **globalen** (und upstream deprecated) Loader-Umschaltung.
-
-### 2.3 Offen / unklar / nicht verifizierbar
-
-- Welche libxml2-Version produktiv auf Linux tatsächlich zur Laufzeit genutzt wird, ist aus dem Repo allein nicht feststellbar.
-- Ob Distributionen lokale Backports einspielen, ist ohne konkrete Zielplattform nicht verifizierbar.
-
-## 3) Aktueller externer Stand zu libxml2
-
-### 3.1 Belegt durch aktuelle externe Quellen
-
-- GNOME-Release-Archiv listet für libxml2 die Reihe **2.15** mit `LATEST-IS-2.15.2` (Datum 2026-03-04).
-- 2.15.0 nennt u. a.:
-  - Entfernen des eingebauten HTTP-Clients,
-  - Entfernen von LZMA-Support,
-  - geänderte Build-Anforderungen (Docs/Doxygen),
-  - geplante weitere Entfernungen.
-- 2.14.0 nennt API/ABI-relevante Änderungen:
-  - Binärkompatibilität nur für 2.14+,
-  - SONAME-Bump von `libxml2.so.2` auf `libxml2.so.16` (ELF).
-- 2.15.2 nennt mehrere Security-Fixes, inklusive CVE-IDs (z. B. CVE-2026-1757, CVE-2026-0990, CVE-2026-0992, CVE-2026-0989) laut offiziellen Release Notes.
-- 2.12.10 (Feb 2025) adressiert laut Release Notes u. a. CVE-2025-24928 und CVE-2024-56171.
-- NVD bestätigt für CVE-2025-24928: betroffen sind Versionen vor 2.12.10 bzw. 2.13.x vor 2.13.6.
-- Aktuelle libxml2-API-Doku (`parser.h`) empfiehlt bei untrusted Daten `XML_PARSE_NO_XXE`; außerdem ist dokumentiert, dass `XML_PARSE_NONET` seit Wegfall der eingebauten Netz-Clients in 2.15 praktisch keine Wirkung mehr hat (außer Weitergabe an Custom Loader).
-- `xmlParserInputBufferCreateFilenameDefault()` ist in aktueller API-Doku als deprecated markiert; empfohlen werden kontextbezogene Loader-APIs (`xmlCtxtSetResourceLoader` o. ä.).
-
-### 3.2 Schlussfolgerung aus externem Stand
-
-- Das libxml2-Ökosystem bewegt sich schnell (2.14/2.15 mit relevanten API/Build-/Security-Änderungen).
-- Alte Mindestversionsgrenzen (2.6.x) sind nicht mehr zeitgemäß als Security-Basis.
-
-### 3.3 Offen / unklar / nicht verifizierbar
-
-- Ob alle in 2.15.2 genannten CVE-Einträge bereits vollständig in allen öffentlichen Datenbanken normalisiert/enriched sind, ist nicht vollständig verifizierbar.
-
-## 4) Gap-Analyse: Repo vs. aktueller Stand
-
-## Belegt im Repo
-- Mindestversion 2.6.29 (Autotools), Windows-Pin 2.12.6.
-- XML-Schutz gegen externe Entitäten über globalen Callback-Schalter, nicht über `XML_PARSE_NO_XXE`.
-
-## Belegt extern
-- Aktueller Stand 2.15.2 mit Security-Fixes und API/Build-Änderungen.
-- Deprecation des im Repo verwendeten globalen Callback-Mechanismus.
-
-## Schlussfolgerung / Empfehlung
-- Es gibt eine reale Modernisierungslücke, v. a. bei:
-  1) Versionspolicy,
-  2) Security-Optionierung,
-  3) Nutzung deprecated globaler Loader-Hooks.
-
-## 5) Einfluss auf die Integration einer neuen JSON-Bibliothek
+## 2.1 Includes, Build, Versionen
 
 ### Belegt im Repo
-- JSON ist bereits über `JSONAdapter` von XML entkoppelt.
-- Backend-Auswahl für JSON existiert (`simdjson`/`jsoncons`).
+- Build-Minimum in Autotools: `MSC_CHECK_LIB(... MIN_VERSION [2.6.29] ...)`.
+- Windows-Build (Conan): `libxml2/2.12.6`.
+- Windows-Readme bestätigt ebenfalls libxml2 2.12.6.
+- CMake Windows koppelt `WITH_LIBXML2` an `LibXml2::LibXml2`.
 
-### Schlussfolgerung / Empfehlung
-- Ein libxml2-Upgrade ist **nicht Voraussetzung**, um eine neue JSON-Bibliothek technisch zu integrieren.
-- Für saubere Gesamtarchitektur ist eher eine gemeinsame Parsing-Abstraktion (einheitliche Fehler-/Limits-/Telemetry-Schnittstelle) relevant als ein Austausch von libxml2.
+### Schlussfolgerung
+- Versionspolitik ist uneinheitlich (sehr altes Mindestlevel vs. fester mittlerer Pin auf Windows).
 
-## 6) Klare Entscheidungsantwort
+### Unsicherheit / nicht verifizierbar
+- Linux-Distributionen können Backports liefern; ohne Ziel-Distroliste **nicht verifizierbar**.
 
-**Teilweise: libxml2 kann bleiben, aber die Einbindung sollte modernisiert werden.**
+## 2.2 Code-Kopplung und Nutzungsarten
 
-Begründung:
-- **Ja zur Modernisierung** wegen Security-/Wartbarkeitsaspekten (deprecated Loader-Hook, veraltete Mindestversion, fehlende explizite NO_XXE-Optionierung).
-- **Nein zur These „nur wegen JSON muss libxml2 raus“**: JSON-Pfade sind bereits gekapselt; der Integrationsengpass liegt nicht primär in libxml2.
+### Belegt im Repo
+- Initialisierung global in `ModSecurity` via `xmlInitParser()` / `xmlCleanupParser()`.
+- XML-Request-Parsing in `src/request_body_processor/xml.cc` per Push-Parser (`xmlCreatePushParserCtxt`, `xmlParseChunk`) plus SAX-Callbacks für `SecParseXmlIntoArgs`.
+- XPath-Nutzung in `src/variables/xml.cc` (`xmlXPathEvalExpression`, Namespace-Registrierung).
+- DTD-Validierung (`xmlParseDTD`, `xmlValidateDtd`) in `validate_dtd.cc`.
+- XSD-Validierung (`xmlSchema*`) in `validate_schema.cc`.
+- XML-Verarbeitung wird in `Transaction::processRequestBody` neben JSON-Verarbeitung geschaltet.
 
-## 7) Priorisierte Maßnahmen
+### Schlussfolgerung
+- libxml2-Aufrufe sind nicht überall verstreut, aber auch nicht durch ein zentrales XML-Backend-Interface isoliert (anders als JSON).
 
-### Kurzfristig (niedriger bis mittlerer Eingriff)
+## 2.3 Fehlerbehandlung und Security-relevante Optionen
 
-1. **Versions-Policy anheben**
-   - Mindestversion für libxml2 im Build auf einen sicher gepflegten Bereich anheben (z. B. 2.12.10+ oder 2.14+ je Plattformstrategie).
-   - Warum: reduziert Risiko bekannter Schwachstellen auf Altversionen.
+### Belegt im Repo
+- Parseroptionen setzen `XML_PARSE_NOWARNING | XML_PARSE_NOERROR`.
+- Externe Entitäten werden über `SecXMLExternalEntity` gesteuert:
+  - ON: Default-Loader,
+  - sonst: Callback liefert `nullptr`.
+- Regressionsfälle für XXE-Szenarien sind vorhanden (`config-xml_external_entity.json`).
 
-2. **Explizite XXE-Härtung ergänzen**
-   - Zusätzlich zu bestehender Logik `XML_PARSE_NO_XXE` (wo verfügbar) setzen.
-   - Warum: dokumentierter Best-Practice-Mechanismus für untrusted XML.
+### Schlussfolgerung
+- Es existiert Schutzlogik, aber in Form eines globalen Mechanismus statt kontextbezogener Härtung.
 
-3. **Tests erweitern**
-   - Regressionen für XXE/DTD/XInclude/Entity-Edgecases in Matrix über mehrere libxml2-Versionen.
+### Unsicherheit / nicht verifizierbar
+- Ob alle denkbaren Entity/Resource-Edgecases (z. B. bei parallel laufenden Konfigurationen) vollständig abgedeckt sind, aus vorhandenen Tests allein **nicht verifizierbar**.
 
-### Mittelfristig (mittlerer Eingriff)
+## 2.4 JSON-Architektur im Repo (Vergleichsmuster)
 
-4. **Globalen Loader-Hook ablösen**
-   - Migration von `xmlParserInputBufferCreateFilenameDefault` zu kontextbezogenen Loader-APIs.
-   - Warum: deprecated API, globaler Schalter ist fehleranfällig in Multi-Thread-/Multi-Request-Szenarien.
+### Belegt im Repo
+- Konfigurierbare Backends: `--with-json-backend=simdjson|jsoncons`.
+- Gemeinsames Backend-Interface (`JsonEventSink`, `JsonParseResult`, `JsonBackendParseOptions`).
+- Adapter-Schicht (`JSONAdapter`) wählt Backend über Compile-Time-Defines.
+- Separate Backend-Implementierungen (`json_backend_simdjson.cc`, `json_backend_jsoncons.cc`) + dedizierte Tests (`json_backend_depth_tests`, Backend-Matrix-Script).
 
-5. **Build-Matrix harmonisieren**
-   - Linux/Windows auf konsistentere libxml2-Zielversionen bringen; Policy dokumentieren.
+### Schlussfolgerung
+- JSON ist strukturell modularer/abstrakter als XML.
+- Dieses Muster ist als Referenz für libxml2-Kapselung geeignet.
 
-### Langfristig (mittlerer bis höherer Eingriff)
+---
 
-6. **Parser-Abstraktion vereinheitlichen (XML/JSON)**
-   - Gemeinsame Schicht für Limits, Fehlernormalisierung, Telemetrie, Cancellation.
-   - Nutzen: Neue JSON-Bibliotheken und XML-Änderungen lassen sich mit geringerem Risiko integrieren.
+## 3) Externer Stand zu libxml2 (Internet-Abgleich)
 
-## 8) Offene Unsicherheiten / nicht verifizierbare Punkte
+### Belegt durch externe Quellen
+- Release-Index listet aktuell 2.15.x mit `LATEST-IS-2.15.2` (2026-03-04).
+- 2.14.0 Release Notes: SONAME-Sprung (`libxml2.so.2` -> `libxml2.so.16`) und Binärkompatibilität nur innerhalb 2.14+.
+- 2.15.0 Release Notes: Wegfall built-in HTTP/LZMA-Komponenten u. a. technische Änderungen.
+- 2.15.2 Release Notes: mehrere Security-Fixes/CVE-Referenzen.
+- 2.12.10 Release Notes: Fixes inkl. CVE-2025-24928 / CVE-2024-56171.
+- NVD bestätigt CVE-2025-24928 als relevant für ältere Versionen (<2.12.10 bzw. 2.13.6).
+- Offizielle API-Doku:
+  - `XML_PARSE_NO_XXE` als relevante Sicherheitsoption,
+  - `xmlParserInputBufferCreateFilenameDefault` deprecated,
+  - `XML_PARSE_NONET` seit 2.15 nur noch begrenzt relevant (kein built-in network client).
 
-- Reale Produktionsversionen pro Zielplattform: **Nicht verifizierbar.**
-- Exakte Laufzeit-ABI-Risiken in allen Downstream-Packages ohne Zielumgebungen: **Nicht verifizierbar.**
+### Schlussfolgerung
+- Der Upstream-Stand liegt deutlich über der in Teilen des Repos sichtbaren Versionierungspolitik.
+- Security- und API-Entwicklung nahelegt: Modernisierung statt „as-is“ beibehalten.
+
+### Unsicherheit / nicht verifizierbar
+- Vollständige CVE-Mapping-Konsistenz über alle Datenbanken am Tag der Analyse: **Nicht verifizierbar**.
+
+---
+
+## 4) Architekturvergleich XML vs JSON
+
+## 4.1 XML-Seite
+
+### Belegt im Repo
+- XML-Logik ist funktional in mehrere konkrete Stellen verteilt (Request-Processor, Variable-Evaluation, Operatoren).
+- Es gibt **kein** XML-Äquivalent zu `JSONAdapter`/`JsonEventSink`, also kein austauschbares XML-Backend-Contract.
+
+### Schlussfolgerung
+- XML ist integriert, aber weniger entkoppelt als JSON.
+
+## 4.2 JSON-Seite
+
+### Belegt im Repo
+- JSON folgt einem klaren Modul-/Interface-Muster mit getrennten Backends und normalisiertem Ergebnis-/Fehlerkonzept.
+
+### Schlussfolgerung
+- JSON zeigt ein praktikables Architekturpattern, das für XML übertragbar ist (zumindest teilweise).
+
+## 4.3 Datenfluss XML/JSON
+
+### Belegt im Repo
+- Gemeinsamer Dispatcher in `Transaction::processRequestBody` (Auswahl über Processor-Typ).
+- Getrennte Processor-Objekte (`m_xml`, `m_json`) mit ähnlichem Lifecycle (`init/processChunk/complete`).
+
+### Schlussfolgerung
+- Es gibt bereits ein gemeinsames Lebenszyklusmuster, aber keine gemeinsame Backend-Abstraktionsebene.
+
+---
+
+## 5) Bewertung: Soll libxml2 als eigenes Modul gekapselt werden?
+
+## 5.1 Technische Kriterien
+
+### Kopplungsgrad
+- **Belegt im Repo:** libxml2-Aufrufe sitzen in mehreren Fachstellen ohne zentrales XML-Backend-Interface.
+- **Schlussfolgerung:** Kapselung reduziert direkte API-Abhängigkeit im Restcode.
+
+### Austauschbarkeit
+- **Belegt im Repo:** JSON ist per Adapter austauschbarer als XML.
+- **Schlussfolgerung:** XML-Kapselung würde Austauschbarkeit erhöhen (auch wenn ein kompletter Parserwechsel nicht kurzfristig geplant ist).
+
+### Testbarkeit
+- **Belegt im Repo:** JSON-Backends haben dedizierte Tiefen-/Backend-Tests; XML hat Funktions-/Regressionstests, aber keine analoge Backend-Schicht.
+- **Schlussfolgerung:** Modulgrenze würde gezieltere XML-Unit-Tests erleichtern.
+
+### Wartbarkeit / Build / Plattform
+- **Belegt im Repo:** Uneinheitliche Versionierung + deprecated API-Nutzung + Plattformunterschiede.
+- **Schlussfolgerung:** Kapselung vereinfacht zukünftige Migrationsschritte.
+
+## 5.2 Architektur-Fazit (Pflichtentscheidung)
+
+**Ergebnis: Teilweise sinnvoll (mit klarer Tendenz zu „Ja, modularisieren“).**
+
+Warum nicht „sofort voll Ja“?
+- Weil der aktuelle Code funktional arbeitet und Refactoring-Aufwand/Regressionen real sind.
+
+Warum nicht „Nein“?
+- Weil JSON bereits beweist, dass ein Adapter-Modell in diesem Projekt funktioniert und Mehrwert bringt.
+
+### Risiken
+- Performance-Overhead: bei dünner Wrapper-Schicht i. d. R. gering; muss gemessen werden.
+- Refactoring-Aufwand: mittel bis hoch je Scope.
+- ABI/API-Risiken: beherrschbar, wenn öffentliche API unverändert bleibt und nur interne Schicht eingezogen wird.
+- Versteckte Abhängigkeiten: möglich; über schrittweise Migration + Regression/Fuzzing abfedern.
+
+### Unsicherheit / nicht verifizierbar
+- Exakter Runtime-Impact ohne Benchmarks: **Nicht verifizierbar**.
+
+---
+
+## 6) Gesamtentscheidung (kombiniert)
+
+1. **Soll libxml2 aktualisiert/erneuert werden?**
+   - **Ja, Aktualisierung/Modernisierung empfohlen.**
+   - Begründung: Versionsabstand, Security-/API-Entwicklung upstream, deprecated API im aktuellen Codepfad.
+
+2. **Soll libxml2 modularisiert werden (wie JSON)?**
+   - **Teilweise sinnvoll (empfohlen als schrittweise interne Modularisierung).**
+   - Begründung: verbessert Entkopplung, Testbarkeit, Konsistenz mit JSON-Architektur.
+
+3. **Ist libxml2 ein Hindernis für JSON-Integration?**
+   - **Nein, nicht der primäre Engpass.**
+   - Begründung: JSON besitzt bereits eigene Backend-Abstraktion; Engpass liegt eher in fehlender formatübergreifender Vereinheitlichung.
+
+---
+
+## 7) Maßnahmenplan
+
+## Kurzfristig (1–3 Sprints)
+
+1. **Version-Policy festziehen**
+- Änderung: Mindestversion im Build und CI-Matrix anheben; Windows-Pin überprüfen.
+- Warum: reduziert bekannte Risiken alter Stände.
+- Risiko bei Nicht-Umsetzung: höheres Security-/Maintenance-Risiko.
+- Aufwand: niedrig-mittel.
+- Nutzen: hoch.
+
+2. **Security-Defaults modernisieren**
+- Änderung: nach verfügbarer libxml2-Version explizite sichere Optionen/API nutzen (z. B. `XML_PARSE_NO_XXE`, kontextbezogene Loader wo möglich).
+- Risiko bei Nicht-Umsetzung: Abhängigkeit von legacy/deprecated Verhalten.
+- Aufwand: mittel.
+- Nutzen: hoch.
+
+3. **Sicherheits-Testmatrix erweitern**
+- Änderung: zusätzliche XXE/Entity/XInclude/DTD-Edgecases + Parallelitätsfälle.
+- Aufwand: mittel.
+- Nutzen: hoch.
+
+## Mittelfristig (3–6 Sprints)
+
+4. **XML-Backend-Fassade einführen (intern, ohne API-Bruch)**
+- Änderung: Interface ähnlich JSON-Contract (z. B. `XmlParseResult`, `XmlParseOptions`, `XmlEventSink` oder schlankere Variante) und zentraler Adapter für libxml2.
+- Aufwand: mittel-hoch.
+- Nutzen: hoch (Entkopplung/Testbarkeit).
+
+5. **Direkte libxml2-Aufrufe bündeln**
+- Änderung: schrittweise Migration aus `variables/xml.cc`, `operators/*`, `request_body_processor/xml.cc` in Modulgrenze.
+- Aufwand: mittel-hoch.
+- Risiko: Regressionen ohne ausreichende Tests.
+
+## Langfristig (6+ Sprints)
+
+6. **Gemeinsames Parser-Framework XML/JSON**
+- Änderung: vereinheitlichte Fehler-/Limit-/Telemetry-Schnittstelle für strukturierte Formate.
+- Aufwand: hoch.
+- Nutzen: hoch (Konsistenz, Erweiterbarkeit für weitere Formate).
+
+7. **Kontinuierliche Security-/Dependency-Governance**
+- Änderung: feste Upgrade-Frequenz, CVE-Triage-Routine, Release-Checklisten.
+- Aufwand: mittel.
+- Nutzen: hoch.
+
+---
+
+## 8) Unsicherheiten / nicht verifizierbare Punkte
+
+- Konkrete produktive libxml2-Versionen und Backports pro Zielplattform: **Nicht verifizierbar.**
+- Exakte Performance-Auswirkung einer XML-Fassade ohne Benchmark-Läufe: **Nicht verifizierbar.**
+- Vollständiger CVE-Abdeckungsgrad je Distribution/Packager: **Nicht verifizierbar.**
+
+---
 
 ## 9) Quellen
 
-### Repository-Quellen
+## Repository-Quellen
 - `build/libxml.m4`
 - `build/win32/conanfile.txt`
 - `build/win32/README.md`
+- `build/win32/CMakeLists.txt`
+- `configure.ac`
 - `src/modsecurity.cc`
 - `src/transaction.cc`
 - `src/request_body_processor/xml.cc`
+- `src/request_body_processor/json.h`
+- `src/request_body_processor/json_backend.h`
+- `src/request_body_processor/json_adapter.cc`
+- `src/request_body_processor/json_backend_simdjson.cc`
+- `src/request_body_processor/json_backend_jsoncons.cc`
 - `src/variables/xml.cc`
 - `src/operators/validate_dtd.cc`
 - `src/operators/validate_schema.cc`
-- `src/request_body_processor/json_adapter.cc`
-- `configure.ac`
 - `test/test-cases/regression/config-xml_external_entity.json`
-- `test/regression/regression.cc`
+- `test/unit/json_backend_depth_tests.cc`
+- `test/run-json-backend-matrix.sh`
 - `test/fuzzer/Makefile.am`
 
-### Externe Primärquellen
-- GNOME libxml2 Release-Archiv (Index):
+## Externe Primärquellen
+- GNOME release index:
   - https://download.gnome.org/sources/libxml2/
   - https://download.gnome.org/sources/libxml2/2.15/
   - https://download.gnome.org/sources/libxml2/2.14/
@@ -187,11 +285,9 @@ Begründung:
   - https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.2.news
   - https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.0.news
   - https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.0.news
-  - https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.5.news
-  - https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.6.news
   - https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.10.news
 - Offizielle API-Doku:
   - https://gnome.pages.gitlab.gnome.org/libxml2/html/parser_8h.html
   - https://gnome.pages.gitlab.gnome.org/libxml2/html/xmlIO_8h.html
-- NVD (CVE-Referenz):
+- CVE/NVD:
   - https://nvd.nist.gov/vuln/detail/CVE-2025-24928
