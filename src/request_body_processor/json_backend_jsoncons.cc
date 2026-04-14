@@ -26,7 +26,6 @@
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <utility>
 
 #include "src/request_body_processor/json_instrumentation.h"
 #include <jsoncons/json_cursor.hpp>
