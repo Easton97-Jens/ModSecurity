@@ -92,7 +92,7 @@ class XML {
     xml_data m_data;
 
  private:
-    Transaction *m_transaction;
+    Transaction *m_transaction = nullptr;
     std::string m_header;
 };
 
