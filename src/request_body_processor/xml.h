@@ -50,10 +50,10 @@ class NodeData {
 class XMLNodes {
     public:
         std::vector<std::shared_ptr<NodeData>> nodes;
-        unsigned long int node_depth;
+        unsigned long int node_depth = 0;
         std::string       currpath;
         std::string       currval;
-        bool              currval_is_set;
+        bool              currval_is_set = false;
         Transaction      *m_transaction;
         // need to store context - this is the same as in xml_data
         // need to stop parsing if the number of arguments reached the limit
