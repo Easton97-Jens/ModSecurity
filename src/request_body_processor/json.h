@@ -21,6 +21,7 @@
 #include <deque>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "src/request_body_processor/json_backend.h"
 
