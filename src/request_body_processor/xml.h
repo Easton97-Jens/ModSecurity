@@ -79,8 +79,6 @@ struct xml_data {
     std::unique_ptr<XMLNodes> xml_parser_state;
 };
 
-typedef struct xml_data xml_data;
-
 class XML {
  public:
     explicit XML(Transaction *transaction);
