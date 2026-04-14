@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 
+#include "modsecurity/transaction.h"
 #include "src/request_body_processor/json_adapter.h"
 #include "src/request_body_processor/json_instrumentation.h"
 
