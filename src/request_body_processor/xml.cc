@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include "modsecurity/transaction.h"
+
 
 namespace modsecurity::RequestBodyProcessor {
 
