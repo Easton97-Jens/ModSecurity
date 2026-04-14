@@ -109,7 +109,7 @@ class MSCSAXHandler {
             // libxml2 SAX parser will call this function multiple times
             // during the parsing of a single node, if the value has multibyte
             // characters, so we need to concatenate the values
-            if (xml_data->currval_is_set == false) {
+            if (!xml_data->currval_is_set) {
                 xml_data->currval = content;
                 xml_data->currval_is_set = true;
             } else {
