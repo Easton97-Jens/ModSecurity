@@ -22,7 +22,6 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules_set.h"
 #include "src/request_body_processor/json_backend.h"
 
 
