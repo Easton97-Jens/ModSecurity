@@ -210,7 +210,7 @@ bool XML::init() {
 
 xmlParserInputBufferPtr XML::unloadExternalEntity(const char *URI,
     xmlCharEncoding enc) {
-    return NULL;
+    return nullptr;
 }
 
 
@@ -275,7 +275,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
     }
 
     /* Not a first invocation. */
-    if (m_data.parsing_ctx != NULL &&
+    if (m_data.parsing_ctx != nullptr &&
         m_transaction->m_secXMLParseXmlIntoArgs
         != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
         xmlParseChunk(m_data.parsing_ctx, buf, size, 0);
@@ -287,7 +287,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
         }
     }
 
-    if (m_data.parsing_ctx_arg != NULL &&
+    if (m_data.parsing_ctx_arg != nullptr &&
         (
             m_transaction->m_secXMLParseXmlIntoArgs
               == RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs
@@ -342,7 +342,7 @@ bool XML::complete(std::string *error) {
             ) {
             /* This is how we signale the end of parsing to libxml. */
             if (xmlParseChunk(m_data.parsing_ctx_arg, nullptr, 0, 1) != 0) {
-                if (m_data.xml_error != "") {
+                if (!m_data.xml_error.empty()) {
                     error->assign(m_data.xml_error);
                 }
                 else {
