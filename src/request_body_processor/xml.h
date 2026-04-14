@@ -20,7 +20,6 @@
 #endif
 
 #include <string>
-#include <iostream>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rules_set.h"

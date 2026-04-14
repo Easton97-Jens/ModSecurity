@@ -16,7 +16,6 @@
 #include "src/request_body_processor/xml.h"
 
 #include <list>
-#include <iostream>
 #include <string>
 
 
@@ -52,11 +51,6 @@ class MSCSAXHandler {
             auto *xml_data = static_cast<XMLNodes*>(ctx);
             xml_data->nodes.push_back(std::make_shared<NodeData>());
             xml_data->node_depth++;
-            // FIXME - later if we want to check the depth of XML tree
-            /* if (max_depth > 0 && max_depth > xml_data->node_depth) {
-                std::cout << "Depth of XML tree reached the given maximum value " << xml_data->node_depth << std::endl;
-                exit(1);
-            } */
             // if it's not the first (root) item, then append a '.'
             // note, the condition should always be true because there is always a pseudo root element: 'xml'
             if (xml_data->nodes.size() > 1) {
