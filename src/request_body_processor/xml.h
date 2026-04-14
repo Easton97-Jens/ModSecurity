@@ -64,8 +64,8 @@ class XMLNodes {
 
 struct xml_data {
     std::unique_ptr<xmlSAXHandler> sax_handler;
-    xmlParserCtxtPtr parsing_ctx;
-    xmlDocPtr doc;
+    xmlParserCtxtPtr parsing_ctx = nullptr;
+    xmlDocPtr doc = nullptr;
 
     unsigned int well_formed;
 
@@ -73,7 +73,7 @@ struct xml_data {
     std::string               xml_error;
 
     /* additional parser context for arguments */
-    xmlParserCtxtPtr          parsing_ctx_arg;
+    xmlParserCtxtPtr          parsing_ctx_arg = nullptr;
 
     /* parser state for SAX parser */
     std::unique_ptr<XMLNodes> xml_parser_state;

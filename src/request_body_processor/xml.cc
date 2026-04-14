@@ -138,11 +138,7 @@ extern "C" {
 }
 
 XML::XML(Transaction *transaction)
-    : m_transaction(transaction) {
-    m_data.doc = nullptr;
-    m_data.parsing_ctx = nullptr;
-    m_data.parsing_ctx_arg = nullptr;
-}
+    : m_transaction(transaction) { }
 
 
 XML::~XML() {
