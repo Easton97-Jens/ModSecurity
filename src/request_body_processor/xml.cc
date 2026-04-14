@@ -129,7 +129,7 @@ extern "C" {
         int nb_defaulted,
         const xmlChar **attributes) {
 
-            MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
+            auto *handler = static_cast<MSCSAXHandler*>(userData);
             handler->onStartElement(userData, name);
     }
 
@@ -139,12 +139,12 @@ extern "C" {
         const xmlChar* prefix,
         const xmlChar* URI) {
 
-            MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
+            auto *handler = static_cast<MSCSAXHandler*>(userData);
             handler->onEndElement(userData, name);
     }
 
     void MSC_xmlcharacters(void *userData, const xmlChar *ch, int len) {
-        MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
+        auto *handler = static_cast<MSCSAXHandler*>(userData);
         handler->onCharacters(userData, ch, len);
     }
 }
