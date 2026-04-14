@@ -151,23 +151,23 @@ extern "C" {
 
 XML::XML(Transaction *transaction)
     : m_transaction(transaction) {
-    m_data.doc = NULL;
-    m_data.parsing_ctx = NULL;
-    m_data.sax_handler = NULL;
+    m_data.doc = nullptr;
+    m_data.parsing_ctx = nullptr;
+    m_data.sax_handler = nullptr;
     m_data.xml_error = "";
-    m_data.parsing_ctx_arg = NULL;
-    m_data.xml_parser_state = NULL;
+    m_data.parsing_ctx_arg = nullptr;
+    m_data.xml_parser_state = nullptr;
 }
 
 
 XML::~XML() {
-    if (m_data.parsing_ctx != NULL) {
+    if (m_data.parsing_ctx != nullptr) {
         xmlFreeParserCtxt(m_data.parsing_ctx);
-        m_data.parsing_ctx = NULL;
+        m_data.parsing_ctx = nullptr;
     }
-    if (m_data.doc != NULL) {
+    if (m_data.doc != nullptr) {
         xmlFreeDoc(m_data.doc);
-        m_data.doc = NULL;
+        m_data.doc = nullptr;
     }
 }
 
@@ -220,7 +220,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
      * enable us to pass it the first chunk of data so that
      * it can attempt to auto-detect the encoding.
      */
-    if (m_data.parsing_ctx == NULL && m_data.parsing_ctx_arg == NULL) {
+    if (m_data.parsing_ctx == nullptr && m_data.parsing_ctx_arg == nullptr) {
         /* First invocation. */
 
         ms_dbg_a(m_transaction, 4, "XML: Initialising parser.");
@@ -240,10 +240,10 @@ bool XML::processChunk(const char *buf, unsigned int size,
 
         if (m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
-            m_data.parsing_ctx = xmlCreatePushParserCtxt(NULL, NULL,
+            m_data.parsing_ctx = xmlCreatePushParserCtxt(nullptr, nullptr,
                 buf, size, "body.xml");
 
-            if (m_data.parsing_ctx == NULL) {
+            if (m_data.parsing_ctx == nullptr) {
                 ms_dbg_a(m_transaction, 4,
                     "XML: Failed to create parsing context.");
                 error->assign("XML: Failed to create parsing context.");
@@ -262,8 +262,8 @@ bool XML::processChunk(const char *buf, unsigned int size,
                 m_data.xml_parser_state.get(),
                 buf,
                 size,
-                NULL);
-            if (m_data.parsing_ctx_arg == NULL) {
+                nullptr);
+            if (m_data.parsing_ctx_arg == nullptr) {
                 error->assign("XML: Failed to create parsing context for ARGS.");
                 return false;
             }
@@ -309,12 +309,12 @@ bool XML::processChunk(const char *buf, unsigned int size,
 
 bool XML::complete(std::string *error) {
     /* Only if we have a context, meaning we've done some work. */
-    if (m_data.parsing_ctx != NULL || m_data.parsing_ctx_arg != NULL) {
-        if (m_data.parsing_ctx != NULL &&
+    if (m_data.parsing_ctx != nullptr || m_data.parsing_ctx_arg != nullptr) {
+        if (m_data.parsing_ctx != nullptr &&
             m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
             /* This is how we signal the end of parsing to libxml. */
-            xmlParseChunk(m_data.parsing_ctx, NULL, 0, 1);
+            xmlParseChunk(m_data.parsing_ctx, nullptr, 0, 1);
 
             /* Preserve the results for our reference. */
             m_data.well_formed = m_data.parsing_ctx->wellFormed;
@@ -322,7 +322,7 @@ bool XML::complete(std::string *error) {
 
             /* Clean up everything else. */
             xmlFreeParserCtxt(m_data.parsing_ctx);
-            m_data.parsing_ctx = NULL;
+            m_data.parsing_ctx = nullptr;
             ms_dbg_a(m_transaction, 4, "XML: Parsing complete (well_formed " \
                 + std::to_string(m_data.well_formed) + ").");
 
@@ -332,7 +332,7 @@ bool XML::complete(std::string *error) {
                 return false;
             }
         }
-        if (m_data.parsing_ctx_arg != NULL &&
+        if (m_data.parsing_ctx_arg != nullptr &&
             (
                 m_transaction->m_secXMLParseXmlIntoArgs
                   == RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs
@@ -341,7 +341,7 @@ bool XML::complete(std::string *error) {
                   == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs)
             ) {
             /* This is how we signale the end of parsing to libxml. */
-            if (xmlParseChunk(m_data.parsing_ctx_arg, NULL, 0, 1) != 0) {
+            if (xmlParseChunk(m_data.parsing_ctx_arg, nullptr, 0, 1) != 0) {
                 if (m_data.xml_error != "") {
                     error->assign(m_data.xml_error);
                 }
@@ -349,11 +349,11 @@ bool XML::complete(std::string *error) {
                     error->assign("XML: Failed to parse document for ARGS.");
                 }
                 xmlFreeParserCtxt(m_data.parsing_ctx_arg);
-                m_data.parsing_ctx_arg = NULL;
+                m_data.parsing_ctx_arg = nullptr;
                 return false;
             }
             xmlFreeParserCtxt(m_data.parsing_ctx_arg);
-            m_data.parsing_ctx_arg = NULL;
+            m_data.parsing_ctx_arg = nullptr;
         }
     }
 

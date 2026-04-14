@@ -107,12 +107,12 @@ simdjson::ondemand::parser &getReusableSimdjsonParser() {
     if (parser == nullptr) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
         const auto parser_start = std::chrono::steady_clock::now();
-        parser.reset(new simdjson::ondemand::parser());
+        parser = std::make_unique<simdjson::ondemand::parser>();
         recordSimdjsonParserConstruction(static_cast<std::uint64_t>(
             std::chrono::duration_cast<std::chrono::nanoseconds>(
                 std::chrono::steady_clock::now() - parser_start).count()));
 #else
-        parser.reset(new simdjson::ondemand::parser());
+        parser = std::make_unique<simdjson::ondemand::parser>();
 #endif
     }
     return *parser;
@@ -398,7 +398,7 @@ class JsonBackendWalker {
             "handling a boolean");
     }
 
-    JsonParseResult enforceTechnicalDepth(simdjson::ondemand::value value) {
+    JsonParseResult enforceTechnicalDepth(simdjson::ondemand::value value) const {
         const int32_t current_depth = value.current_depth();
         if (current_depth <= 0) {
             return makeResult(JsonParseStatus::InternalError,
