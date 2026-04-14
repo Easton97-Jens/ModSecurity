@@ -53,10 +53,10 @@ class XMLNodes {
         std::string       currpath;
         std::string       currval;
         bool              currval_is_set = false;
-        Transaction      *m_transaction;
+        Transaction      *m_transaction = nullptr;
         // need to store context - this is the same as in xml_data
         // need to stop parsing if the number of arguments reached the limit
-        xmlParserCtxtPtr  parsing_ctx_arg;
+        xmlParserCtxtPtr  parsing_ctx_arg = nullptr;
 
         explicit XMLNodes (Transaction *);
         ~XMLNodes();
