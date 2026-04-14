@@ -15,7 +15,10 @@
 
 #include "modsecurity/rules_exceptions.h"
 
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "src/utils/string.h"
 #include "src/variables/variable.h"

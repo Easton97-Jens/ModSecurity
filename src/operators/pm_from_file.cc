@@ -15,6 +15,7 @@
 
 #include "src/operators/pm_from_file.h"
 
+#include <memory>
 #include <string>
 
 #include "src/operators/operator.h"

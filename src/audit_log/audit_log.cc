@@ -20,6 +20,7 @@
 #include <ctype.h>
 
 #include <fstream>
+#include <string_view>
 
 #include "modsecurity/transaction.h"
 #include "modsecurity/rule_message.h"
