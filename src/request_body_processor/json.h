@@ -111,9 +111,9 @@ class JSON : public JsonEventSink {
     Transaction *m_transaction = nullptr;
     std::string m_current_key;
     std::string m_data;
-    double m_max_depth;
-    int64_t m_current_depth;
-    bool m_depth_limit_exceeded;
+    double m_max_depth = 0.0;
+    int64_t m_current_depth = 0;
+    bool m_depth_limit_exceeded = false;
 };
 
 
