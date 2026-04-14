@@ -32,7 +32,7 @@ NodeData::NodeData() {
     has_child = false;
 }
 
-NodeData::~NodeData() {};
+NodeData::~NodeData() = default;
 
 /*
 * XMLNodes for parsing XML into args
@@ -46,7 +46,7 @@ XMLNodes::XMLNodes(Transaction *transaction)
     m_transaction(transaction)
     {}
 
-XMLNodes::~XMLNodes() {};
+XMLNodes::~XMLNodes() = default;
 
 /*
 * SAX handler for parsing XML into args
