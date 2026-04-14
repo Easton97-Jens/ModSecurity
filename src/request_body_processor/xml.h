@@ -67,7 +67,7 @@ struct xml_data {
     xmlParserCtxtPtr parsing_ctx = nullptr;
     xmlDocPtr doc = nullptr;
 
-    unsigned int well_formed;
+    unsigned int well_formed = 0;
 
     /* error reporting and XML array flag */
     std::string               xml_error;
