@@ -178,8 +178,6 @@ bool XML::init() {
 
         // set the parser state struct
         m_data.xml_parser_state                  = std::make_unique<XMLNodes>(m_transaction);
-        m_data.xml_parser_state->node_depth      = 0;
-        m_data.xml_parser_state->currval.clear();
         // the XML will contain at least one node, which is the pseudo root node 'xml'
         m_data.xml_parser_state->currpath        = "xml.";
     }
