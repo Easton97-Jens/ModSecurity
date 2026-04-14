@@ -186,7 +186,7 @@ int JSON::addArgument(const std::string& value) {
     std::string data;
     std::string path;
 
-    for (size_t i =  0; i < m_containers.size(); i++) {
+    for (size_t i = 0; i < m_containers.size(); i++) {
         const auto *a = dynamic_cast<JSONContainerArray *>(
             m_containers[i].get());
         path = path + m_containers[i]->m_name;
