@@ -22,7 +22,6 @@
 #include <string>
 
 #include "modsecurity/transaction.h"
-#include "modsecurity/rules_set.h"
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_XML_H_
 #define SRC_REQUEST_BODY_PROCESSOR_XML_H_
