@@ -36,10 +36,7 @@ NodeData::~NodeData() = default;
 * XMLNodes for parsing XML into args
 */
 XMLNodes::XMLNodes(Transaction *transaction) 
-    : nodes{},
-    node_depth(0),
-    currpath(""),
-    currval(""),
+    : node_depth(0),
     currval_is_set(false),
     m_transaction(transaction)
     {}
