@@ -141,9 +141,7 @@ XML::XML(Transaction *transaction)
     : m_transaction(transaction) {
     m_data.doc = nullptr;
     m_data.parsing_ctx = nullptr;
-    m_data.sax_handler = nullptr;
     m_data.parsing_ctx_arg = nullptr;
-    m_data.xml_parser_state = nullptr;
 }
 
 
