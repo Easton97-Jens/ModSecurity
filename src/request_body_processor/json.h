@@ -108,7 +108,7 @@ class JSON : public JsonEventSink {
     void clearContainers();
 
     std::deque<std::unique_ptr<JSONContainer>> m_containers;
-    Transaction *m_transaction;
+    Transaction *m_transaction = nullptr;
     std::string m_current_key;
     std::string m_data;
     double m_max_depth;
