@@ -20,8 +20,7 @@
 #include <string>
 
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 #ifdef WITH_LIBXML2
 
@@ -343,5 +342,4 @@ bool XML::complete(std::string *error) {
 
 #endif
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor

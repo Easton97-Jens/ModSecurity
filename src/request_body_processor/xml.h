@@ -29,8 +29,7 @@
 #define SRC_REQUEST_BODY_PROCESSOR_XML_H_
 
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 #ifdef WITH_LIBXML2
 
@@ -102,7 +101,6 @@ class XML {
 
 #endif
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+}  // namespace modsecurity::RequestBodyProcessor
 
 #endif  // SRC_REQUEST_BODY_PROCESSOR_XML_H_
