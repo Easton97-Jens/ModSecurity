@@ -83,14 +83,13 @@ class MSCSAXHandler {
             std::string name = reinterpret_cast<const char*>(localname);
             auto *xml_data = static_cast<XMLNodes*>(ctx);
             if (const std::shared_ptr<NodeData> &nd =
-                    xml_data->nodes[xml_data->nodes.size()-1]; !nd->has_child) {
+                    xml_data->nodes[xml_data->nodes.size()-1];
+                    !nd->has_child && !xml_data->m_transaction->addArgument(
+                        "XML", xml_data->currpath, xml_data->currval, 0)) {
                 // check the return value
                 // if false, then stop parsing
                 // this means the number of arguments reached the limit
-                if (!xml_data->m_transaction->addArgument("XML",
-                        xml_data->currpath, xml_data->currval, 0)) {
-                    xmlStopParser(xml_data->parsing_ctx_arg);
-                }
+                xmlStopParser(xml_data->parsing_ctx_arg);
             }
             if (!xml_data->currpath.empty()) {
                 // set an offset to store whether this is the first item, in order to know whether to remove the '.'
