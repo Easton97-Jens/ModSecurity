@@ -21,8 +21,11 @@
 #include <memory>
 #include <string>
 
-#include "modsecurity/transaction.h"
 #include "src/request_body_processor/json_backend.h"
+
+namespace modsecurity {
+class Transaction;
+}
 
 
 namespace modsecurity::RequestBodyProcessor {
