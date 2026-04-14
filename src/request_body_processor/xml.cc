@@ -121,13 +121,13 @@ class MSCSAXHandler {
 extern "C" {
     void MSC_startElement(void *userData,
         const xmlChar *name,
-        const xmlChar *prefix,
-        const xmlChar *URI,
-        int nb_namespaces,
-        const xmlChar **namespaces,
-        int nb_attributes,
-        int nb_defaulted,
-        const xmlChar **attributes) {
+        const xmlChar *,
+        const xmlChar *,
+        int,
+        const xmlChar **,
+        int,
+        int,
+        const xmlChar **) {
 
             auto *handler = static_cast<MSCSAXHandler*>(userData);
             handler->onStartElement(userData, name);
@@ -136,8 +136,8 @@ extern "C" {
     void MSC_endElement(
         void *userData,
         const xmlChar *name,
-        const xmlChar* prefix,
-        const xmlChar* URI) {
+        const xmlChar*,
+        const xmlChar*) {
 
             auto *handler = static_cast<MSCSAXHandler*>(userData);
             handler->onEndElement(userData, name);
@@ -208,8 +208,8 @@ bool XML::init() {
 }
 
 
-xmlParserInputBufferPtr XML::unloadExternalEntity(const char *URI,
-    xmlCharEncoding enc) {
+xmlParserInputBufferPtr XML::unloadExternalEntity(const char *,
+    xmlCharEncoding) {
     return nullptr;
 }
 
