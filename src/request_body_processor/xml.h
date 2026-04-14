@@ -19,7 +19,9 @@
 #include <libxml/SAX2.h>
 #endif
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_XML_H_
 #define SRC_REQUEST_BODY_PROCESSOR_XML_H_
