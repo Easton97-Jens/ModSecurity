@@ -172,13 +172,12 @@ XML::~XML() {
 }
 
 bool XML::init() {
-    //xmlParserInputBufferCreateFilenameFunc entity;
     if (m_transaction->m_rules->m_secXMLExternalEntity
         == RulesSetProperties::TrueConfigBoolean) {
-        /*entity = */xmlParserInputBufferCreateFilenameDefault(
+        xmlParserInputBufferCreateFilenameDefault(
             __xmlParserInputBufferCreateFilename);
     } else {
-        /*entity = */xmlParserInputBufferCreateFilenameDefault(
+        xmlParserInputBufferCreateFilenameDefault(
             this->unloadExternalEntity);
     }
     if (m_transaction->m_secXMLParseXmlIntoArgs
@@ -224,19 +223,6 @@ bool XML::processChunk(const char *buf, unsigned int size,
         /* First invocation. */
 
         ms_dbg_a(m_transaction, 4, "XML: Initialising parser.");
-
-        /* NOTE When Sax interface is used libxml will not
-         *      create the document object, but we need it.
-
-        msr->xml->sax_handler = (xmlSAXHandler *)apr_pcalloc(msr->mp,
-            sizeof(xmlSAXHandler));
-        if (msr->xml->sax_handler == NULL) return -1;
-        msr->xml->sax_handler->error = xml_receive_sax_error;
-        msr->xml->sax_handler->warning = xml_receive_sax_error;
-        msr->xml->parsing_ctx = xmlCreatePushParserCtxt(msr->xml->sax_handler,
-            msr, buf, size, "body.xml");
-
-        */
 
         if (m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
