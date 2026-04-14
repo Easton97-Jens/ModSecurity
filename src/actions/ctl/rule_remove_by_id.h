@@ -13,7 +13,9 @@
  *
  */
 
+#include <list>
 #include <string>
+#include <utility>
 
 #include "modsecurity/actions/action.h"
 #include "modsecurity/transaction.h"

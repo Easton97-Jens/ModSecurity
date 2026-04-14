@@ -17,6 +17,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <string_view>
 #endif
 
 #ifndef HEADERS_MODSECURITY_AUDIT_LOG_H_

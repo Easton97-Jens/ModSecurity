@@ -26,6 +26,7 @@
 #include <utility>
 #include <memory>
 #include <cassert>
+#include <vector>
 
 #include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"

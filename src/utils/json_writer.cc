@@ -15,6 +15,7 @@
 
 #include "src/utils/json_writer.h"
 
+#include <cstddef>
 #include <cstdio>
 #include <utility>
 

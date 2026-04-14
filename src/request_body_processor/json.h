@@ -16,14 +16,18 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 #define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <memory>
 #include <string>
+#include <string_view>
 
-#include "modsecurity/transaction.h"
-#include "modsecurity/rules_set.h"
 #include "src/request_body_processor/json_backend.h"
+
+namespace modsecurity {
+class Transaction;
+}
 
 
 namespace modsecurity::RequestBodyProcessor {
@@ -32,22 +36,21 @@ namespace modsecurity::RequestBodyProcessor {
 class JSONContainer {
  public:
     explicit JSONContainer(const std::string &name) : m_name(name) { }
-    virtual ~JSONContainer() { }
+    virtual ~JSONContainer() = default;
     std::string m_name;
 };
 
 
 class JSONContainerArray : public JSONContainer {
  public:
-    explicit JSONContainerArray(const std::string &name) : JSONContainer(name),
-        m_elementCounter(0) { }
-    size_t m_elementCounter;
+    using JSONContainer::JSONContainer;
+    size_t m_elementCounter = 0;
 };
 
 
 class JSONContainerMap : public JSONContainer {
  public:
-     explicit JSONContainerMap(const std::string &name) : JSONContainer(name) { }
+    using JSONContainer::JSONContainer;
 };
 
 
@@ -88,7 +91,7 @@ class JSON : public JsonEventSink {
 
     std::string getCurrentKey(bool emptyIsNull = false) {
         std::string ret(m_current_key);
-        if (m_containers.size() == 0) {
+        if (m_containers.empty()) {
             return "json";
         }
         if (m_current_key.empty()) {
@@ -109,12 +112,12 @@ class JSON : public JsonEventSink {
     void clearContainers();
 
     std::deque<std::unique_ptr<JSONContainer>> m_containers;
-    Transaction *m_transaction;
+    Transaction *m_transaction = nullptr;
     std::string m_current_key;
     std::string m_data;
-    double m_max_depth;
-    int64_t m_current_depth;
-    bool m_depth_limit_exceeded;
+    double m_max_depth = 0.0;
+    int64_t m_current_depth = 0;
+    bool m_depth_limit_exceeded = false;
 };
 
 

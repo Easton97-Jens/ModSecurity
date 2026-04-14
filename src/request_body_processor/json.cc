@@ -20,10 +20,12 @@
 #include "src/request_body_processor/json.h"
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
 
+#include "modsecurity/transaction.h"
 #include "src/request_body_processor/json_adapter.h"
 #include "src/request_body_processor/json_instrumentation.h"
 
@@ -31,7 +33,8 @@
 namespace modsecurity::RequestBodyProcessor {
 
 static const double json_depth_limit_default = 10000.0;
-static const char* json_depth_limit_exceeded_msg = ". Parsing depth limit exceeded";
+static const char *const json_depth_limit_exceeded_msg =
+    ". Parsing depth limit exceeded";
 
 namespace {
 
@@ -119,11 +122,7 @@ JsonSinkStatus addStringViewAsSinkStatus(JSON *json, std::string_view value) {
 }  // namespace
 
 JSON::JSON(Transaction *transaction) : m_transaction(transaction),
-    m_current_key(""),
-    m_data(""),
-    m_max_depth(json_depth_limit_default),
-    m_current_depth(0),
-    m_depth_limit_exceeded(false) {
+    m_max_depth(json_depth_limit_default) {
 }
 
 
@@ -185,11 +184,11 @@ bool JSON::complete(std::string *err) {
 
 
 int JSON::addArgument(const std::string& value) {
-    std::string data("");
+    std::string data;
     std::string path;
 
-    for (size_t i =  0; i < m_containers.size(); i++) {
-        const JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+    for (size_t i = 0; i < m_containers.size(); i++) {
+        const auto *a = dynamic_cast<JSONContainerArray *>(
             m_containers[i].get());
         path = path + m_containers[i]->m_name;
         if (a != nullptr) {
@@ -199,8 +198,8 @@ int JSON::addArgument(const std::string& value) {
         }
     }
 
-    if (m_containers.size() > 0) {
-        JSONContainerArray *a = dynamic_cast<JSONContainerArray *>(
+    if (!m_containers.empty()) {
+        auto *a = dynamic_cast<JSONContainerArray *>(
             m_containers.back().get());
         if (a) {
             a->m_elementCounter++;
