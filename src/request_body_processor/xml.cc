@@ -62,7 +62,7 @@ class MSCSAXHandler {
             // set the current value empty
             // this is necessary because if there is any text between the tags (new line, etc)
             // it will be added to the current value
-            xml_data->currval = "";
+            xml_data->currval.clear();
             xml_data->currval_is_set = false;
         }
 
@@ -86,7 +86,7 @@ class MSCSAXHandler {
             }
             xml_data->nodes.pop_back();
             xml_data->node_depth--;
-            xml_data->currval = "";
+            xml_data->currval.clear();
             xml_data->currval_is_set = false;
         }
 
@@ -186,7 +186,7 @@ bool XML::init() {
         // set the parser state struct
         m_data.xml_parser_state                  = std::make_unique<XMLNodes>(m_transaction);
         m_data.xml_parser_state->node_depth      = 0;
-        m_data.xml_parser_state->currval         = "";
+        m_data.xml_parser_state->currval.clear();
         // the XML will contain at least one node, which is the pseudo root node 'xml'
         m_data.xml_parser_state->currpath        = "xml.";
     }
