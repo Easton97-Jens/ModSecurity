@@ -57,7 +57,7 @@ class MSCSAXHandler {
 
             std::string name = reinterpret_cast<const char*>(localname);
 
-            XMLNodes* xml_data = static_cast<XMLNodes*>(ctx);
+            auto *xml_data = static_cast<XMLNodes*>(ctx);
             xml_data->nodes.push_back(std::make_shared<NodeData>());
             xml_data->node_depth++;
             // FIXME - later if we want to check the depth of XML tree
@@ -81,13 +81,14 @@ class MSCSAXHandler {
 
         void onEndElement(void * ctx, const xmlChar *localname) {
             std::string name = reinterpret_cast<const char*>(localname);
-            XMLNodes* xml_data = static_cast<XMLNodes*>(ctx);
+            auto *xml_data = static_cast<XMLNodes*>(ctx);
             const std::shared_ptr<NodeData>& nd = xml_data->nodes[xml_data->nodes.size()-1];
-            if (nd->has_child == false) {
+            if (!nd->has_child) {
                 // check the return value
                 // if false, then stop parsing
                 // this means the number of arguments reached the limit
-                if (xml_data->m_transaction->addArgument("XML", xml_data->currpath, xml_data->currval, 0) == false) {
+                if (!xml_data->m_transaction->addArgument("XML",
+                        xml_data->currpath, xml_data->currval, 0)) {
                     xmlStopParser(xml_data->parsing_ctx_arg);
                 }
             }
@@ -103,7 +104,7 @@ class MSCSAXHandler {
         }
 
         void onCharacters(void *ctx, const xmlChar *ch, int len) {
-            XMLNodes* xml_data = static_cast<XMLNodes*>(ctx);
+            auto *xml_data = static_cast<XMLNodes*>(ctx);
             std::string content(reinterpret_cast<const char *>(ch), len);
 
             // libxml2 SAX parser will call this function multiple times
