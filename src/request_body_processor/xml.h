@@ -41,7 +41,7 @@ class NodeData {
         explicit NodeData();
         ~NodeData();
 
-        bool has_child;
+        bool has_child = false;
 };
 
 /*

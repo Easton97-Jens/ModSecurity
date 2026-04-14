@@ -27,7 +27,7 @@ namespace modsecurity::RequestBodyProcessor {
 /*
 * NodeData for parsing XML into args
 */
-NodeData::NodeData() : has_child(false) {}
+NodeData::NodeData() = default;
 
 NodeData::~NodeData() = default;
 
