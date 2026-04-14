@@ -39,7 +39,7 @@ class JSONContainer {
 
 class JSONContainerArray : public JSONContainer {
  public:
-    explicit JSONContainerArray(const std::string &name) : JSONContainer(name) { }
+    using JSONContainer::JSONContainer;
     size_t m_elementCounter = 0;
 };
 
