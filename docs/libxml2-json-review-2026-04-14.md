@@ -1,293 +1,377 @@
-# libxml2 / JSON Architektur- und Dependency-Review (Stand: 2026-04-14)
+# libxml2 Security-/Architektur-/Dependency-Audit (Stand: 2026-04-14)
 
-Ziel dieses Dokuments ist eine belastbare Bewertung von Nutzung, Sicherheitslage, Wartbarkeit und Integrationsfähigkeit von **libxml2** im Projekt – inklusive Vergleich mit dem aktuellen öffentlichen Stand sowie expliziter Bewertung einer **Modularisierung von libxml2 analog zur JSON-Architektur**.
+## 1. Executive Summary
+
+### Im Repo belegt
+- libxml2 wird aktiv für XML-Request-Body-Parsing, XPath-Variablen und DTD/XSD-Validierung verwendet.
+- Die Integration ist buildseitig optional (`WITH_LIBXML2`), funktional aber kritisch für XML-Regeln.
+- JSON ist bereits über eine klarere Backend-Abstraktion (simdjson/jsoncons + `JSONAdapter`/`JsonEventSink`) modularisiert.
+- YAJL ist im C/C++-Codepfad nicht mehr nachweisbar, aber in README/CI weiterhin als Dependency referenziert.
+
+### Extern belegt
+- Upstream libxml2 steht bei 2.15.2 (März 2026).
+- Offizielle API-Doku markiert die im Repo genutzte globale Loader-Umschaltung als deprecated.
+- Debian/Ubuntu zeigen, dass numerisch ältere Paketstände weiterhin Security-Backports erhalten; Fedora und Homebrew liegen näher an aktuellen Upstream-Ständen.
+
+### Schlussfolgerung
+- **libxml2 sollte modernisiert werden** (Version-/Security-/API-Härtung).
+- **libxml2 ist aktuell nicht der Primär-Blocker für JSON-Migration**.
+- **Modularisierung von libxml2 ist sinnvoll, aber gestaffelt** (nicht als Big-Bang parallel zur JSON-Ablösung).
+- **Release-/Advisory-Monitoring-Workflow ist empfehlenswert**, aber als „monitor + report + manuelle Freigabe“, nicht als blindes Auto-Upgrade.
+
+### Unsicherheit / nicht verifizierbar
+- Produktiv tatsächlich eingesetzte libxml2-Versionen außerhalb CI/Windows-Conan: **Nicht verifizierbar.**
 
 ---
 
-## 1) Executive Summary
+## 2. Repo-Befunde zu libxml2
 
-### Belegt im Repo
-- libxml2 wird für XML-Request-Body-Parsing, XPath-basierte Variablen, DTD-Validierung und XSD-Validierung genutzt.
-- Die Einbindung ist optional (`WITH_LIBXML2`), aber funktional tief in XML-Features integriert.
-- Autotools fordert nur `libxml2 >= 2.6.29`; Windows-Conan pinnt `2.12.6`.
-- XML-Sicherheitssteuerung erfolgt aktuell über globalen Loader-Callback (`xmlParserInputBufferCreateFilenameDefault`), während JSON über eine klarere Backend-Abstraktion (`JSONAdapter` + `JsonEventSink`) geführt wird.
+### Im Repo belegt
 
-### Belegt durch externe Quellen
-- Upstream-Stand ist 2.15.x (aktueller Index: 2.15.2 in März 2026).
-- 2.14/2.15 enthalten API/ABI- und Sicherheitsrelevanz (u. a. SONAME-Änderung in 2.14.0, Security-Fixes in neueren Releases).
-- Offizielle API-Doku markiert `xmlParserInputBufferCreateFilenameDefault` als deprecated und empfiehlt kontextbezogene Loader-Mechanismen.
+#### Code-Nutzung
+- Globale Initialisierung/Shutdown: `xmlInitParser()`/`xmlCleanupParser()` in `src/modsecurity.cc`.
+- Request-Body-XML-Parsing: Push-Parser + SAX in `src/request_body_processor/xml.cc`.
+- XPath-Auswertung: `src/variables/xml.cc`.
+- DTD-Validierung: `src/operators/validate_dtd.cc`.
+- XSD-Validierung: `src/operators/validate_schema.cc`.
+- Dispatcher XML/JSON: `src/transaction.cc`.
+
+#### Sicherheitsrelevante Befunde
+- Externe Entitäten werden über `SecXMLExternalEntity` via globalen Loader-Callback gesteuert (`xmlParserInputBufferCreateFilenameDefault`).
+- Parseroptionen setzen sichtbar `XML_PARSE_NOWARNING | XML_PARSE_NOERROR`.
+- Sichtbarer Einsatz von `XML_PARSE_NO_XXE` im XML-Body-Parserpfad: nicht belegt.
+
+#### Build/Dependency
+- Autotools-Mindestversion für libxml2: `2.6.29`.
+- Windows-Conan pinnt `libxml2/2.12.6`.
+- CI testet mit und ohne `--without-libxml`.
+
+#### Tests/Fuzzing
+- Mehrere Regressionsfälle mit Resource-Gate `libxml2`.
+- Expliziter XXE-Regressionsfall (`config-xml_external_entity.json`).
+- Fuzzer-Linking enthält `$(LIBXML2_LDADD)`.
+
+### Extern belegt
+- Keine externen Quellen für diese Repo-internen Fakten erforderlich.
 
 ### Schlussfolgerung
-- **Update/Modernisierung von libxml2-Einbindung ist sinnvoll** (Security + Wartbarkeit + Zukunftsfähigkeit).
-- **libxml2 ist nicht der primäre Blocker für neue JSON-Bibliothek**.
-- **Modularisierung von libxml2 ist teilweise sinnvoll bis empfohlen**: nicht zwingend für Funktionalität heute, aber klar vorteilhaft für Konsistenz, Testbarkeit und künftige Parser-Vereinheitlichung.
+- libxml2 ist für XML-Features technisch zentral.
+- Sicherheitskontrolle ist vorhanden, aber über global/deprecated Mechanismus statt moderner, kontextbezogener API.
+- Versionierungsstrategie wirkt inkonsistent (sehr alte Mindestgrenze vs. neuerer Windows-Pin).
 
 ### Unsicherheit / nicht verifizierbar
-- Reale Produktionsversionen je Zielumgebung sind aus dem Repo allein nicht bestimmbar. **Nicht verifizierbar.**
+- Thread-Safety-Auswirkungen des globalen Loader-Umschaltens unter realer Parallelität sind aus dem Repo allein **nicht vollständig verifizierbar**.
 
 ---
 
-## 2) Repo-Befunde
+## 3. Repo-Befunde zur JSON-Migration (YAJL → neue Bibliothek)
 
-## 2.1 Includes, Build, Versionen
+### Im Repo belegt
+- `configure.ac` unterstützt `--with-json-backend=simdjson|jsoncons`.
+- JSON-Backends sind separat implementiert (`json_backend_simdjson.cc`, `json_backend_jsoncons.cc`) und über `JSONAdapter` abstrahiert.
+- `JsonEventSink`/`JsonParseResult` bilden ein konsistentes Contract-Modell.
+- Es existieren dedizierte Backend-Tests (`json_backend_depth_tests`) und eine Matrix-Ausführung (`test/run-json-backend-matrix.sh`).
+- YAJL-Nutzung im C/C++-Codepfad: durch Suche nach `yajl`/YAJL-Includes nicht belegt.
+- YAJL-Referenzen verbleiben in README und CI-Paketinstallation.
 
-### Belegt im Repo
-- Build-Minimum in Autotools: `MSC_CHECK_LIB(... MIN_VERSION [2.6.29] ...)`.
-- Windows-Build (Conan): `libxml2/2.12.6`.
-- Windows-Readme bestätigt ebenfalls libxml2 2.12.6.
-- CMake Windows koppelt `WITH_LIBXML2` an `LibXml2::LibXml2`.
+### Extern belegt
+- Nicht erforderlich für Repo-Befund.
 
 ### Schlussfolgerung
-- Versionspolitik ist uneinheitlich (sehr altes Mindestlevel vs. fester mittlerer Pin auf Windows).
+- Die neue JSON-Schicht ist klar modularer als XML.
+- Der Zustand ist konsistent mit einer laufenden/weit fortgeschrittenen Ablösung von YAJL im Kerncode, bei verbleibenden Dokumentations-/CI-Resten.
 
 ### Unsicherheit / nicht verifizierbar
-- Linux-Distributionen können Backports liefern; ohne Ziel-Distroliste **nicht verifizierbar**.
-
-## 2.2 Code-Kopplung und Nutzungsarten
-
-### Belegt im Repo
-- Initialisierung global in `ModSecurity` via `xmlInitParser()` / `xmlCleanupParser()`.
-- XML-Request-Parsing in `src/request_body_processor/xml.cc` per Push-Parser (`xmlCreatePushParserCtxt`, `xmlParseChunk`) plus SAX-Callbacks für `SecParseXmlIntoArgs`.
-- XPath-Nutzung in `src/variables/xml.cc` (`xmlXPathEvalExpression`, Namespace-Registrierung).
-- DTD-Validierung (`xmlParseDTD`, `xmlValidateDtd`) in `validate_dtd.cc`.
-- XSD-Validierung (`xmlSchema*`) in `validate_schema.cc`.
-- XML-Verarbeitung wird in `Transaction::processRequestBody` neben JSON-Verarbeitung geschaltet.
-
-### Schlussfolgerung
-- libxml2-Aufrufe sind nicht überall verstreut, aber auch nicht durch ein zentrales XML-Backend-Interface isoliert (anders als JSON).
-
-## 2.3 Fehlerbehandlung und Security-relevante Optionen
-
-### Belegt im Repo
-- Parseroptionen setzen `XML_PARSE_NOWARNING | XML_PARSE_NOERROR`.
-- Externe Entitäten werden über `SecXMLExternalEntity` gesteuert:
-  - ON: Default-Loader,
-  - sonst: Callback liefert `nullptr`.
-- Regressionsfälle für XXE-Szenarien sind vorhanden (`config-xml_external_entity.json`).
-
-### Schlussfolgerung
-- Es existiert Schutzlogik, aber in Form eines globalen Mechanismus statt kontextbezogener Härtung.
-
-### Unsicherheit / nicht verifizierbar
-- Ob alle denkbaren Entity/Resource-Edgecases (z. B. bei parallel laufenden Konfigurationen) vollständig abgedeckt sind, aus vorhandenen Tests allein **nicht verifizierbar**.
-
-## 2.4 JSON-Architektur im Repo (Vergleichsmuster)
-
-### Belegt im Repo
-- Konfigurierbare Backends: `--with-json-backend=simdjson|jsoncons`.
-- Gemeinsames Backend-Interface (`JsonEventSink`, `JsonParseResult`, `JsonBackendParseOptions`).
-- Adapter-Schicht (`JSONAdapter`) wählt Backend über Compile-Time-Defines.
-- Separate Backend-Implementierungen (`json_backend_simdjson.cc`, `json_backend_jsoncons.cc`) + dedizierte Tests (`json_backend_depth_tests`, Backend-Matrix-Script).
-
-### Schlussfolgerung
-- JSON ist strukturell modularer/abstrakter als XML.
-- Dieses Muster ist als Referenz für libxml2-Kapselung geeignet.
+- Exakter Migrationsstatus in nicht sichtbaren Branches/Downstreams: **Nicht verifizierbar.**
 
 ---
 
-## 3) Externer Stand zu libxml2 (Internet-Abgleich)
+## 4. Aktueller externer Stand zu libxml2
 
-### Belegt durch externe Quellen
-- Release-Index listet aktuell 2.15.x mit `LATEST-IS-2.15.2` (2026-03-04).
-- 2.14.0 Release Notes: SONAME-Sprung (`libxml2.so.2` -> `libxml2.so.16`) und Binärkompatibilität nur innerhalb 2.14+.
-- 2.15.0 Release Notes: Wegfall built-in HTTP/LZMA-Komponenten u. a. technische Änderungen.
+### Extern belegt
+- GNOME Release-Index führt libxml2 2.15.x, inklusive `LATEST-IS-2.15.2`.
+- 2.14.0 Release Notes: SONAME-Änderung (`libxml2.so.2` → `libxml2.so.16`) und ABI-Hinweise.
+- 2.15.0 Release Notes: u. a. Wegfall built-in HTTP/LZMA-Komponenten.
 - 2.15.2 Release Notes: mehrere Security-Fixes/CVE-Referenzen.
-- 2.12.10 Release Notes: Fixes inkl. CVE-2025-24928 / CVE-2024-56171.
-- NVD bestätigt CVE-2025-24928 als relevant für ältere Versionen (<2.12.10 bzw. 2.13.6).
+- 2.12.10 Release Notes enthalten u. a. CVE-2025-24928 / CVE-2024-56171.
+- NVD führt CVE-2025-24928 mit betroffenen älteren Versionen.
 - Offizielle API-Doku:
-  - `XML_PARSE_NO_XXE` als relevante Sicherheitsoption,
-  - `xmlParserInputBufferCreateFilenameDefault` deprecated,
-  - `XML_PARSE_NONET` seit 2.15 nur noch begrenzt relevant (kein built-in network client).
+  - `xmlParserInputBufferCreateFilenameDefault` deprecated (`xmlIO_8h`).
+  - `XML_PARSE_NO_XXE` als relevante Sicherheitsoption (`parser_8h`).
+
+### Im Repo belegt
+- Nicht anwendbar.
 
 ### Schlussfolgerung
-- Der Upstream-Stand liegt deutlich über der in Teilen des Repos sichtbaren Versionierungspolitik.
-- Security- und API-Entwicklung nahelegt: Modernisierung statt „as-is“ beibehalten.
+- Upstream entwickelt sich sicherheits- und API-seitig aktiv; mittelfristiges „stehen bleiben“ erhöht Wartungs- und Security-Risiko.
 
 ### Unsicherheit / nicht verifizierbar
-- Vollständige CVE-Mapping-Konsistenz über alle Datenbanken am Tag der Analyse: **Nicht verifizierbar**.
+- Vollständige CVE-Enrichment-Konsistenz über alle Datenbanken am selben Tag: **Nicht verifizierbar.**
 
 ---
 
-## 4) Architekturvergleich XML vs JSON
+## 5. Linux- und macOS-Versions-/Packaging-Vergleich
 
-## 4.1 XML-Seite
+### Extern belegt
 
-### Belegt im Repo
-- XML-Logik ist funktional in mehrere konkrete Stellen verteilt (Request-Processor, Variable-Evaluation, Operatoren).
-- Es gibt **kein** XML-Äquivalent zu `JSONAdapter`/`JsonEventSink`, also kein austauschbares XML-Backend-Contract.
+#### Linux
+- Debian Security Tracker zeigt für stabile Releases numerisch ältere Versionsstände mit separaten Security-Updates/DSA/DLA (Backport-Modell).
+- Ubuntu Paket-/USN-Seiten zeigen ebenfalls ältere Versionsnummern mit Security-Notices/Updates.
+- Fedora-Paketseite listet deutlich neuere Stände (z. B. 2.12.10 in Fedora-Releases laut gelisteter Übersicht).
 
-### Schlussfolgerung
-- XML ist integriert, aber weniger entkoppelt als JSON.
+#### macOS
+- Homebrew `libxml2`-API zeigt `stable: 2.15.2`, `keg_only` mit Grund `provided_by_macos`.
+- Das belegt zugleich die Trennung zwischen systembereitgestellter libxml2 und explizit installierter Homebrew-Variante.
 
-## 4.2 JSON-Seite
-
-### Belegt im Repo
-- JSON folgt einem klaren Modul-/Interface-Muster mit getrennten Backends und normalisiertem Ergebnis-/Fehlerkonzept.
-
-### Schlussfolgerung
-- JSON zeigt ein praktikables Architekturpattern, das für XML übertragbar ist (zumindest teilweise).
-
-## 4.3 Datenfluss XML/JSON
-
-### Belegt im Repo
-- Gemeinsamer Dispatcher in `Transaction::processRequestBody` (Auswahl über Processor-Typ).
-- Getrennte Processor-Objekte (`m_xml`, `m_json`) mit ähnlichem Lifecycle (`init/processChunk/complete`).
+### Im Repo belegt
+- CI installiert auf Linux `libxml2-dev` (APT) und auf macOS `brew install libxml2`.
 
 ### Schlussfolgerung
-- Es gibt bereits ein gemeinsames Lebenszyklusmuster, aber keine gemeinsame Backend-Abstraktionsebene.
-
----
-
-## 5) Bewertung: Soll libxml2 als eigenes Modul gekapselt werden?
-
-## 5.1 Technische Kriterien
-
-### Kopplungsgrad
-- **Belegt im Repo:** libxml2-Aufrufe sitzen in mehreren Fachstellen ohne zentrales XML-Backend-Interface.
-- **Schlussfolgerung:** Kapselung reduziert direkte API-Abhängigkeit im Restcode.
-
-### Austauschbarkeit
-- **Belegt im Repo:** JSON ist per Adapter austauschbarer als XML.
-- **Schlussfolgerung:** XML-Kapselung würde Austauschbarkeit erhöhen (auch wenn ein kompletter Parserwechsel nicht kurzfristig geplant ist).
-
-### Testbarkeit
-- **Belegt im Repo:** JSON-Backends haben dedizierte Tiefen-/Backend-Tests; XML hat Funktions-/Regressionstests, aber keine analoge Backend-Schicht.
-- **Schlussfolgerung:** Modulgrenze würde gezieltere XML-Unit-Tests erleichtern.
-
-### Wartbarkeit / Build / Plattform
-- **Belegt im Repo:** Uneinheitliche Versionierung + deprecated API-Nutzung + Plattformunterschiede.
-- **Schlussfolgerung:** Kapselung vereinfacht zukünftige Migrationsschritte.
-
-## 5.2 Architektur-Fazit (Pflichtentscheidung)
-
-**Ergebnis: Teilweise sinnvoll (mit klarer Tendenz zu „Ja, modularisieren“).**
-
-Warum nicht „sofort voll Ja“?
-- Weil der aktuelle Code funktional arbeitet und Refactoring-Aufwand/Regressionen real sind.
-
-Warum nicht „Nein“?
-- Weil JSON bereits beweist, dass ein Adapter-Modell in diesem Projekt funktioniert und Mehrwert bringt.
-
-### Risiken
-- Performance-Overhead: bei dünner Wrapper-Schicht i. d. R. gering; muss gemessen werden.
-- Refactoring-Aufwand: mittel bis hoch je Scope.
-- ABI/API-Risiken: beherrschbar, wenn öffentliche API unverändert bleibt und nur interne Schicht eingezogen wird.
-- Versteckte Abhängigkeiten: möglich; über schrittweise Migration + Regression/Fuzzing abfedern.
+- Reiner Versionsnummernvergleich reicht nicht: Debian/Ubuntu können numerisch ältere, aber security-gepflegte Pakete liefern.
+- Für reproduzierbare Sicherheitsbewertung muss das Projekt klarer festlegen, ob Systempakete, Homebrew/Conan oder pin-basierte Vendor-Strategie maßgeblich sind.
 
 ### Unsicherheit / nicht verifizierbar
-- Exakter Runtime-Impact ohne Benchmarks: **Nicht verifizierbar**.
+- Exakte Backport-Abdeckung aller relevanten CVEs je Distribution/Release ohne vollständige Advisory-Matrix: **Nicht verifizierbar.**
 
 ---
 
-## 6) Gesamtentscheidung (kombiniert)
+## 6. Sicherheitsbewertung
 
-1. **Soll libxml2 aktualisiert/erneuert werden?**
+### Im Repo belegt
+- XML-Eingaben sind untrusted Request-Body-Daten.
+- Schutz gegen externe Entitäten basiert aktuell auf globalem Loader-Override.
+- `XML_PARSE_NO_XXE`-Setzung im gezeigten XML-Body-Pfad ist nicht belegt.
+- XML und JSON laufen beide über denselben Request-Body-Dispatcher, aber mit separaten Prozessoren.
+
+### Extern belegt
+- Deprecated-Status des globalen Loader-Mechanismus.
+- Vorhandensein aktueller Sicherheitsfixes in neueren libxml2-Releases.
+
+### Schlussfolgerung
+- Sicherheit ist **teilweise abgesichert**, aber nicht auf dem robustesten verfügbaren Mechanismus.
+- Zentralisierte Sicherheitsdefaults in einer XML-Fassade würden das Risiko inkonsistenter Parser-Konfiguration senken.
+
+### Unsicherheit / nicht verifizierbar
+- Ob alle Angriffsvektoren (insb. Race-/Global-State-Randfälle) unter Produktionslast abgedeckt sind: **Nicht verifizierbar.**
+
+---
+
+## 7. Architekturvergleich: libxml2 vs. neue JSON-Schicht
+
+### Im Repo belegt
+- JSON: klarer Backend-Contract (`JsonEventSink`, Result-Typen), Adapter (`JSONAdapter`), austauschbare Implementierungen, dedizierte Backendspezifik-Tests.
+- XML: direkte libxml2-Aufrufe in mehreren Fachkomponenten ohne zentrales XML-Backend-Interface.
+
+### Extern belegt
+- Nicht erforderlich.
+
+### Schlussfolgerung
+- JSON ist architektonisch stärker entkoppelt.
+- Das JSON-Muster ist ein konkreter Referenzentwurf für ein XML-Modul (Facade/Adapter/Options/Result-Contract).
+
+### Unsicherheit / nicht verifizierbar
+- Netto-Performanceeffekt einer XML-Adapter-Schicht ohne Benchmarks: **Nicht verifizierbar.**
+
+---
+
+## 8. Bewertung: libxml2 als Modul integrieren oder nicht
+
+### Kategorie
+**Ja, aber nur in einem gestaffelten Ansatz.**
+
+### Im Repo belegt
+- XML ist aktuell weniger modular als JSON.
+- Direkte libxml2-Nutzung existiert an mehreren Stellen.
+
+### Extern belegt
+- Upstream/API-Situation (deprecated global loader + laufende Security-Fixes) stützt die Notwendigkeit zentraler Kontrolle.
+
+### Schlussfolgerung
+- Modulgrenze bringt Vorteile bei Wartbarkeit, Testbarkeit, Sicherheitsstandardisierung und späteren Upgrades.
+- Parallel als Big-Bang zur JSON-Migration wäre unnötig riskant; sinnvoll ist eine sequenzierte Einführung.
+
+### Unsicherheit / nicht verifizierbar
+- Konkreter Refactoring-Aufwand bis auf Funktions-/Dateiebene ohne Spike-Implementierung: **Nicht verifizierbar.**
+
+---
+
+## 9. Bewertung: Ist direkte Modulbildung sicher
+
+### Im Repo belegt
+- Es gibt aktuell globale libxml2-Steuerungspunkte und direkte API-Aufrufe in Fachcode.
+
+### Extern belegt
+- Deprecated API-Hinweise unterstützen eine Umstellung auf zentral kontrollierte, kontextbezogene Ressourcen-/Parserkonfiguration.
+
+### Schlussfolgerung
+- **Direkte Modulbildung ist nicht automatisch „sicher“, aber kann sicherer werden**, wenn Guardrails verpflichtend sind:
+  1. Zentrale Parser-Defaults (inkl. XXE-/Resource-Policy) im Modul.
+  2. Harte Limits (Depth/Size/Entity-Policy) im Modul-Contract.
+  3. Einheitliche Fehlerklassifikation und Auditierbarkeit.
+  4. Explizite Trennung trusted/untrusted Inputs.
+  5. Verbot neuer direkter libxml2-Aufrufe außerhalb des Moduls (CI-Lint/Codeowners).
+
+### Unsicherheit / nicht verifizierbar
+- Ohne diese Guardrails ist die Aussage „Modulbildung ist sicher genug“ **nicht verifizierbar**.
+
+---
+
+## 10. Bewertung: Release-/Security-Monitoring-Workflow
+
+### Im Repo belegt
+- CI testet Build-Varianten, aber ein dediziertes Release-/Advisory-Monitoring für libxml2 + JSON-Backend ist nicht als eigener Workflow ersichtlich.
+
+### Extern belegt
+- Upstream-Releases (libxml2, simdjson/jsoncons) ändern sich regelmäßig.
+- Distributionen liefern teils Backports, daher reicht „nur Upstream-Version vergleichen“ nicht.
+
+### Schlussfolgerung
+**Empfehlung: beobachten + reporten + manuell freigegebene Updates.**
+
+- **Release Monitoring:** Ja (Upstream libxml2 + verwendetes JSON-Backend).
+- **Security Advisory Monitoring:** Ja (CVE/NVD + distro advisories).
+- **Automatisches Upgrade:** Nein, nicht blind.
+- **Manuell freigegebener Update-Prozess:** Ja.
+
+Pragmatisches Modell:
+1. Geplanter Workflow (z. B. wöchentlich) sammelt Versionen/Advisories.
+2. Erzeugt Report + optional GitHub Issue/PR-Kommentar.
+3. Menschen entscheiden über Upgrade/Patchbackport nach Testmatrix.
+
+### Unsicherheit / nicht verifizierbar
+- Konkretes Signal-zu-Rauschen-Verhältnis ohne Pilotlauf: **Nicht verifizierbar.**
+
+---
+
+## 11. Klare Gesamtentscheidungen
+
+1. **Soll libxml2 aktualisiert oder erneuert werden?**
    - **Ja, Aktualisierung/Modernisierung empfohlen.**
-   - Begründung: Versionsabstand, Security-/API-Entwicklung upstream, deprecated API im aktuellen Codepfad.
+   - Belege: Upstream 2.15.2, Security-Fixes, deprecated API-Hinweise, Repo nutzt alte Mindestgrenze + globalen Mechanismus.
+   - Hauptrisiko: Migrations-/Kompatibilitätsaufwand.
+   - Unsicherheit: konkrete Upgrade-Auswirkungen je Zielplattform **nicht vollständig verifizierbar**.
 
-2. **Soll libxml2 modularisiert werden (wie JSON)?**
-   - **Teilweise sinnvoll (empfohlen als schrittweise interne Modularisierung).**
-   - Begründung: verbessert Entkopplung, Testbarkeit, Konsistenz mit JSON-Architektur.
+2. **Soll libxml2 als eigenes Modul integriert werden?**
+   - **Ja, aber nur in gestaffeltem Ansatz.**
+   - Belege: JSON-Adaptermuster vorhanden; XML aktuell weniger entkoppelt.
+   - Hauptrisiko: Refactoring-Komplexität.
 
-3. **Ist libxml2 ein Hindernis für JSON-Integration?**
-   - **Nein, nicht der primäre Engpass.**
-   - Begründung: JSON besitzt bereits eigene Backend-Abstraktion; Engpass liegt eher in fehlender formatübergreifender Vereinheitlichung.
+3. **Ist jetzt wegen YAJL-Ablösung ein guter Zeitpunkt dafür?**
+   - **Teilweise ja: vorbereiten jetzt, harte Umstellung gestaffelt.**
+   - Belege: JSON-Migrationsarchitektur liefert Muster; gleichzeitiger Big-Bang erhöht Risiko.
 
----
+4. **Ist direkte Modulbildung sicher genug?**
+   - **Nur mit Guardrails.**
+   - Ohne zentrale Sicherheitsdefaults/Limits/Policy-Enforcement: **nicht sicher genug belastbar belegt**.
 
-## 7) Maßnahmenplan
-
-## Kurzfristig (1–3 Sprints)
-
-1. **Version-Policy festziehen**
-- Änderung: Mindestversion im Build und CI-Matrix anheben; Windows-Pin überprüfen.
-- Warum: reduziert bekannte Risiken alter Stände.
-- Risiko bei Nicht-Umsetzung: höheres Security-/Maintenance-Risiko.
-- Aufwand: niedrig-mittel.
-- Nutzen: hoch.
-
-2. **Security-Defaults modernisieren**
-- Änderung: nach verfügbarer libxml2-Version explizite sichere Optionen/API nutzen (z. B. `XML_PARSE_NO_XXE`, kontextbezogene Loader wo möglich).
-- Risiko bei Nicht-Umsetzung: Abhängigkeit von legacy/deprecated Verhalten.
-- Aufwand: mittel.
-- Nutzen: hoch.
-
-3. **Sicherheits-Testmatrix erweitern**
-- Änderung: zusätzliche XXE/Entity/XInclude/DTD-Edgecases + Parallelitätsfälle.
-- Aufwand: mittel.
-- Nutzen: hoch.
-
-## Mittelfristig (3–6 Sprints)
-
-4. **XML-Backend-Fassade einführen (intern, ohne API-Bruch)**
-- Änderung: Interface ähnlich JSON-Contract (z. B. `XmlParseResult`, `XmlParseOptions`, `XmlEventSink` oder schlankere Variante) und zentraler Adapter für libxml2.
-- Aufwand: mittel-hoch.
-- Nutzen: hoch (Entkopplung/Testbarkeit).
-
-5. **Direkte libxml2-Aufrufe bündeln**
-- Änderung: schrittweise Migration aus `variables/xml.cc`, `operators/*`, `request_body_processor/xml.cc` in Modulgrenze.
-- Aufwand: mittel-hoch.
-- Risiko: Regressionen ohne ausreichende Tests.
-
-## Langfristig (6+ Sprints)
-
-6. **Gemeinsames Parser-Framework XML/JSON**
-- Änderung: vereinheitlichte Fehler-/Limit-/Telemetry-Schnittstelle für strukturierte Formate.
-- Aufwand: hoch.
-- Nutzen: hoch (Konsistenz, Erweiterbarkeit für weitere Formate).
-
-7. **Kontinuierliche Security-/Dependency-Governance**
-- Änderung: feste Upgrade-Frequenz, CVE-Triage-Routine, Release-Checklisten.
-- Aufwand: mittel.
-- Nutzen: hoch.
+5. **Soll ein Workflow zur Abfrage aktueller Releases/Sicherheitsstände eingeführt werden?**
+   - **Ja: Monitoring + Reporting + manuelle Freigabe.**
+   - Kein blindes Auto-Upgrade.
 
 ---
 
-## 8) Unsicherheiten / nicht verifizierbare Punkte
+## 12. Priorisierte Maßnahmen
 
-- Konkrete produktive libxml2-Versionen und Backports pro Zielplattform: **Nicht verifizierbar.**
-- Exakte Performance-Auswirkung einer XML-Fassade ohne Benchmark-Läufe: **Nicht verifizierbar.**
-- Vollständiger CVE-Abdeckungsgrad je Distribution/Packager: **Nicht verifizierbar.**
+## Kurzfristig
+1. **Repo-Hygiene YAJL-Reste bereinigen**
+- Änderung: README/CI-Dependency-Liste gegen tatsächliche JSON-Backends konsolidieren.
+- Ziel: Architektur- und Security-Transparenz.
+- Risiko bei Nicht-Umsetzung: falsche Annahmen in Betrieb/Audit.
+- Eingriffsgrad: niedrig.
+- Plattformauswirkung: gering.
+- Testbedarf: CI-Konfig-Tests.
+- Sicherheitsauswirkung: indirekt positiv (weniger Drift).
+
+2. **XML-Sicherheits-Baseline dokumentieren und härten**
+- Änderung: explizite Policy für XXE/DTD/externes Laden, Limits, Fehlermeldungsstrategie.
+- Eingriffsgrad: niedrig-mittel.
+- Sicherheitsauswirkung: hoch.
+
+3. **Monitoring-Workflow als Report-only einführen**
+- Änderung: geplanter Job sammelt libxml2 + JSON-Backend Releases, CVE/NVD, Debian/Ubuntu/Fedora, Homebrew-Stände.
+- Ausgabe: maschinenlesbarer Report + optional Issue.
+- Sicherheitsauswirkung: hoch.
+
+## Mittelfristig
+4. **XML-Fassade (intern) einführen**
+- Änderung: `XmlParseOptions`, `XmlParseResult`, zentrale `XmlProcessor`-Schnittstelle.
+- Ziel: Entkopplung/Standardisierung.
+- Risiko: Regressionen.
+- Eingriffsgrad: mittel-hoch.
+- Testbedarf: neue Unit-/Integrationstests + bestehende Regressionen.
+
+5. **Direkte libxml2-Aufrufe schrittweise konsolidieren**
+- Kandidaten: `request_body_processor/xml.cc`, `variables/xml.cc`, `operators/validate_*`.
+- Ziel: keine direkten libxml2-Calls außerhalb XML-Modul.
+- Sicherheitsauswirkung: mittel-hoch.
+
+## Langfristig
+6. **Formatübergreifendes Parsing-Contract (JSON/XML) harmonisieren**
+- Änderung: gemeinsame Prinzipien für Optionen, Limits, Errors, Telemetrie.
+- Ziel: konsistente Security- und Wartbarkeitseigenschaften.
+
+7. **Governance-Prozess für Abhängigkeiten**
+- Änderung: feste Review-Kadenz, Security-Triage, manuelle Freigabegates.
+- Sicherheitsauswirkung: hoch.
 
 ---
 
-## 9) Quellen
+## 13. Offene Unsicherheiten / nicht verifizierbare Punkte
 
-## Repository-Quellen
-- `build/libxml.m4`
-- `build/win32/conanfile.txt`
-- `build/win32/README.md`
-- `build/win32/CMakeLists.txt`
-- `configure.ac`
+- Produktiv verwendete libxml2-Version je Deployment: **Nicht verifizierbar.**
+- Vollständige Backport-Abdeckung aller relevanten CVEs je Linux-Distribution/Release: **Nicht verifizierbar.**
+- Genaue Upgrade-Kompatibilität (ABI/API) für alle Downstreams: **Nicht verifizierbar.**
+- Exakter Performance-Impact einer XML-Fassade ohne Benchmarks: **Nicht verifizierbar.**
+- Eindeutiger Abschlussstatus der YAJL-Migration außerhalb sichtbarer Repo-Artefakte: **Nicht verifizierbar.**
+
+---
+
+## 14. Quellenliste
+
+## Repository
 - `src/modsecurity.cc`
 - `src/transaction.cc`
 - `src/request_body_processor/xml.cc`
-- `src/request_body_processor/json.h`
+- `src/variables/xml.cc`
+- `src/operators/validate_dtd.cc`
+- `src/operators/validate_schema.cc`
 - `src/request_body_processor/json_backend.h`
 - `src/request_body_processor/json_adapter.cc`
 - `src/request_body_processor/json_backend_simdjson.cc`
 - `src/request_body_processor/json_backend_jsoncons.cc`
-- `src/variables/xml.cc`
-- `src/operators/validate_dtd.cc`
-- `src/operators/validate_schema.cc`
-- `test/test-cases/regression/config-xml_external_entity.json`
-- `test/unit/json_backend_depth_tests.cc`
+- `configure.ac`
+- `build/libxml.m4`
+- `build/win32/conanfile.txt`
+- `build/win32/README.md`
+- `.github/workflows/ci.yml`
+- `.github/workflows/ci_new.yml`
+- `README.md`
 - `test/run-json-backend-matrix.sh`
+- `test/unit/json_backend_depth_tests.cc`
+- `test/test-cases/regression/config-xml_external_entity.json`
 - `test/fuzzer/Makefile.am`
 
 ## Externe Primärquellen
-- GNOME release index:
+- libxml2 Upstream Releases/Archive:
   - https://download.gnome.org/sources/libxml2/
   - https://download.gnome.org/sources/libxml2/2.15/
-  - https://download.gnome.org/sources/libxml2/2.14/
-  - https://download.gnome.org/sources/libxml2/2.12/
-- Release Notes:
   - https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.2.news
   - https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.0.news
   - https://download.gnome.org/sources/libxml2/2.14/libxml2-2.14.0.news
   - https://download.gnome.org/sources/libxml2/2.12/libxml2-2.12.10.news
-- Offizielle API-Doku:
+- Offizielle API-Dokumentation:
   - https://gnome.pages.gitlab.gnome.org/libxml2/html/parser_8h.html
   - https://gnome.pages.gitlab.gnome.org/libxml2/html/xmlIO_8h.html
-- CVE/NVD:
+- CVE-Datenbank:
   - https://nvd.nist.gov/vuln/detail/CVE-2025-24928
+- Linux-Paketquellen:
+  - Debian Security Tracker: https://security-tracker.debian.org/tracker/source-package/libxml2
+  - Ubuntu Packages (noble): https://packages.ubuntu.com/noble/libxml2-dev
+  - Ubuntu Security Notice (USN-7743-1): https://ubuntu.com/security/notices/USN-7743-1
+  - Fedora Packages: https://packages.fedoraproject.org/pkgs/libxml2/libxml2/
+- macOS/Packaging:
+  - Homebrew libxml2 API: https://formulae.brew.sh/api/formula/libxml2.json
+  - Homebrew simdjson API: https://formulae.brew.sh/api/formula/simdjson.json
+- JSON-Backend Upstream-Releases:
+  - simdjson Releases: https://github.com/simdjson/simdjson/releases
+  - jsoncons Releases: https://github.com/danielaparker/jsoncons/releases
