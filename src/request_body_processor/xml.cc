@@ -55,7 +55,8 @@ class MSCSAXHandler {
             // note, the condition should always be true because there is always a pseudo root element: 'xml'
             if (xml_data->nodes.size() > 1) {
                 xml_data->currpath.append(".");
-                xml_data->nodes[xml_data->nodes.size()-2]->has_child = true;
+                const std::size_t parent_index = xml_data->nodes.size() - 2;
+                xml_data->nodes[parent_index]->has_child = true;
             }
             xml_data->currpath.append(name);
             // set the current value empty
