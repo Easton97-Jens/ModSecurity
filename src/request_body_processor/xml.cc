@@ -82,8 +82,8 @@ class MSCSAXHandler {
         void onEndElement(void * ctx, const xmlChar *localname) {
             std::string name = reinterpret_cast<const char*>(localname);
             auto *xml_data = static_cast<XMLNodes*>(ctx);
-            const std::shared_ptr<NodeData>& nd = xml_data->nodes[xml_data->nodes.size()-1];
-            if (!nd->has_child) {
+            if (const std::shared_ptr<NodeData> &nd =
+                    xml_data->nodes[xml_data->nodes.size()-1]; !nd->has_child) {
                 // check the return value
                 // if false, then stop parsing
                 // this means the number of arguments reached the limit
@@ -92,7 +92,7 @@ class MSCSAXHandler {
                     xmlStopParser(xml_data->parsing_ctx_arg);
                 }
             }
-            if (xml_data->currpath.length() > 0) {
+            if (!xml_data->currpath.empty()) {
                 // set an offset to store whether this is the first item, in order to know whether to remove the '.'
                 int offset = (xml_data->nodes.size() > 1) ? 1 : 0;
                 xml_data->currpath.erase(xml_data->currpath.length() - (name.length()+offset));
