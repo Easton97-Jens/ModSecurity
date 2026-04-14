@@ -21,10 +21,12 @@
 
 #include <string>
 
-#include "modsecurity/transaction.h"
-
 #ifndef SRC_REQUEST_BODY_PROCESSOR_XML_H_
 #define SRC_REQUEST_BODY_PROCESSOR_XML_H_
+
+namespace modsecurity {
+class Transaction;
+}
 
 
 namespace modsecurity::RequestBodyProcessor {
