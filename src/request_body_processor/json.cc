@@ -120,11 +120,7 @@ JsonSinkStatus addStringViewAsSinkStatus(JSON *json, std::string_view value) {
 }  // namespace
 
 JSON::JSON(Transaction *transaction) : m_transaction(transaction),
-    m_current_key(""),
-    m_data(""),
-    m_max_depth(json_depth_limit_default),
-    m_current_depth(0),
-    m_depth_limit_exceeded(false) {
+    m_max_depth(json_depth_limit_default) {
 }
 
 
