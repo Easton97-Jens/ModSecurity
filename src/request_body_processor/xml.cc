@@ -69,7 +69,7 @@ class MSCSAXHandler {
             std::string name = reinterpret_cast<const char*>(localname);
             auto *xml_data = static_cast<XMLNodes*>(ctx);
             if (const auto &nd =
-                    xml_data->nodes[xml_data->nodes.size()-1];
+                    xml_data->nodes.back();
                     !nd->has_child && !xml_data->m_transaction->addArgument(
                         "XML", xml_data->currpath, xml_data->currval, 0)) {
                 // check the return value
