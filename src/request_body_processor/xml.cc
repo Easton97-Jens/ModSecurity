@@ -79,8 +79,9 @@ class MSCSAXHandler {
             }
             if (!xml_data->currpath.empty()) {
                 // set an offset to store whether this is the first item, in order to know whether to remove the '.'
-                int offset = (xml_data->nodes.size() > 1) ? 1 : 0;
-                xml_data->currpath.erase(xml_data->currpath.length() - (name.length()+offset));
+                const std::size_t offset = (xml_data->nodes.size() > 1) ? 1 : 0;
+                xml_data->currpath.erase(
+                    xml_data->currpath.size() - (name.size() + offset));
             }
             xml_data->nodes.pop_back();
             xml_data->node_depth--;
