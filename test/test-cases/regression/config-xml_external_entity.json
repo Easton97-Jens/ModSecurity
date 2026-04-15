@@ -98,7 +98,7 @@
       ]
     },
     "expected": {
-      "debug_log": "XML: Failed to load DTD: test-cases/data/SoapEnvelope.dtd",
+      "debug_log": "XML: DTD validation failed.",
       "http_code": 403
     },
     "rules": [
