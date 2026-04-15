@@ -19,15 +19,38 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#ifdef WITH_LIBXML2
+#include <libxml/xmlschemas.h>
+#include <libxml/xpath.h>
+#endif
 #include <string>
 #include <memory>
 #include <utility>
 
 #include "src/operators/operator.h"
+#include "validate_schema.h"
 
 
 namespace modsecurity {
 namespace operators {
+
+#ifdef WITH_LIBXML2
+class XmlDtdPtrManager {
+ public:
+    /** @ingroup ModSecurity_Operator */
+    explicit XmlDtdPtrManager(xmlDtdPtr dtd)
+        : m_dtd(dtd) { }
+    ~XmlDtdPtrManager() {
+        if (m_dtd != NULL) {
+            xmlFreeDtd(m_dtd);
+            m_dtd = NULL;
+        }
+    }
+    xmlDtdPtr get() const {return m_dtd;}
+ private:
+    xmlDtdPtr m_dtd; // The resource being managed
+};
+#endif
 
 class ValidateDTD : public Operator {
  public:
@@ -37,6 +60,22 @@ class ValidateDTD : public Operator {
 #ifdef WITH_LIBXML2
     bool evaluate(Transaction *transaction, const std::string  &str) override;
     bool init(const std::string &file, std::string *error) override;
+
+
+    static void error_runtime(void *ctx, const char *msg, ...) {
+        va_list args;
+        va_start(args, msg);
+        ValidateSchema::callback_func(ctx, ValidateSchema::log_msg, ValidateSchema::PREFIX_ERROR, msg, args);
+        va_end(args);
+    }
+
+
+    static void warn_runtime(void *ctx, const char *msg, ...) {
+        va_list args;
+        va_start(args, msg);
+        ValidateSchema::callback_func(ctx, ValidateSchema::log_msg, ValidateSchema::PREFIX_WARNING, msg, args);
+        va_end(args);
+    }
 
 
  private:

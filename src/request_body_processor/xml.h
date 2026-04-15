@@ -16,12 +16,10 @@
 #ifdef WITH_LIBXML2
 #include <libxml/xmlschemas.h>
 #include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
 #include <libxml/SAX2.h>
 #endif
 
 #include <memory>
-#include <utility>
 #include <string>
 #include <vector>
 
@@ -86,39 +84,13 @@ struct xml_data {
 
 class XML {
  public:
-    enum class XmlErrorCode {
-        None,
-        ParseError,
-        InvalidInput,
-        LimitExceeded,
-        ValidationError,
-        SecurityError,
-        InternalError
-    };
-
-    struct XmlError {
-        XmlErrorCode code{XmlErrorCode::None};
-        std::string detail;
-    };
-
-    struct NamespaceDecl {
-        std::string prefix;
-        std::string href;
-    };
-
     explicit XML(Transaction *transaction);
     ~XML();
     bool init();
     bool processChunk(const char *buf, unsigned int size, std::string *err);
     bool complete(std::string *err);
-    bool hasDocument() const;
-    bool isWellFormed() const;
-    bool validateDocumentAgainstDtd(const std::string &resource) const;
-    bool validateDocumentAgainstSchema(const std::string &resource,
-        std::string *load_error) const;
-    bool evaluateXPath(const std::string &expression,
-        const std::vector<NamespaceDecl> &namespaces,
-        std::vector<std::string> *values, std::string *error) const;
+    static xmlParserInputBufferPtr unloadExternalEntity(const char *URI,
+        xmlCharEncoding enc);
 
     xml_data m_data;
 

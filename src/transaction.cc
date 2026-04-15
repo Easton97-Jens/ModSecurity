@@ -711,22 +711,6 @@ int Transaction::processRequestBody() {
 	}
     }
 
-    auto setRequestBodyParserResult = [this](const std::string &parser_name,
-        const std::string &error_message, std::size_t body_size) {
-        if (!error_message.empty() && body_size > 0) {
-            const std::string composed_error = parser_name + " parsing error: "
-                + error_message;
-            m_variableReqbodyError.set("1", m_variableOffset);
-            m_variableReqbodyProcessorError.set("1", m_variableOffset);
-            m_variableReqbodyErrorMsg.set(composed_error, m_variableOffset);
-            m_variableReqbodyProcessorErrorMsg.set(composed_error,
-                m_variableOffset);
-        } else {
-            m_variableReqbodyError.set("0", m_variableOffset);
-            m_variableReqbodyProcessorError.set("0", m_variableOffset);
-        }
-    };
-
     if (m_requestBodyProcessor == JSONRequestBody) {
         // large size might cause issues in the parsing itself; omit if exceeded
         if (!requestBodyNoFilesLimitExceeded) {
@@ -740,7 +724,17 @@ int Transaction::processRequestBody() {
                     &error);
                 m_json->complete(&error);
             }
-            setRequestBodyParserResult("JSON", error, requestBodySnapshotSize);
+            if (error.empty() == false && requestBodySnapshotSize > 0) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("JSON parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("JSON parsing error: " \
+                    + error, m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
         }
     }
 #ifdef WITH_LIBXML2
@@ -754,7 +748,17 @@ int Transaction::processRequestBody() {
                     &error);
                 m_xml->complete(&error);
             }
-            setRequestBodyParserResult("XML", error, requestBodySnapshotSize);
+            if (error.empty() == false) {
+                m_variableReqbodyError.set("1", m_variableOffset);
+                m_variableReqbodyErrorMsg.set("XML parsing error: " + error,
+                    m_variableOffset);
+                m_variableReqbodyProcessorErrorMsg.set("XML parsing error: " \
+                    + error, m_variableOffset);
+                m_variableReqbodyProcessorError.set("1", m_variableOffset);
+            } else {
+                m_variableReqbodyError.set("0", m_variableOffset);
+                m_variableReqbodyProcessorError.set("0", m_variableOffset);
+            }
         }
     }
 #endif
