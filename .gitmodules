@@ -16,3 +16,6 @@
 [submodule "others/jsoncons"]
 	path = others/jsoncons
 	url = https://github.com/danielaparker/jsoncons.git
+[submodule "others/libxml2"]
+	path = others/libxml2
+	url = https://github.com/gnome/libxml2.git
