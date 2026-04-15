@@ -16,7 +16,11 @@
 #include "src/request_body_processor/xml.h"
 
 #include <cstddef>
+#include <cstdarg>
+#include <cstdio>
+#include <cstring>
 #include <string>
+#include <vector>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/rules_set_properties.h"
@@ -27,6 +31,52 @@ namespace modsecurity::RequestBodyProcessor {
 
 #ifdef WITH_LIBXML2
 namespace {
+struct XmlSecurityPolicy {
+    bool deny_all_external_resources{false};
+};
+
+constexpr int kXmlParserCommonOptions = XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+constexpr int kXmlParserMandatorySecurityOptions = XML_PARSE_NONET;
+#ifdef XML_PARSE_NO_XXE
+constexpr bool kXmlParseNoXxeAvailable = true;
+#else
+constexpr bool kXmlParseNoXxeAvailable = false;
+#endif
+
+bool isLikelyNetworkResource(const char *url) {
+    if (url == nullptr) {
+        return false;
+    }
+    return std::strncmp(url, "http://", 7) == 0
+        || std::strncmp(url, "https://", 8) == 0
+        || std::strncmp(url, "ftp://", 6) == 0;
+}
+
+xmlParserErrors xmlBackendResourceLoader(void *ctxt, const char *url,
+    const char *, xmlResourceType, xmlParserInputFlags flags,
+    xmlParserInput **out) {
+    if (out == nullptr) {
+        return XML_ERR_ARGUMENT;
+    }
+    *out = nullptr;
+
+    const auto *policy = reinterpret_cast<const XmlSecurityPolicy *>(ctxt);
+    if (policy != nullptr && policy->deny_all_external_resources) {
+        return XML_IO_LOAD_ERROR;
+    }
+
+    if (isLikelyNetworkResource(url)) {
+        return XML_IO_NETWORK_ATTEMPT;
+    }
+
+    xmlParserErrors parser_error = xmlNewInputFromUrl(url, flags, out);
+    if (parser_error != XML_ERR_OK || *out == nullptr) {
+        return XML_IO_LOAD_ERROR;
+    }
+
+    return XML_ERR_OK;
+}
+
 bool finalizeArgsParsingContext(xml_data *data, std::string *error) {
     if (xmlParseChunk(data->parsing_ctx_arg, nullptr, 0, 1) == 0) {
         xmlFreeParserCtxt(data->parsing_ctx_arg);
@@ -42,6 +92,82 @@ bool finalizeArgsParsingContext(xml_data *data, std::string *error) {
     xmlFreeParserCtxt(data->parsing_ctx_arg);
     data->parsing_ctx_arg = nullptr;
     return false;
+}
+
+void configureParserSecurityPolicy(xmlParserCtxtPtr ctx,
+    XmlSecurityPolicy *policy) {
+    if (ctx == nullptr) {
+        return;
+    }
+
+    int options = kXmlParserCommonOptions | kXmlParserMandatorySecurityOptions;
+#ifdef XML_PARSE_NO_XXE
+    options |= XML_PARSE_NO_XXE;
+#endif
+    xmlCtxtSetOptions(ctx, ctx->options | options);
+
+    if (policy != nullptr) {
+#ifndef XML_PARSE_NO_XXE
+        policy->deny_all_external_resources = true;
+#endif
+        xmlCtxtSetResourceLoader(ctx, xmlBackendResourceLoader, policy);
+    }
+}
+
+void appendToString(void *ctx, const std::string &message) {
+    auto *value = reinterpret_cast<std::string *>(ctx);
+    if (value != nullptr) {
+        value->append(message);
+    }
+}
+
+void debugTransactionMessage(const void *ctx, const std::string &message) {
+    auto *tx = reinterpret_cast<const Transaction *>(ctx);
+    if (tx != nullptr) {
+        ms_dbg_a(tx, 4, message);
+    }
+}
+
+template <typename Sink>
+void xmlErrorCallback(void *ctx, Sink sink, const char *prefix,
+    const char *msg, va_list args) {
+    if (ctx == nullptr || msg == nullptr) {
+        return;
+    }
+
+    char buf[1024];
+    const auto len = vsnprintf(buf, sizeof(buf), msg, args);
+    if (len > 0) {
+        sink(ctx, std::string(prefix) + std::string(buf));
+    }
+}
+
+void schemaParserError(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, appendToString, "XML Error: ", msg, args);
+    va_end(args);
+}
+
+void schemaParserWarning(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, appendToString, "XML Warning: ", msg, args);
+    va_end(args);
+}
+
+void schemaRuntimeError(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, debugTransactionMessage, "XML Error: ", msg, args);
+    va_end(args);
+}
+
+void schemaRuntimeWarning(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, debugTransactionMessage, "XML Warning: ", msg, args);
+    va_end(args);
 }
 }  // namespace
 
@@ -175,14 +301,11 @@ XML::~XML() {
 }
 
 bool XML::init() {
-    if (m_transaction->m_rules->m_secXMLExternalEntity
-        == RulesSetProperties::TrueConfigBoolean) {
-        xmlParserInputBufferCreateFilenameDefault(
-            __xmlParserInputBufferCreateFilename);
-    } else {
-        xmlParserInputBufferCreateFilenameDefault(
-            this->unloadExternalEntity);
-    }
+#ifndef XML_PARSE_NO_XXE
+    ms_dbg_a(m_transaction, 3, "XML: XML_PARSE_NO_XXE is not available in this "
+        "libxml2 build; external resources are denied via the XML backend "
+        "resource loader fallback.");
+#endif
     if (m_transaction->m_secXMLParseXmlIntoArgs
         == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs ||
         m_transaction->m_secXMLParseXmlIntoArgs
@@ -208,14 +331,11 @@ bool XML::init() {
 }
 
 
-xmlParserInputBufferPtr XML::unloadExternalEntity(const char *,
-    xmlCharEncoding) {
-    return nullptr;
-}
-
-
 bool XML::processChunk(const char *buf, unsigned int size,
     std::string *error) {
+    static XmlSecurityPolicy main_policy;
+    static XmlSecurityPolicy args_policy;
+
     /* We want to initialise our parsing context here, to
      * enable us to pass it the first chunk of data so that
      * it can attempt to auto-detect the encoding.
@@ -236,8 +356,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
                 error->assign("XML: Failed to create parsing context.");
                 return false;
             }
-            // disable parser errors being printed to stderr
-            m_data.parsing_ctx->options |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+            configureParserSecurityPolicy(m_data.parsing_ctx, &main_policy);
         }
 
         if (m_transaction->m_secXMLParseXmlIntoArgs
@@ -254,8 +373,7 @@ bool XML::processChunk(const char *buf, unsigned int size,
                 error->assign("XML: Failed to create parsing context for ARGS.");
                 return false;
             }
-            // disable parser errors being printed to stderr
-            m_data.parsing_ctx_arg->options |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+            configureParserSecurityPolicy(m_data.parsing_ctx_arg, &args_policy);
         }
 
         return true;
@@ -334,6 +452,157 @@ bool XML::complete(std::string *error) {
         }
     }
 
+    return true;
+}
+
+bool XML::hasDocument() const {
+    return m_data.doc != nullptr;
+}
+
+bool XML::isWellFormed() const {
+    return m_data.well_formed == 1;
+}
+
+bool XML::validateDocumentAgainstDtd(const std::string &resource) const {
+    xmlDtdPtr dtd = xmlParseDTD(nullptr,
+        reinterpret_cast<const xmlChar *>(resource.c_str()));
+    if (dtd == nullptr) {
+        ms_dbg_a(m_transaction, 4, std::string("XML: Failed to load DTD: ")
+            + resource);
+        return false;
+    }
+
+    xmlValidCtxtPtr validation_context = xmlNewValidCtxt();
+    if (validation_context == nullptr) {
+        ms_dbg_a(m_transaction, 4, "XML: Failed to create a validation context.");
+        xmlFreeDtd(dtd);
+        return false;
+    }
+
+    validation_context->error = reinterpret_cast<xmlValidityErrorFunc>(
+        schemaRuntimeError);
+    validation_context->warning = reinterpret_cast<xmlValidityWarningFunc>(
+        schemaRuntimeWarning);
+    validation_context->userData = m_transaction;
+
+    const bool valid = xmlValidateDtd(validation_context, m_data.doc, dtd) != 0;
+
+    xmlFreeValidCtxt(validation_context);
+    xmlFreeDtd(dtd);
+
+    return valid;
+}
+
+bool XML::validateDocumentAgainstSchema(const std::string &resource,
+    std::string *load_error) const {
+    static XmlSecurityPolicy schema_policy;
+    xmlSchemaParserCtxtPtr parser_context = xmlSchemaNewParserCtxt(
+        resource.c_str());
+    if (parser_context == nullptr) {
+        if (load_error != nullptr) {
+            load_error->assign("XML: Failed to load Schema from file: "
+                + resource);
+        }
+        return false;
+    }
+
+    std::string parser_messages;
+    xmlSchemaSetParserErrors(parser_context,
+        reinterpret_cast<xmlSchemaValidityErrorFunc>(schemaParserError),
+        reinterpret_cast<xmlSchemaValidityWarningFunc>(schemaParserWarning),
+        &parser_messages);
+    xmlSchemaSetResourceLoader(parser_context, xmlBackendResourceLoader,
+        &schema_policy);
+
+    xmlSchemaPtr schema = xmlSchemaParse(parser_context);
+    if (schema == nullptr) {
+        if (load_error != nullptr) {
+            load_error->assign("XML: Failed to load Schema: " + resource + ". "
+                + parser_messages);
+        }
+        xmlSchemaFreeParserCtxt(parser_context);
+        return false;
+    }
+
+    xmlSchemaValidCtxtPtr validation_context = xmlSchemaNewValidCtxt(schema);
+    if (validation_context == nullptr) {
+        if (load_error != nullptr) {
+            load_error->assign("XML: Failed to create validation context. "
+                + parser_messages);
+        }
+        xmlSchemaFree(schema);
+        xmlSchemaFreeParserCtxt(parser_context);
+        return false;
+    }
+
+    xmlSchemaSetValidErrors(validation_context,
+        reinterpret_cast<xmlSchemaValidityErrorFunc>(schemaRuntimeError),
+        reinterpret_cast<xmlSchemaValidityWarningFunc>(schemaRuntimeWarning),
+        m_transaction);
+    const bool valid = xmlSchemaValidateDoc(validation_context, m_data.doc) == 0;
+
+    xmlSchemaFreeValidCtxt(validation_context);
+    xmlSchemaFree(schema);
+    xmlSchemaFreeParserCtxt(parser_context);
+    return valid;
+}
+
+bool XML::evaluateXPath(const std::string &expression,
+    const std::vector<NamespaceDecl> &namespaces, std::vector<std::string> *values,
+    std::string *error) const {
+    if (values == nullptr) {
+        if (error != nullptr) {
+            error->assign("XML: Internal error: output collection is null.");
+        }
+        return false;
+    }
+
+    xmlXPathContextPtr xpath_context = xmlXPathNewContext(m_data.doc);
+    if (xpath_context == nullptr) {
+        if (error != nullptr) {
+            error->assign("XML: Unable to create new XPath context.");
+        }
+        return false;
+    }
+
+    for (const NamespaceDecl &namespace_decl : namespaces) {
+        if (xmlXPathRegisterNs(xpath_context,
+                reinterpret_cast<const xmlChar *>(namespace_decl.prefix.c_str()),
+                reinterpret_cast<const xmlChar *>(namespace_decl.href.c_str()))
+            != 0) {
+            if (error != nullptr) {
+                error->assign("Failed to register XML namespace href \""
+                    + namespace_decl.href + "\" prefix \""
+                    + namespace_decl.prefix + "\".");
+            }
+            xmlXPathFreeContext(xpath_context);
+            return false;
+        }
+    }
+
+    xmlXPathObjectPtr xpath_object = xmlXPathEvalExpression(
+        reinterpret_cast<const xmlChar *>(expression.c_str()), xpath_context);
+    if (xpath_object == nullptr) {
+        if (error != nullptr) {
+            error->assign("XML: Unable to evaluate xpath expression.");
+        }
+        xmlXPathFreeContext(xpath_context);
+        return false;
+    }
+
+    xmlNodeSetPtr nodes = xpath_object->nodesetval;
+    if (nodes != nullptr) {
+        for (int index = 0; index < nodes->nodeNr; ++index) {
+            xmlChar *content = xmlNodeGetContent(nodes->nodeTab[index]);
+            if (content != nullptr) {
+                values->emplace_back(reinterpret_cast<const char *>(content));
+                xmlFree(content);
+            }
+        }
+    }
+
+    xmlXPathFreeObject(xpath_object);
+    xmlXPathFreeContext(xpath_context);
     return true;
 }
 
