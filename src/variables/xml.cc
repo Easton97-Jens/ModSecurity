@@ -90,9 +90,10 @@ void XML::evaluate(Transaction *t,
     }
 
     for (const std::string &value : values) {
-        VariableValue *var = new VariableValue(m_fullName.get(), &value);
+        std::unique_ptr<VariableValue> var(
+            new VariableValue(m_fullName.get(), &value));
         if (!m_keyExclusion.toOmit(*m_fullName)) {
-            l->push_back(var);
+            l->push_back(var.release());
         }
     }
 }

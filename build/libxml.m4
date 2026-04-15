@@ -29,6 +29,11 @@ if test "x$with_libxml" = "xno"; then
 elif test "x$msc_libxml2_source" = "xvendor"; then
     LIBXML2_VENDOR_DIR="${PWD}/others/libxml2"
     LIBXML2_VENDOR_BUILD_DIR="${PWD}/others/libxml2-vendor-build"
+    AC_PATH_PROG([CMAKE], [cmake])
+
+    if test -z "$CMAKE"; then
+        AC_MSG_ERROR([Vendored libxml2 requires CMake, but 'cmake' was not found in PATH.])
+    fi
 
     if ! test -f "${LIBXML2_VENDOR_DIR}/CMakeLists.txt"; then
         AC_MSG_ERROR([\
@@ -45,13 +50,13 @@ elif test "x$msc_libxml2_source" = "xvendor"; then
     AC_MSG_NOTICE([Configuring vendored libxml2 from ${LIBXML2_VENDOR_DIR}])
     AS_MKDIR_P(["${LIBXML2_VENDOR_BUILD_DIR}"])
 
-    LIBXML2_VENDOR_CONFIGURE_CMD="cmake -S \"${LIBXML2_VENDOR_DIR}\" -B \"${LIBXML2_VENDOR_BUILD_DIR}\" -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_ICONV=OFF -DLIBXML2_WITH_ICU=OFF"
+    LIBXML2_VENDOR_CONFIGURE_CMD="\"${CMAKE}\" -S \"${LIBXML2_VENDOR_DIR}\" -B \"${LIBXML2_VENDOR_BUILD_DIR}\" -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_PYTHON=OFF -DLIBXML2_WITH_PROGRAMS=OFF -DLIBXML2_WITH_TESTS=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML2_WITH_ICONV=OFF -DLIBXML2_WITH_ICU=OFF"
     AC_MSG_NOTICE([${LIBXML2_VENDOR_CONFIGURE_CMD}])
     if ! eval "${LIBXML2_VENDOR_CONFIGURE_CMD}"; then
         AC_MSG_ERROR([Failed to configure vendored libxml2 with CMake.])
     fi
 
-    LIBXML2_VENDOR_BUILD_CMD="cmake --build \"${LIBXML2_VENDOR_BUILD_DIR}\" --target LibXml2"
+    LIBXML2_VENDOR_BUILD_CMD="\"${CMAKE}\" --build \"${LIBXML2_VENDOR_BUILD_DIR}\" --target LibXml2"
     AC_MSG_NOTICE([${LIBXML2_VENDOR_BUILD_CMD}])
     if ! eval "${LIBXML2_VENDOR_BUILD_CMD}"; then
         AC_MSG_ERROR([Failed to build vendored libxml2.])

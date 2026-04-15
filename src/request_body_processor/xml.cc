@@ -17,8 +17,10 @@
 
 #include <cstddef>
 #include <cstdarg>
+#include <cctype>
 #include <cstdio>
 #include <cstring>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -35,23 +37,35 @@ struct XmlSecurityPolicy {
     bool deny_all_external_resources{false};
 };
 
+constexpr int kLibxmlResourceLoaderApiVersion = 21400;
+
 constexpr int kXmlParserCommonOptions = XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
 constexpr int kXmlParserMandatorySecurityOptions = XML_PARSE_NONET;
-#ifdef XML_PARSE_NO_XXE
-constexpr bool kXmlParseNoXxeAvailable = true;
-#else
-constexpr bool kXmlParseNoXxeAvailable = false;
-#endif
 
-bool isLikelyNetworkResource(const char *url) {
+bool isRemoteResource(const char *url) {
     if (url == nullptr) {
         return false;
     }
-    return std::strncmp(url, "http://", 7) == 0
-        || std::strncmp(url, "https://", 8) == 0
-        || std::strncmp(url, "ftp://", 6) == 0;
+
+    const char *scheme_end = std::strstr(url, "://");
+    if (scheme_end == nullptr || scheme_end == url) {
+        return false;
+    }
+
+    std::string scheme(url, static_cast<std::size_t>(scheme_end - url));
+    for (char &character : scheme) {
+        character = static_cast<char>(std::tolower(
+            static_cast<unsigned char>(character)));
+    }
+
+    return scheme == "http"
+        || scheme == "https"
+        || scheme == "ftp"
+        || scheme == "ftps"
+        || scheme == "sftp";
 }
 
+#if LIBXML_VERSION >= 21400
 xmlParserErrors xmlBackendResourceLoader(void *ctxt, const char *url,
     const char *, xmlResourceType, xmlParserInputFlags flags,
     xmlParserInput **out) {
@@ -65,7 +79,7 @@ xmlParserErrors xmlBackendResourceLoader(void *ctxt, const char *url,
         return XML_IO_LOAD_ERROR;
     }
 
-    if (isLikelyNetworkResource(url)) {
+    if (isRemoteResource(url)) {
         return XML_IO_NETWORK_ATTEMPT;
     }
 
@@ -75,6 +89,72 @@ xmlParserErrors xmlBackendResourceLoader(void *ctxt, const char *url,
     }
 
     return XML_ERR_OK;
+}
+#endif
+
+thread_local const XmlSecurityPolicy *g_xml_external_entity_policy = nullptr;
+std::mutex g_xml_external_entity_loader_mutex;
+
+xmlParserInputPtr xmlExternalEntityLoaderFallback(const char *url,
+    const char *id, xmlParserCtxtPtr ctxt) {
+    const XmlSecurityPolicy *policy = g_xml_external_entity_policy;
+    if (policy != nullptr && policy->deny_all_external_resources) {
+        return nullptr;
+    }
+
+    if (isRemoteResource(url)) {
+        return nullptr;
+    }
+
+    xmlExternalEntityLoader default_loader = xmlGetExternalEntityLoader();
+    if (default_loader == nullptr || default_loader == xmlExternalEntityLoaderFallback) {
+        return nullptr;
+    }
+
+    return default_loader(url, id, ctxt);
+}
+
+class ScopedExternalEntityLoaderFallback {
+ public:
+    explicit ScopedExternalEntityLoaderFallback(const XmlSecurityPolicy *policy)
+        : m_policy(policy) {
+        if (m_policy == nullptr || !m_policy->deny_all_external_resources) {
+            return;
+        }
+
+        m_lock = std::unique_lock<std::mutex>(g_xml_external_entity_loader_mutex);
+        m_previous_policy = g_xml_external_entity_policy;
+        g_xml_external_entity_policy = m_policy;
+        m_previous_loader = xmlGetExternalEntityLoader();
+        xmlSetExternalEntityLoader(xmlExternalEntityLoaderFallback);
+        m_active = true;
+    }
+
+    ~ScopedExternalEntityLoaderFallback() {
+        if (!m_active) {
+            return;
+        }
+
+        xmlSetExternalEntityLoader(m_previous_loader);
+        g_xml_external_entity_policy = m_previous_policy;
+    }
+
+ private:
+    const XmlSecurityPolicy *m_policy = nullptr;
+    const XmlSecurityPolicy *m_previous_policy = nullptr;
+    xmlExternalEntityLoader m_previous_loader = nullptr;
+    std::unique_lock<std::mutex> m_lock;
+    bool m_active = false;
+};
+
+void initializeSecurityPolicy(XmlSecurityPolicy *policy) {
+    if (policy == nullptr) {
+        return;
+    }
+
+#ifndef XML_PARSE_NO_XXE
+    policy->deny_all_external_resources = true;
+#endif
 }
 
 bool finalizeArgsParsingContext(xml_data *data, std::string *error) {
@@ -104,13 +184,17 @@ void configureParserSecurityPolicy(xmlParserCtxtPtr ctx,
 #ifdef XML_PARSE_NO_XXE
     options |= XML_PARSE_NO_XXE;
 #endif
+#if LIBXML_VERSION >= 21400
     xmlCtxtSetOptions(ctx, ctx->options | options);
+#else
+    xmlCtxtUseOptions(ctx, ctx->options | options);
+#endif
 
     if (policy != nullptr) {
-#ifndef XML_PARSE_NO_XXE
-        policy->deny_all_external_resources = true;
-#endif
+        initializeSecurityPolicy(policy);
+#if LIBXML_VERSION >= 21400
         xmlCtxtSetResourceLoader(ctx, xmlBackendResourceLoader, policy);
+#endif
     }
 }
 
@@ -347,6 +431,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
 
         if (m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
+            initializeSecurityPolicy(&main_policy);
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_main_create(&main_policy);
             m_data.parsing_ctx = xmlCreatePushParserCtxt(nullptr, nullptr,
                 buf, size, "body.xml");
 
@@ -363,6 +450,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
             == RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs ||
             m_transaction->m_secXMLParseXmlIntoArgs
             == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs) {
+            initializeSecurityPolicy(&args_policy);
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_args_create(&args_policy);
             m_data.parsing_ctx_arg = xmlCreatePushParserCtxt(
                 m_data.sax_handler.get(),
                 m_data.xml_parser_state.get(),
@@ -380,6 +470,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
     }
 
     /* Not a first invocation. */
+    ScopedExternalEntityLoaderFallback external_entity_loader_guard_main(
+        &main_policy);
+
     if (m_data.parsing_ctx != nullptr &&
         m_transaction->m_secXMLParseXmlIntoArgs
         != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
@@ -391,6 +484,9 @@ bool XML::processChunk(const char *buf, unsigned int size,
             return false;
         }
     }
+
+    ScopedExternalEntityLoaderFallback external_entity_loader_guard_args(
+        &args_policy);
 
     if (m_data.parsing_ctx_arg != nullptr &&
         (
@@ -418,6 +514,9 @@ bool XML::complete(std::string *error) {
         if (m_data.parsing_ctx != nullptr &&
             m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
+            static XmlSecurityPolicy main_policy;
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_main(&main_policy);
             /* This is how we signal the end of parsing to libxml. */
             xmlParseChunk(m_data.parsing_ctx, nullptr, 0, 1);
 
@@ -445,6 +544,9 @@ bool XML::complete(std::string *error) {
                 m_transaction->m_secXMLParseXmlIntoArgs
                   == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs)
             ) {
+            static XmlSecurityPolicy args_policy;
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_args(&args_policy);
             /* This is how we signale the end of parsing to libxml. */
             if (!finalizeArgsParsingContext(&m_data, error)) {
                 return false;
@@ -511,9 +613,15 @@ bool XML::validateDocumentAgainstSchema(const std::string &resource,
         reinterpret_cast<xmlSchemaValidityErrorFunc>(schemaParserError),
         reinterpret_cast<xmlSchemaValidityWarningFunc>(schemaParserWarning),
         &parser_messages);
+#if LIBXML_VERSION >= 21400
     xmlSchemaSetResourceLoader(parser_context, xmlBackendResourceLoader,
         &schema_policy);
+#else
+    schema_policy.deny_all_external_resources = true;
+#endif
 
+    ScopedExternalEntityLoaderFallback external_entity_loader_guard_schema(
+        &schema_policy);
     xmlSchemaPtr schema = xmlSchemaParse(parser_context);
     if (schema == nullptr) {
         if (load_error != nullptr) {
