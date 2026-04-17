@@ -39,6 +39,11 @@ noinst_PROGRAMS += json_backend_depth_tests
 json_backend_depth_tests_SOURCES = \
         unit/json_backend_depth_tests.cc
 
+noinst_PROGRAMS += json_schema_tests
+json_schema_tests_SOURCES = \
+	unit/json_schema_tests.cc \
+	common/custom_debug_log.cc
+
 
 noinst_HEADERS = \
        $(srcdir)/common/colors.h \
@@ -103,6 +108,30 @@ json_backend_depth_tests_LDFLAGS = \
 
 json_backend_depth_tests_CPPFLAGS = \
 	$(unit_tests_CPPFLAGS)
+
+json_schema_tests_LDADD = \
+	$(unit_tests_LDADD)
+
+if BLAZE_ENABLED
+BLAZE_TEST_BUILD_DIR = $(top_builddir)/others/blaze-build
+json_schema_tests_LDADD += \
+	$(BLAZE_TEST_BUILD_DIR)/libmodsecurity_blaze_bridge.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/src/compiler/libsourcemeta_blaze_compiler.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/src/evaluator/libsourcemeta_blaze_evaluator.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/vendor/core/src/core/jsonschema/libsourcemeta_core_jsonschema.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/vendor/core/src/core/jsonpointer/libsourcemeta_core_jsonpointer.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/vendor/core/src/core/uri/libsourcemeta_core_uri.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/vendor/core/src/core/json/libsourcemeta_core_json.a \
+	$(BLAZE_TEST_BUILD_DIR)/blaze/vendor/core/liburiparser.a
+endif
+
+json_schema_tests_LDFLAGS = \
+	$(unit_tests_LDFLAGS)
+
+json_schema_tests_CPPFLAGS = \
+	$(unit_tests_CPPFLAGS) \
+	-I$(top_builddir) \
+	-DTEST_TOP_SRCDIR=\"$(top_srcdir)\"
 
 
 # regression

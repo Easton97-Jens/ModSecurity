@@ -354,6 +354,36 @@ MSC_ARG_ENABLE_BOOL([afl-fuzz], [Turn on the afl fuzzer compilation utilities], 
 MSC_ARG_ENABLE_BOOL([examples], [Turn on the examples compilation (default option)], [true], [buildExamples])
 MSC_ARG_ENABLE_BOOL([parser-generation], [Enables parser generation during the build], [false], [buildParser])
 MSC_ARG_ENABLE_BOOL([mutex-on-pm], [Treat pm operations as critical section], [false], [mutexPm])
+MSC_ARG_ENABLE_BOOL([blaze], [Build bundled Blaze JSON Schema validator support], [true], [buildBlaze])
+
+BLAZE_VERSION="disabled"
+if test $buildBlaze = true; then
+    if ! test -f "${srcdir}/others/blaze/CMakeLists.txt"; then
+AC_MSG_ERROR([\
+
+
+  Blaze was not found within the ModSecurity source directory.
+
+  Blaze code is expected to be available as the bundled git submodule
+  located under others/blaze.
+
+  You can download Blaze using git:
+
+     $ git submodule update --init --recursive
+
+  Or disable Blaze explicitly:
+
+     $ ./configure --disable-blaze
+
+   ])
+    fi
+
+    AC_PATH_PROG([CMAKE], [cmake])
+    test "x$CMAKE" = "x" && AC_MSG_ERROR([cmake is required to build bundled Blaze. Re-run configure with --disable-blaze to skip Blaze support.])
+
+    AC_DEFINE([WITH_BLAZE], [1], [Define if bundled Blaze support is enabled])
+    BLAZE_VERSION=`cd "${srcdir}/others/blaze" && (git describe --tags --always 2>/dev/null || echo unknown)`
+fi
 
 
 if test $buildParser = true; then
@@ -392,6 +422,7 @@ AM_CONDITIONAL([BUILD_PARSER], [test $buildParser = true])
 AM_CONDITIONAL([USE_MUTEX_ON_PM], [test $mutexPm = true])
 AM_CONDITIONAL([JSON_BACKEND_SIMDJSON], [test "x$json_backend" = "xsimdjson"])
 AM_CONDITIONAL([JSON_BACKEND_JSONCONS], [test "x$json_backend" = "xjsoncons"])
+AM_CONDITIONAL([BLAZE_ENABLED], [test $buildBlaze = true])
 
 
 # General link options
@@ -518,6 +549,12 @@ fi
 
 MSC_STATUS_LIB([LibCURL                                      ], [CURL])
 MSC_STATUS_LIB([LMDB                                         ], [LMDB])
+AS_ECHO_N("   + Blaze                                        ....")
+if test $buildBlaze = true; then
+    echo "found ${BLAZE_VERSION}"
+else
+    echo "disabled"
+fi
 MSC_STATUS_LIB([LibXML2                                      ], [LIBXML2])
 MSC_STATUS_LIB([SSDEEP                                       ], [SSDEEP])
 MSC_STATUS_LIB([LUA                                          ], [LUA])

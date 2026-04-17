@@ -16,6 +16,7 @@
 #ifndef SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 #define SRC_REQUEST_BODY_PROCESSOR_JSON_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <memory>
@@ -25,6 +26,9 @@
 #include "modsecurity/rules_set.h"
 #include "src/request_body_processor/json_backend.h"
 
+namespace modsecurity::JsonSchema {
+class ValidationInput;
+}
 
 namespace modsecurity::RequestBodyProcessor {
 
@@ -64,6 +68,7 @@ class JSON : public JsonEventSink {
     bool processChunk(const char *buf, unsigned int size,
         const std::string *err);
     bool complete(std::string *err);
+    const JsonSchema::ValidationInput *getValidationInput(std::string *err);
 
     int addArgument(const std::string& value);
 
@@ -105,8 +110,23 @@ class JSON : public JsonEventSink {
         m_max_depth = max_depth;
     }
 
+    bool hasCachedValidationInput() const {
+        return m_validation_input_state == ValidationInputState::Ready;
+    }
+
+    std::size_t validationInputBuildCount() const {
+        return m_validation_input_build_count;
+    }
+
  private:
+    enum class ValidationInputState {
+        NotBuilt,
+        Ready,
+        Failed
+    };
+
     void clearContainers();
+    void clearValidationInput();
 
     std::deque<std::unique_ptr<JSONContainer>> m_containers;
     Transaction *m_transaction;
@@ -115,6 +135,10 @@ class JSON : public JsonEventSink {
     double m_max_depth;
     int64_t m_current_depth;
     bool m_depth_limit_exceeded;
+    std::unique_ptr<JsonSchema::ValidationInput> m_validation_input;
+    ValidationInputState m_validation_input_state;
+    std::string m_validation_input_error;
+    std::size_t m_validation_input_build_count;
 };
 
 

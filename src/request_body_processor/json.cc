@@ -24,6 +24,7 @@
 #include <memory>
 #include <string>
 
+#include "src/json_schema/validation_input_builder.h"
 #include "src/request_body_processor/json_adapter.h"
 #include "src/request_body_processor/json_instrumentation.h"
 
@@ -123,21 +124,28 @@ JSON::JSON(Transaction *transaction) : m_transaction(transaction),
     m_data(""),
     m_max_depth(json_depth_limit_default),
     m_current_depth(0),
-    m_depth_limit_exceeded(false) {
+    m_depth_limit_exceeded(false),
+    m_validation_input(nullptr),
+    m_validation_input_state(ValidationInputState::NotBuilt),
+    m_validation_input_error(""),
+    m_validation_input_build_count(0) {
 }
 
 
 JSON::~JSON() {
+    clearValidationInput();
     clearContainers();
 }
 
 
 bool JSON::init() {
     clearContainers();
+    clearValidationInput();
     m_current_key.clear();
     m_data.clear();
     m_current_depth = 0;
     m_depth_limit_exceeded = false;
+    m_validation_input_build_count = 0;
 
     return true;
 }
@@ -146,6 +154,7 @@ bool JSON::init() {
 bool JSON::processChunk(const char *buf, unsigned int size,
     const std::string *err) {
     (void) err;
+    clearValidationInput();
     if (buf != nullptr && size > 0) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
         const auto start_time = std::chrono::steady_clock::now();
@@ -181,6 +190,56 @@ bool JSON::complete(std::string *err) {
     }
 
     return true;
+}
+
+
+const JsonSchema::ValidationInput *JSON::getValidationInput(std::string *err) {
+    if (m_data.empty()) {
+        if (err != nullptr) {
+            err->clear();
+        }
+        return nullptr;
+    }
+
+    if (m_validation_input_state == ValidationInputState::Ready) {
+        if (err != nullptr) {
+            err->clear();
+        }
+        return m_validation_input.get();
+    }
+
+    if (m_validation_input_state == ValidationInputState::Failed) {
+        if (err != nullptr) {
+            err->assign(m_validation_input_error);
+        }
+        return nullptr;
+    }
+
+    JsonSchema::ValidationInputBuilder builder(m_max_depth);
+    JSONAdapter adapter;
+    if (JsonParseResult result = adapter.parse(
+            static_cast<const std::string &>(m_data), &builder); !result.ok()) {
+        assignJsonErrorMessage(&m_validation_input_error, result.parse_status,
+            result.detail);
+        if (builder.depthLimitExceeded()) {
+            m_validation_input_error.append(json_depth_limit_exceeded_msg);
+        }
+        m_validation_input_state = ValidationInputState::Failed;
+        if (err != nullptr) {
+            err->assign(m_validation_input_error);
+        }
+        return nullptr;
+    }
+
+    m_validation_input = builder.release();
+    m_validation_input_state = ValidationInputState::Ready;
+    m_validation_input_error.clear();
+    m_validation_input_build_count++;
+
+    if (err != nullptr) {
+        err->clear();
+    }
+    return m_validation_input.get();
 }
 
 
@@ -272,6 +331,13 @@ JsonSinkStatus JSON::on_end_object() {
 
 void JSON::clearContainers() {
     m_containers.clear();
+}
+
+
+void JSON::clearValidationInput() {
+    m_validation_input.reset();
+    m_validation_input_state = ValidationInputState::NotBuilt;
+    m_validation_input_error.clear();
 }
 
 }  // namespace modsecurity::RequestBodyProcessor

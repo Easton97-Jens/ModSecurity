@@ -262,6 +262,27 @@ JSON_BACKEND_CPPFLAGS = \
 	-I$(top_srcdir)/others/simdjson/singleheader
 endif
 
+JSON_SCHEMA = \
+	json_schema/validation_input_builder.cc \
+	json_schema/validator_factory.cc \
+	json_schema/validator_unavailable.cc
+
+if BLAZE_ENABLED
+JSON_SCHEMA += \
+	json_schema/validator_blaze.cc
+
+BLAZE_BUILD_DIR = $(top_builddir)/others/blaze-build
+BLAZE_PRIVATE_LIBS = \
+	$(BLAZE_BUILD_DIR)/libmodsecurity_blaze_bridge.a \
+	$(BLAZE_BUILD_DIR)/blaze/src/compiler/libsourcemeta_blaze_compiler.a \
+	$(BLAZE_BUILD_DIR)/blaze/src/evaluator/libsourcemeta_blaze_evaluator.a \
+	$(BLAZE_BUILD_DIR)/blaze/vendor/core/src/core/jsonschema/libsourcemeta_core_jsonschema.a \
+	$(BLAZE_BUILD_DIR)/blaze/vendor/core/src/core/jsonpointer/libsourcemeta_core_jsonpointer.a \
+	$(BLAZE_BUILD_DIR)/blaze/vendor/core/src/core/uri/libsourcemeta_core_uri.a \
+	$(BLAZE_BUILD_DIR)/blaze/vendor/core/src/core/json/libsourcemeta_core_json.a \
+	$(BLAZE_BUILD_DIR)/blaze/vendor/core/liburiparser.a
+endif
+
 if JSON_BACKEND_JSONCONS
 BODY_PROCESSORS += \
 	request_body_processor/json_backend_jsoncons.cc
@@ -299,6 +320,7 @@ libmodsecurity_la_SOURCES = \
 	unique_id.cc \
 	rules_exceptions.cc \
 	${BODY_PROCESSORS} \
+	${JSON_SCHEMA} \
 	${ACTIONS} \
 	${ENGINES} \
 	${COLLECTION} \
@@ -360,4 +382,5 @@ libmodsecurity_la_LIBADD = \
 	$(PCRE_LDADD) \
 	$(PCRE2_LDADD) \
 	$(MAXMIND_LDADD) \
-	$(SSDEEP_LDADD)
+	$(SSDEEP_LDADD) \
+	$(BLAZE_PRIVATE_LIBS)

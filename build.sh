@@ -17,6 +17,7 @@ ls -1 \
     collection/backend/*.h \
     operators/*.h \
     parser/*.h \
+    json_schema/*.h \
     request_body_processor/*.h \
     utils/*.h \
     variables/*.h \
@@ -31,5 +32,4 @@ autoheader
 automake --add-missing --foreign --copy --force-missing
 autoconf --force
 rm -rf autom4te.cache
-
 

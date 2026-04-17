@@ -16,3 +16,6 @@
 [submodule "others/jsoncons"]
 	path = others/jsoncons
 	url = https://github.com/danielaparker/jsoncons.git
+[submodule "others/blaze"]
+	path = others/blaze
+	url = https://github.com/sourcemeta/blaze.git

@@ -18,7 +18,7 @@
 
 #include <modsecurity/modsecurity.h>
 #include <modsecurity/rules_set.h>
-#include "examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h"
+#include "reading_logs_via_rule_message.h"
 
 
 
