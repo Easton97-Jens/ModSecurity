@@ -15,6 +15,7 @@
 
 
 #include <memory>
+#include <vector>
 
 #include "src/run_time_string.h"
 

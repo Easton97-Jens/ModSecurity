@@ -18,12 +18,14 @@
 #include <stdio.h>
 
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
 #include <string>
 #include <cstring>
 #include <list>
 #include <utility>
 #include <memory>
+#include <vector>
 
 #include "modsecurity/rules_set.h"
 #include "src/operators/operator.h"

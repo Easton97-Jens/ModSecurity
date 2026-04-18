@@ -45,6 +45,13 @@ std::string ModSecurityTest<T>::header() {
 
 template <class T>
 bool ModSecurityTest<T>::load_test_json(const std::string &file) {
+    auto reportParsingError = [&file](const std::string &error_message) {
+        std::cout << "Problems parsing file: " << file << std::endl;
+        if (error_message.empty() == false) {
+            std::cout << error_message << std::endl;
+        }
+    };
+
     std::string error;
     modsecurity_test::json::JsonDocument document;
 
@@ -58,10 +65,7 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
 
     if (modsecurity_test::json::load_document(file, &document, &error)
             == false) {
-        std::cout << "Problems parsing file: " << file << std::endl;
-        if (error.empty() == false) {
-            std::cout << error << std::endl;
-        }
+        reportParsingError(error);
         return false;
     }
 
@@ -74,10 +78,7 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
         modsecurity_test::json::JsonArray tests;
         if (modsecurity_test::json::get(document.get_array(), &tests,
                 &error) == false) {
-            std::cout << "Problems parsing file: " << file << std::endl;
-            if (error.empty() == false) {
-                std::cout << error << std::endl;
-            }
+            reportParsingError(error);
             return false;
         }
 
@@ -85,10 +86,7 @@ bool ModSecurityTest<T>::load_test_json(const std::string &file) {
             modsecurity_test::json::JsonValue value;
             if (modsecurity_test::json::get(std::move(test_result), &value,
                     &error) == false) {
-                std::cout << "Problems parsing file: " << file << std::endl;
-                if (error.empty() == false) {
-                    std::cout << error << std::endl;
-                }
+                reportParsingError(error);
                 return false;
             }
 

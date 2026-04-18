@@ -15,6 +15,7 @@
 
 #include "src/operators/validate_byte_range.h"
 
+#include <array>
 #include <cctype>
 #include <cstring>
 #include <string>

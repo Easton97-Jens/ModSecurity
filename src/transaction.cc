@@ -23,12 +23,16 @@
 #include <string.h>
 
 #include <cstdio>
+#include <cstddef>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <set>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modsecurity/actions/action.h"

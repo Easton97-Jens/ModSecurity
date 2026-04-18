@@ -1,0 +1,1247 @@
+[
+  {
+    "sha": "c0f166800cb72a5289015dfc8859c9e00eb06ba3",
+    "node_id": "C_kwDOQkI2j9oAKGMwZjE2NjgwMGNiNzJhNTI4OTAxNWRmYzg4NTljOWUwMGViMDZiYTM",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-10T18:58:34Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-10T18:58:34Z"
+      },
+      "message": "Pin simdjson to v4.6.1",
+      "tree": {
+        "sha": "e3294343db36a18edd13e540a08e23d11adb3360",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/e3294343db36a18edd13e540a08e23d11adb3360"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/c0f166800cb72a5289015dfc8859c9e00eb06ba3",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c0f166800cb72a5289015dfc8859c9e00eb06ba3",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/c0f166800cb72a5289015dfc8859c9e00eb06ba3",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c0f166800cb72a5289015dfc8859c9e00eb06ba3/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "e5d00df2a324f25d29ee841f7719872ac70fc6e5",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/e5d00df2a324f25d29ee841f7719872ac70fc6e5",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/e5d00df2a324f25d29ee841f7719872ac70fc6e5"
+      }
+    ]
+  },
+  {
+    "sha": "98fd8f715a4bfdb56729f12da111a05770e9436b",
+    "node_id": "C_kwDOQkI2j9oAKDk4ZmQ4ZjcxNWE0YmZkYjU2NzI5ZjEyZGExMTFhMDU3NzBlOTQzNmI",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-10T20:03:44Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-10T20:03:44Z"
+      },
+      "message": "Pin jsoncons to v1.6.0",
+      "tree": {
+        "sha": "dc481890285c0d31546b0ef13a8a3601d1ce71ef",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/dc481890285c0d31546b0ef13a8a3601d1ce71ef"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/98fd8f715a4bfdb56729f12da111a05770e9436b",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/98fd8f715a4bfdb56729f12da111a05770e9436b",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/98fd8f715a4bfdb56729f12da111a05770e9436b",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/98fd8f715a4bfdb56729f12da111a05770e9436b/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "c0f166800cb72a5289015dfc8859c9e00eb06ba3",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c0f166800cb72a5289015dfc8859c9e00eb06ba3",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/c0f166800cb72a5289015dfc8859c9e00eb06ba3"
+      }
+    ]
+  },
+  {
+    "sha": "a30e0dacc720df5b28595194d2d0747200165b0b",
+    "node_id": "C_kwDOQkI2j9oAKGEzMGUwZGFjYzcyMGRmNWIyODU5NTE5NGQyZDA3NDcyMDAxNjViMGI",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T04:16:01Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T04:16:01Z"
+      },
+      "message": "remove yajl",
+      "tree": {
+        "sha": "a4e7322bd38d6b5044c236648b5670e4e2ebd70a",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/a4e7322bd38d6b5044c236648b5670e4e2ebd70a"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/a30e0dacc720df5b28595194d2d0747200165b0b",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/a30e0dacc720df5b28595194d2d0747200165b0b",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/a30e0dacc720df5b28595194d2d0747200165b0b",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/a30e0dacc720df5b28595194d2d0747200165b0b/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "98fd8f715a4bfdb56729f12da111a05770e9436b",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/98fd8f715a4bfdb56729f12da111a05770e9436b",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/98fd8f715a4bfdb56729f12da111a05770e9436b"
+      }
+    ]
+  },
+  {
+    "sha": "7681a8e66b2aa38f2aa557bd38abc74262ab3e9e",
+    "node_id": "C_kwDOQkI2j9oAKDc2ODFhOGU2NmIyYWEzOGYyYWE1NTdiZDM4YWJjNzQyNjJhYjNlOWU",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T16:01:01Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T18:36:18Z"
+      },
+      "message": "test error corrected",
+      "tree": {
+        "sha": "1ee3cdb00cc4b15405e8b92af33a960dbc150527",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/1ee3cdb00cc4b15405e8b92af33a960dbc150527"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/7681a8e66b2aa38f2aa557bd38abc74262ab3e9e",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7681a8e66b2aa38f2aa557bd38abc74262ab3e9e",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/7681a8e66b2aa38f2aa557bd38abc74262ab3e9e",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7681a8e66b2aa38f2aa557bd38abc74262ab3e9e/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "a30e0dacc720df5b28595194d2d0747200165b0b",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/a30e0dacc720df5b28595194d2d0747200165b0b",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/a30e0dacc720df5b28595194d2d0747200165b0b"
+      }
+    ]
+  },
+  {
+    "sha": "82ca699a9aa220b0f2e5c957b01560d7f408e965",
+    "node_id": "C_kwDOQkI2j9oAKDgyY2E2OTlhOWFhMjIwYjBmMmU1Yzk1N2IwMTU2MGQ3ZjQwOGU5NjU",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T16:37:54Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T18:36:18Z"
+      },
+      "message": "add analysis",
+      "tree": {
+        "sha": "6862b168f9e29f42551ce2e4b1c6bb800dab1e0d",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/6862b168f9e29f42551ce2e4b1c6bb800dab1e0d"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/82ca699a9aa220b0f2e5c957b01560d7f408e965",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/82ca699a9aa220b0f2e5c957b01560d7f408e965",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/82ca699a9aa220b0f2e5c957b01560d7f408e965",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/82ca699a9aa220b0f2e5c957b01560d7f408e965/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "7681a8e66b2aa38f2aa557bd38abc74262ab3e9e",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7681a8e66b2aa38f2aa557bd38abc74262ab3e9e",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/7681a8e66b2aa38f2aa557bd38abc74262ab3e9e"
+      }
+    ]
+  },
+  {
+    "sha": "c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721",
+    "node_id": "C_kwDOQkI2j9oAKGM4NTA2ZDNlNWZjNGE3NTUwMGFhNDA4NmMyYzY3ZmU1YTlmM2Y3MjE",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T17:37:34Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T18:36:18Z"
+      },
+      "message": "test error corrected",
+      "tree": {
+        "sha": "1068fc1a800ea5e1e2cd0712cfc0d92969b9c1e2",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/1068fc1a800ea5e1e2cd0712cfc0d92969b9c1e2"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "82ca699a9aa220b0f2e5c957b01560d7f408e965",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/82ca699a9aa220b0f2e5c957b01560d7f408e965",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/82ca699a9aa220b0f2e5c957b01560d7f408e965"
+      }
+    ]
+  },
+  {
+    "sha": "d0589143e206bd0c830e492cf7812ae1acc334a6",
+    "node_id": "C_kwDOQkI2j9oAKGQwNTg5MTQzZTIwNmJkMGM4MzBlNDkyY2Y3ODEyYWUxYWNjMzM0YTY",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T21:28:19Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-11T21:28:19Z"
+      },
+      "message": "Remove duplicate code, performance optimization",
+      "tree": {
+        "sha": "37b13529ea93d43c33fe0788889418df3a1486a3",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/37b13529ea93d43c33fe0788889418df3a1486a3"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/d0589143e206bd0c830e492cf7812ae1acc334a6",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/d0589143e206bd0c830e492cf7812ae1acc334a6",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/d0589143e206bd0c830e492cf7812ae1acc334a6",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/d0589143e206bd0c830e492cf7812ae1acc334a6/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/c8506d3e5fc4a75500aa4086c2c67fe5a9f3f721"
+      }
+    ]
+  },
+  {
+    "sha": "ec9dce9afcf45440731e9496cce69d6875abb22d",
+    "node_id": "C_kwDOQkI2j9oAKGVjOWRjZTlhZmNmNDU0NDA3MzFlOTQ5NmNjZTY5ZDY4NzVhYmIyMmQ",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-12T10:29:07Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-12T10:29:07Z"
+      },
+      "message": "add build ordner",
+      "tree": {
+        "sha": "6cf4cd0fc33fb9ffcd4763ad3c325d921ae87da8",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/6cf4cd0fc33fb9ffcd4763ad3c325d921ae87da8"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/ec9dce9afcf45440731e9496cce69d6875abb22d",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/ec9dce9afcf45440731e9496cce69d6875abb22d",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/ec9dce9afcf45440731e9496cce69d6875abb22d",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/ec9dce9afcf45440731e9496cce69d6875abb22d/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "d0589143e206bd0c830e492cf7812ae1acc334a6",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/d0589143e206bd0c830e492cf7812ae1acc334a6",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/d0589143e206bd0c830e492cf7812ae1acc334a6"
+      }
+    ]
+  },
+  {
+    "sha": "c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8",
+    "node_id": "C_kwDOQkI2j9oAKGMxM2Y3ZDEwZjNkYjFkMWJiODAzODBkMjg4MmUwYWZiZGJlMmQ1Yjg",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-12T11:15:59Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-12T18:38:02Z"
+      },
+      "message": "performance optimization\n\nComplete implementation simdjson\n\nComplete implementation jsoncons\n\nremove analysis\n\nInitialize ret variable to zero in UnitTestResult\n\nfix test\n\nFix validateByteRange and cssDecode unit test edge cases\n\ncomplete jsoncons\n\nperformance adjustment\n\nsonarqubecloud error corrected",
+      "tree": {
+        "sha": "3119dbaf479a50abffd5d87cf27f5020c9a844c8",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/3119dbaf479a50abffd5d87cf27f5020c9a844c8"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "ec9dce9afcf45440731e9496cce69d6875abb22d",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/ec9dce9afcf45440731e9496cce69d6875abb22d",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/ec9dce9afcf45440731e9496cce69d6875abb22d"
+      }
+    ]
+  },
+  {
+    "sha": "ed42377959a4fe102a591b08f8ceb5ba0948522a",
+    "node_id": "C_kwDOQkI2j9oAKGVkNDIzNzc5NTlhNGZlMTAyYTU5MWIwOGY4Y2ViNWJhMDk0ODUyMmE",
+    "commit": {
+      "author": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-12T19:05:19Z"
+      },
+      "committer": {
+        "name": "Jens",
+        "email": "Jens_st97@gmx.de",
+        "date": "2026-04-13T18:14:46Z"
+      },
+      "message": "fix windows\n\nsonarqubecloud error corrected\n\nRefactor JSONAdapter parse method to use parseImpl\n\nRefactor JSONAdapter parse methods to remove adapter parameter\n\nAdd parseImpl method to json_adapter.h\n\nRefactor JSON field handling in regression tests\n\nRefactor JSON field processing by introducing a reusable for_each_json_field function. This change simplifies the code in multiple update functions by eliminating redundant logic.\n\nRefactor parsing functions for improved validation\n\nCleanup: Remove unused parsing functions\n\nRemoved unused functions related to parsing and scenario building in json_benchmark.cc.\n\nImprove benchmark output and add bilingual benchmark docs\n\nApply minimal Sonar-focused fixes in benchmark parser/script\n\nMeasure benchmark timer only around transaction loop\n\nRevisit JSON Sonar follow-ups for adapter and enum handling\n\nReduce duplicated JSON backend control-flow blocks\n\nfix: probably UB (left shift of neg. val) in ip_tree\n\nfix: nullptr dereference in seclang scanner\n\nfix: unhandled exception in parser\n\nDeduplicate shared JSON backend helper functions",
+      "tree": {
+        "sha": "36aadeebabf0cf4dead4e57c5bdae997d5123ac3",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/36aadeebabf0cf4dead4e57c5bdae997d5123ac3"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/ed42377959a4fe102a591b08f8ceb5ba0948522a",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/ed42377959a4fe102a591b08f8ceb5ba0948522a",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/ed42377959a4fe102a591b08f8ceb5ba0948522a",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/ed42377959a4fe102a591b08f8ceb5ba0948522a/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/c13f7d10f3db1d1bb80380d2882e0afbdbe2d5b8"
+      }
+    ]
+  },
+  {
+    "sha": "3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+    "node_id": "C_kwDOQkI2j9oAKDNlYzg2Y2Y2M2UwOTVjZGRmNGYyMmY2ZDljZmUzNDYxYmJiZjQ5NDI",
+    "commit": {
+      "author": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-13T18:16:29Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-04-13T18:16:29Z"
+      },
+      "message": "Merge branch 'owasp-modsecurity:v3/master' into v3/master-json2",
+      "tree": {
+        "sha": "36aadeebabf0cf4dead4e57c5bdae997d5123ac3",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/36aadeebabf0cf4dead4e57c5bdae997d5123ac3"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJp3TL9CRC1aQ7uu5UhlAAAx20QAKhS6fl9Ivnti6WL/Uwc+98h\nJjaSF2P34lUPChhf0tHoKG8oiCb0+d2PoHW4p7HCoZZzCrKrUgq890hPXUZoscbj\nD/RoKgA8XR0h+8SAHQeQuZdKVEDXdzu9KK2uFQ8/RVM7gkjYtvyBMsPzSWW2j0WQ\n59mVicgEgqEfp+GNwJLf9iAgWGLGxRFqDGSfHlL2lR1+xdphSiPn8UDO5tq/t4Np\nk3WjsFYCWCj2qY/ywB4OgnY0JHXIJOH3cwAjGnZ97+xntGk8KxpjxiirhqxP9BLo\nxP8nC4i3ds4JHgEq646pDbxWf1OeeGklittMh9jZd0xy/RIGbHdAKBtzAkL4QH4M\nqS3px3UAnPXO/emNsCWuxmOCGI/a92ZPD89kFVnd8MWzSuht3QfBDfaRF4bCebnB\nRJqq6MqsC6w9s1OSXZ8GTe8vofWS9Gu1d038tgbL6UPUBzWoGv8K4ud8v5YzGH6A\nV+12A+ac6+ZJMOe6qpz1mJKBeSuqU6JnFlUTn1btdH4uBi7ceELGsMVVc3cXR8H/\n19QJ2W+kQKVt6R++Ui458EZz+TGEijFg1e6GBW44fp7RpEawq/rUYsNC7JAtgvhN\nEYLQ+Rfe05fTfH35MuWa4cKnabC3vHfsQpafJFxTGfEavmHm7j6VPigAYh8IKD4o\nKYLU4bHIDWUsnACnnZpq\n=PJW6\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 36aadeebabf0cf4dead4e57c5bdae997d5123ac3\nparent ed42377959a4fe102a591b08f8ceb5ba0948522a\nparent 8c658f00394b194e06e6d04a903fd366b8f1aeaf\nauthor Easton97-Jens <66330090+Easton97-Jens@users.noreply.github.com> 1776104189 +0200\ncommitter GitHub <noreply@github.com> 1776104189 +0200\n\nMerge branch 'owasp-modsecurity:v3/master' into v3/master-json2\n",
+        "verified_at": "2026-04-13T18:16:35Z"
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "ed42377959a4fe102a591b08f8ceb5ba0948522a",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/ed42377959a4fe102a591b08f8ceb5ba0948522a",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/ed42377959a4fe102a591b08f8ceb5ba0948522a"
+      },
+      {
+        "sha": "8c658f00394b194e06e6d04a903fd366b8f1aeaf",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/8c658f00394b194e06e6d04a903fd366b8f1aeaf",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/8c658f00394b194e06e6d04a903fd366b8f1aeaf"
+      }
+    ]
+  },
+  {
+    "sha": "57bf6d2e909e45c95b2d06e9b31a1535d4936aee",
+    "node_id": "C_kwDOQkI2j9oAKDU3YmY2ZDJlOTA5ZTQ1Yzk1YjJkMDZlOWIzMWExNTM1ZDQ5MzZhZWU",
+    "commit": {
+      "author": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-14T18:35:36Z"
+      },
+      "committer": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-14T18:35:36Z"
+      },
+      "message": "Restore rules_set include required by XML processor build",
+      "tree": {
+        "sha": "7b544a4299d9fc993ef4f7308e91cc3eeb7b331b",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/7b544a4299d9fc993ef4f7308e91cc3eeb7b331b"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/57bf6d2e909e45c95b2d06e9b31a1535d4936aee",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/57bf6d2e909e45c95b2d06e9b31a1535d4936aee",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/57bf6d2e909e45c95b2d06e9b31a1535d4936aee",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/57bf6d2e909e45c95b2d06e9b31a1535d4936aee/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942"
+      }
+    ]
+  },
+  {
+    "sha": "7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+    "node_id": "C_kwDOQkI2j9oAKDdjNGYyNGFjZTNhOWVkNmU2MGUxMjExZGE3OGY0ODk0OTMxZTlhYjA",
+    "commit": {
+      "author": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-14T18:35:58Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-04-14T18:35:58Z"
+      },
+      "message": "Merge pull request #74 from Easton97-Jens/codex/systematische-behebung-offener-sonar-probleme-7954xf\n\nModernize codebase: nullptr/default initializers, std::string_view, smart pointers and minor cleanups",
+      "tree": {
+        "sha": "7b544a4299d9fc993ef4f7308e91cc3eeb7b331b",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/7b544a4299d9fc993ef4f7308e91cc3eeb7b331b"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJp3okOCRC1aQ7uu5UhlAAAhs4QAGYzVRo4oZz0iq7Mx0OGwKis\nTAgX5QMdpi4UlvADwDwJBEfhOV8LmJSWIRanO251dZcmUvBImVlBhpOdcJgnmW9X\nvjLDFg/HGgxeyO3MazhSVCg/VWqz/Xysu8BN2qbjXw92CoL5m+SCng7xUMq3X3DU\na/Ol/XlbzLUMMuRyzdxjj+y+tvEJ4fG9tYGk2/WLvr8IBvP9s5fYuOiPMGb9qvip\nlH9PVbMenH0k7btZsMe+7L1yC6M7i7IA7jnmTmWPQPqVM93LfXAo8pq86S7hMjmy\n/mjX+QpJVcRhojO4IgIt5ictuOswhmLZ5AXjc9aTfFhoVY9Aindu5K22vRq5oKOs\nihMUUbZCg51r0HK0G+NiAZADvn6yiviZzZZmUtrOV2ilufsWl2BKDG2w2Jf2beSn\n/gqvUdblLcXO0bypusi4xJWCTchDK3PyNEggS1muYAACp3eeEeX7xBLcKTccU1sO\nAadyWGwb+h+7aIKivgXq8FZwSaxWLOny+6cUHOBQEXA4SXx7HVw6LdpAFh4XPKlq\nLRlTzAy8TQswstDJOCXNToRzFY+HyH7I/ErBbzv6C9BeaGR74snPn0qrwefrRxYD\nf7xeokHfhvu0GsiRaMD72VtdO3Z1BRMPF8FhOy3g0yjkfgVXq/GajkvZft1Yado8\nGCwS+f6aNzPWAJSDrIKb\n=3YvN\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 7b544a4299d9fc993ef4f7308e91cc3eeb7b331b\nparent 3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942\nparent 57bf6d2e909e45c95b2d06e9b31a1535d4936aee\nauthor Easton97-Jens <66330090+Easton97-Jens@users.noreply.github.com> 1776191758 +0200\ncommitter GitHub <noreply@github.com> 1776191758 +0200\n\nMerge pull request #74 from Easton97-Jens/codex/systematische-behebung-offener-sonar-probleme-7954xf\n\nModernize codebase: nullptr/default initializers, std::string_view, smart pointers and minor cleanups",
+        "verified_at": "2026-04-14T18:35:58Z"
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/3ec86cf63e095cddf4f22f6d9cfe3461bbbf4942"
+      },
+      {
+        "sha": "57bf6d2e909e45c95b2d06e9b31a1535d4936aee",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/57bf6d2e909e45c95b2d06e9b31a1535d4936aee",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/57bf6d2e909e45c95b2d06e9b31a1535d4936aee"
+      }
+    ]
+  },
+  {
+    "sha": "8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3",
+    "node_id": "C_kwDOQkI2j9oAKDgxOTdkMmIwNzljYmQxNmYyYTdmZjVlZTM1MTc4ZDYwYTFlYWI0ZjM",
+    "commit": {
+      "author": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-14T19:10:47Z"
+      },
+      "committer": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-14T19:10:47Z"
+      },
+      "message": "Refactor open critical Sonar complexity and nesting findings",
+      "tree": {
+        "sha": "faea0399cb682e2cae1060e29816045b86f338c9",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/faea0399cb682e2cae1060e29816045b86f338c9"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0"
+      }
+    ]
+  },
+  {
+    "sha": "9c29515ef87b85baaf22bcb004c4403cd14ed0ce",
+    "node_id": "C_kwDOQkI2j9oAKDljMjk1MTVlZjg3Yjg1YmFhZjIyYmNiMDA0YzQ0MDNjZDE0ZWQwY2U",
+    "commit": {
+      "author": {
+        "name": "Easton97-Jens",
+        "email": "66330090+Easton97-Jens@users.noreply.github.com",
+        "date": "2026-04-14T19:11:08Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-04-14T19:11:08Z"
+      },
+      "message": "Merge pull request #77 from Easton97-Jens/codex/bearbeite-critical-sonar-befunde-in-pr-#3540\n\nAddress open CRITICAL Sonar nesting and cognitive-complexity findings",
+      "tree": {
+        "sha": "faea0399cb682e2cae1060e29816045b86f338c9",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/trees/faea0399cb682e2cae1060e29816045b86f338c9"
+      },
+      "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/git/commits/9c29515ef87b85baaf22bcb004c4403cd14ed0ce",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJp3pFMCRC1aQ7uu5UhlAAAWjkQACakDL2XIbYjvY14LN6Laq7P\nPKwKAh1yXFLT6OrMK0aFWp+VcfjW+IPqjdheoVUkmLnBTeneLAsPGG94ZJqnv4U+\nmB51ku8PkH/i6nDlzJVZxLpCkCAkj9emePMEny4U/b4VyTCBdtwImbBsFTb/qGt1\nXzn9FM0VeplgzEoHX+gMbuYHpaYOWMeixR/T+2Z7eu7N3kPZqdPshHa5zeC0ooua\n+VO6zijcyimEHRqZ7ocdi7qtb8vtnkuAMdROFxB401sYYggX5a2vBw88iFQO7wKs\nKRLgBnpbhyZpEyYcvoxF5/dDN+a0FUol/O7EhjJ5SgTFSOhFF6Jb9g2vO1Kvx3EY\nkbNsNbAsVVxFFt4gvaBwiBwWN5dPv1lu9gB/wXS+D4CjiI8hblgcznNcgD9CoSKS\nAx6/FziV/aV4nc9On6gUSos8WpilVEvgrTkz8fBQgii4SdpQAFQfuV+xfO613Nuz\n01Q9SgGtYbai6awvx9+jdk5az5zxRzL3dMs+wlW3nNHcE0iTziF6fHx1lHXzVQ48\nj2ws4AQXDlBirmReNr9c9YvNebAGmqVvWW4mZQT7RYJEPrSpLgzHvye/uPBbjGTI\nk99Ditscfv0bZQj67R7LkpDUz473TgN5PQQ+Sir6+g/haWwh7zdF2KH96tbqxP/U\nTfWYHdiLnzG93jSen+0U\n=pLWP\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree faea0399cb682e2cae1060e29816045b86f338c9\nparent 7c4f24ace3a9ed6e60e1211da78f4894931e9ab0\nparent 8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3\nauthor Easton97-Jens <66330090+Easton97-Jens@users.noreply.github.com> 1776193868 +0200\ncommitter GitHub <noreply@github.com> 1776193868 +0200\n\nMerge pull request #77 from Easton97-Jens/codex/bearbeite-critical-sonar-befunde-in-pr-#3540\n\nAddress open CRITICAL Sonar nesting and cognitive-complexity findings",
+        "verified_at": "2026-04-14T19:11:08Z"
+      }
+    },
+    "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/9c29515ef87b85baaf22bcb004c4403cd14ed0ce",
+    "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/9c29515ef87b85baaf22bcb004c4403cd14ed0ce",
+    "comments_url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/9c29515ef87b85baaf22bcb004c4403cd14ed0ce/comments",
+    "author": {
+      "login": "Easton97-Jens",
+      "id": 66330090,
+      "node_id": "MDQ6VXNlcjY2MzMwMDkw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/66330090?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/Easton97-Jens",
+      "html_url": "https://github.com/Easton97-Jens",
+      "followers_url": "https://api.github.com/users/Easton97-Jens/followers",
+      "following_url": "https://api.github.com/users/Easton97-Jens/following{/other_user}",
+      "gists_url": "https://api.github.com/users/Easton97-Jens/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/Easton97-Jens/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/Easton97-Jens/subscriptions",
+      "organizations_url": "https://api.github.com/users/Easton97-Jens/orgs",
+      "repos_url": "https://api.github.com/users/Easton97-Jens/repos",
+      "events_url": "https://api.github.com/users/Easton97-Jens/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/Easton97-Jens/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/7c4f24ace3a9ed6e60e1211da78f4894931e9ab0"
+      },
+      {
+        "sha": "8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3",
+        "url": "https://api.github.com/repos/owasp-modsecurity/ModSecurity/commits/8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3",
+        "html_url": "https://github.com/owasp-modsecurity/ModSecurity/commit/8197d2b079cbd16f2a7ff5ee35178d60a1eab4f3"
+      }
+    ]
+  }
+]

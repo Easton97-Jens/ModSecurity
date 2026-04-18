@@ -22,11 +22,11 @@
 
 #include <cctype>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <utility>
 
 #include "src/request_body_processor/json_instrumentation.h"
 #include <jsoncons/json_cursor.hpp>
@@ -89,13 +89,69 @@ bool isDigit(char value) {
     return std::isdigit(static_cast<unsigned char>(value)) != 0;
 }
 
-bool isValidJsonNumber(std::string_view token) {
-    std::size_t index = 0;
+bool isExponentMarker(char value) {
+    return value == 'e' || value == 'E';
+}
 
+bool isSignedExponent(std::string_view token, std::size_t index) {
+    return index < token.size() && (token[index] == '+' || token[index] == '-');
+}
+
+bool parseIntegerPart(std::string_view token, std::size_t *index) {
+    if (token[*index] == '0') {
+        (*index)++;
+        return true;
+    }
+
+    if (!isDigit(token[*index]) || token[*index] == '0') {
+        return false;
+    }
+
+    while (*index < token.size() && isDigit(token[*index])) {
+        (*index)++;
+    }
+    return true;
+}
+
+bool parseFractionPart(std::string_view token, std::size_t *index) {
+    if (*index >= token.size() || token[*index] != '.') {
+        return true;
+    }
+
+    (*index)++;
+    if (*index == token.size() || !isDigit(token[*index])) {
+        return false;
+    }
+    while (*index < token.size() && isDigit(token[*index])) {
+        (*index)++;
+    }
+    return true;
+}
+
+bool parseExponentPart(std::string_view token, std::size_t *index) {
+    if (*index >= token.size() || !isExponentMarker(token[*index])) {
+        return true;
+    }
+
+    (*index)++;
+    if (isSignedExponent(token, *index)) {
+        (*index)++;
+    }
+    if (*index == token.size() || !isDigit(token[*index])) {
+        return false;
+    }
+    while (*index < token.size() && isDigit(token[*index])) {
+        (*index)++;
+    }
+    return true;
+}
+
+bool isValidJsonNumber(std::string_view token) {
     if (token.empty()) {
         return false;
     }
 
+    std::size_t index = 0;
     if (token[index] == '-') {
         index++;
         if (index == token.size()) {
@@ -103,38 +159,14 @@ bool isValidJsonNumber(std::string_view token) {
         }
     }
 
-    if (token[index] == '0') {
-        index++;
-    } else {
-        if (!isDigit(token[index]) || token[index] == '0') {
-            return false;
-        }
-        while (index < token.size() && isDigit(token[index])) {
-            index++;
-        }
+    if (!parseIntegerPart(token, &index)) {
+        return false;
     }
-
-    if (index < token.size() && token[index] == '.') {
-        index++;
-        if (index == token.size() || !isDigit(token[index])) {
-            return false;
-        }
-        while (index < token.size() && isDigit(token[index])) {
-            index++;
-        }
+    if (!parseFractionPart(token, &index)) {
+        return false;
     }
-
-    if (index < token.size() && (token[index] == 'e' || token[index] == 'E')) {
-        index++;
-        if (index < token.size() && (token[index] == '+' || token[index] == '-')) {
-            index++;
-        }
-        if (index == token.size() || !isDigit(token[index])) {
-            return false;
-        }
-        while (index < token.size() && isDigit(token[index])) {
-            index++;
-        }
+    if (!parseExponentPart(token, &index)) {
+        return false;
     }
 
     return index == token.size();
@@ -272,6 +304,13 @@ class RawJsonTokenCursor {
     }
 
  private:
+    static bool setError(std::string *detail, const char *message) {
+        if (detail != nullptr) {
+            *detail = message;
+        }
+        return false;
+    }
+
     static bool isWhitespace(char value) {
         return std::isspace(static_cast<unsigned char>(value)) != 0;
     }
@@ -350,10 +389,8 @@ class RawJsonTokenCursor {
         const std::size_t start = *offset;
 
         if (*offset >= m_input.size() || m_input[*offset] != '"') {
-            if (detail != nullptr) {
-                *detail = "Expected raw JSON string token while synchronizing jsoncons events.";
-            }
-            return false;
+            return setError(detail,
+                "Expected raw JSON string token while synchronizing jsoncons events.");
         }
 
         (*offset)++;
@@ -361,26 +398,8 @@ class RawJsonTokenCursor {
             char current = m_input[*offset];
             (*offset)++;
             if (current == '\\') {
-                if (*offset >= m_input.size()) {
-                    if (detail != nullptr) {
-                        *detail = "Truncated escape sequence while synchronizing raw JSON string token.";
-                    }
+                if (!consumeEscapedCharacter(offset, detail)) {
                     return false;
-                }
-
-                char escaped = m_input[*offset];
-                (*offset)++;
-                if (escaped == 'u') {
-                    for (int i = 0; i < 4; i++) {
-                        if (*offset >= m_input.size()
-                            || !isHexDigit(m_input[*offset])) {
-                            if (detail != nullptr) {
-                                *detail = "Invalid Unicode escape while synchronizing raw JSON string token.";
-                            }
-                            return false;
-                        }
-                        (*offset)++;
-                    }
                 }
                 continue;
             }
@@ -392,17 +411,13 @@ class RawJsonTokenCursor {
             }
 
             if (static_cast<unsigned char>(current) < 0x20) {
-                if (detail != nullptr) {
-                    *detail = "Unexpected control character while synchronizing raw JSON string token.";
-                }
-                return false;
+                return setError(detail,
+                    "Unexpected control character while synchronizing raw JSON string token.");
             }
         }
 
-        if (detail != nullptr) {
-            *detail = "Unterminated string token while synchronizing jsoncons events.";
-        }
-        return false;
+        return setError(detail,
+            "Unterminated string token while synchronizing jsoncons events.");
     }
 
     bool consumeNumber(std::string_view *raw_token, std::string *detail) {
@@ -413,63 +428,103 @@ class RawJsonTokenCursor {
         std::string *detail) const {
         const std::size_t start = *offset;
 
+        if (!consumeNumberSign(offset)
+            || !consumeIntegerComponent(offset, detail)
+            || !consumeFractionComponent(offset, detail)
+            || !consumeExponentComponent(offset, detail)) {
+            return false;
+        }
+
+        *raw_token = std::string_view(m_input.data() + start, *offset - start);
+        return true;
+    }
+
+    bool consumeEscapedCharacter(std::size_t *offset, std::string *detail) const {
+        if (*offset >= m_input.size()) {
+            return setError(detail,
+                "Truncated escape sequence while synchronizing raw JSON string token.");
+        }
+
+        const char escaped = m_input[*offset];
+        (*offset)++;
+        if (escaped != 'u') {
+            return true;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (*offset >= m_input.size() || !isHexDigit(m_input[*offset])) {
+                return setError(detail,
+                    "Invalid Unicode escape while synchronizing raw JSON string token.");
+            }
+            (*offset)++;
+        }
+        return true;
+    }
+
+    bool consumeNumberSign(std::size_t *offset) const {
         if (*offset < m_input.size() && m_input[*offset] == '-') {
             (*offset)++;
         }
+        return true;
+    }
 
+    bool consumeIntegerComponent(std::size_t *offset, std::string *detail) const {
         if (*offset >= m_input.size()) {
-            if (detail != nullptr) {
-                *detail = "Unexpected end of input while synchronizing raw JSON number token.";
-            }
-            return false;
+            return setError(detail,
+                "Unexpected end of input while synchronizing raw JSON number token.");
         }
 
         if (m_input[*offset] == '0') {
             (*offset)++;
-        } else {
-            if (!isDigit(m_input[*offset]) || m_input[*offset] == '0') {
-                if (detail != nullptr) {
-                    *detail = "Invalid integer component while synchronizing raw JSON number token.";
-                }
-                return false;
-            }
-            while (*offset < m_input.size() && isDigit(m_input[*offset])) {
-                (*offset)++;
-            }
+            return true;
         }
 
-        if (*offset < m_input.size() && m_input[*offset] == '.') {
+        if (!isDigit(m_input[*offset]) || m_input[*offset] == '0') {
+            return setError(detail,
+                "Invalid integer component while synchronizing raw JSON number token.");
+        }
+
+        while (*offset < m_input.size() && isDigit(m_input[*offset])) {
             (*offset)++;
-            if (*offset >= m_input.size() || !isDigit(m_input[*offset])) {
-                if (detail != nullptr) {
-                    *detail = "Invalid fraction component while synchronizing raw JSON number token.";
-                }
-                return false;
-            }
-            while (*offset < m_input.size() && isDigit(m_input[*offset])) {
-                (*offset)++;
-            }
+        }
+        return true;
+    }
+
+    bool consumeFractionComponent(std::size_t *offset, std::string *detail) const {
+        if (*offset >= m_input.size() || m_input[*offset] != '.') {
+            return true;
         }
 
+        (*offset)++;
+        if (*offset >= m_input.size() || !isDigit(m_input[*offset])) {
+            return setError(detail,
+                "Invalid fraction component while synchronizing raw JSON number token.");
+        }
+
+        while (*offset < m_input.size() && isDigit(m_input[*offset])) {
+            (*offset)++;
+        }
+        return true;
+    }
+
+    bool consumeExponentComponent(std::size_t *offset, std::string *detail) const {
+        if (*offset >= m_input.size() || !isExponentMarker(m_input[*offset])) {
+            return true;
+        }
+
+        (*offset)++;
         if (*offset < m_input.size()
-            && (m_input[*offset] == 'e' || m_input[*offset] == 'E')) {
+            && (m_input[*offset] == '+' || m_input[*offset] == '-')) {
             (*offset)++;
-            if (*offset < m_input.size()
-                && (m_input[*offset] == '+' || m_input[*offset] == '-')) {
-                (*offset)++;
-            }
-            if (*offset >= m_input.size() || !isDigit(m_input[*offset])) {
-                if (detail != nullptr) {
-                    *detail = "Invalid exponent component while synchronizing raw JSON number token.";
-                }
-                return false;
-            }
-            while (*offset < m_input.size() && isDigit(m_input[*offset])) {
-                (*offset)++;
-            }
+        }
+        if (*offset >= m_input.size() || !isDigit(m_input[*offset])) {
+            return setError(detail,
+                "Invalid exponent component while synchronizing raw JSON number token.");
         }
 
-        *raw_token = std::string_view(m_input.data() + start, *offset - start);
+        while (*offset < m_input.size() && isDigit(m_input[*offset])) {
+            (*offset)++;
+        }
         return true;
     }
 
@@ -704,7 +759,7 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
                 std::chrono::steady_clock::now() - event_loop_start).count()));
     };
     const auto finish_with_event_loop = [&record_event_loop](
-        JsonParseResult result) {
+        const JsonParseResult &result) {
         record_event_loop();
         return result;
     };
@@ -717,8 +772,9 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
                 cursor.current(), cursor.context()); !result.ok()) {
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
             return finish_with_event_loop(result);
-#endif
+#else
             return result;
+#endif
         }
 
         cursor.next(error);
@@ -726,8 +782,9 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
             return finish_with_event_loop(
                 fromJsonconsError(error, cursor.context()));
-#endif
+#else
             return fromJsonconsError(error, cursor.context());
+#endif
         }
     }
 
@@ -736,8 +793,9 @@ JsonParseResult parseDocumentWithJsoncons(const std::string &input,
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION
         return finish_with_event_loop(fromJsonconsError(error,
             cursor.context()));
-#endif
+#else
         return fromJsonconsError(error, cursor.context());
+#endif
     }
 
 #ifdef MSC_JSON_AUDIT_INSTRUMENTATION

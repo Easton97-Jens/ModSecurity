@@ -25,6 +25,7 @@
 #ifdef __cplusplus
 #include <ctime>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <list>
