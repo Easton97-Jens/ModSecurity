@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 RUN_TS_UTC="$(date -u +"%Y%m%dT%H%M%SZ")"
+DEBUG="${DEBUG:-0}"
+TRACE_COMMANDS="${TRACE_COMMANDS:-1}"
+VERBOSE="${VERBOSE:-1}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCH_DIR="$SCRIPT_DIR"
@@ -46,6 +49,7 @@ DOWNLOAD_CRS_V4_SCRIPT="$BENCH_DIR/download-owasp-v4-rules.sh"
 #   CRS_V3_SETUP, CRS_V3_RULES_GLOB, CRS_V4_SETUP, CRS_V4_RULES_GLOB.
 
 mkdir -p "$RESULTS_ROOT" "$WORK_ROOT" "$BACKUP_DIR"
+touch "$GLOBAL_LOG"
 
 cp "$BASIC_RULES" "$BACKUP_DIR/basic_rules.conf.orig"
 cp "$JSON_RULES" "$BACKUP_DIR/json_benchmark_rules.conf.orig"
@@ -60,12 +64,94 @@ declare -A VARIANT_BENCH_THROUGHPUT
 declare -A VARIANT_JSON_AVG_TOTAL_NS
 declare -A VARIANT_JSON_AVG_THROUGHPUT
 
+ts_utc() {
+    date -u +"%Y-%m-%dT%H:%M:%SZ"
+}
+
+if [[ -t 1 ]]; then
+    COLOR_RESET=$'\033[0m'
+    COLOR_INFO=$'\033[36m'
+    COLOR_WARN=$'\033[33m'
+    COLOR_ERROR=$'\033[31m'
+    COLOR_STEP=$'\033[35m'
+else
+    COLOR_RESET=""
+    COLOR_INFO=""
+    COLOR_WARN=""
+    COLOR_ERROR=""
+    COLOR_STEP=""
+fi
+
 log() {
     local message="$1"
-    local ts
-    ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-    printf '[%s] %s\n' "$ts" "$message" | tee -a "$GLOBAL_LOG"
+    printf '[%s] %s\n' "$(ts_utc)" "$message" | tee -a "$GLOBAL_LOG"
 }
+
+log_info() {
+    local message="$1"
+    printf '%s[%s] [INFO] %s%s\n' "$COLOR_INFO" "$(ts_utc)" "$message" "$COLOR_RESET" | tee -a "$GLOBAL_LOG"
+}
+
+log_warn() {
+    local message="$1"
+    printf '%s[%s] [WARN] %s%s\n' "$COLOR_WARN" "$(ts_utc)" "$message" "$COLOR_RESET" | tee -a "$GLOBAL_LOG"
+}
+
+log_error() {
+    local message="$1"
+    printf '%s[%s] [ERROR] %s%s\n' "$COLOR_ERROR" "$(ts_utc)" "$message" "$COLOR_RESET" | tee -a "$GLOBAL_LOG" >&2
+}
+
+log_step() {
+    local message="$1"
+    printf '%s[%s] [STEP] ===== %s =====%s\n' "$COLOR_STEP" "$(ts_utc)" "$message" "$COLOR_RESET" | tee -a "$GLOBAL_LOG"
+}
+
+log_debug() {
+    local message="$1"
+    if [[ "$DEBUG" == "1" ]]; then
+        printf '[%s] [DEBUG] %s\n' "$(ts_utc)" "$message" | tee -a "$GLOBAL_LOG"
+    fi
+}
+
+log_running_processes() {
+    local context="${1:-snapshot}"
+    if [[ "$VERBOSE" == "1" || "$DEBUG" == "1" ]]; then
+        log_debug "Prozessliste ($context): benchmark/json_benchmark/modsecurity"
+        ps -eo pid,ppid,etime,stat,comm,args \
+            | awk 'NR==1 || /benchmark|json_benchmark|modsecurity|nginx|apache2|httpd/' \
+            | tee -a "$GLOBAL_LOG"
+    fi
+}
+
+trace_preexec() {
+    local __trace_rc=$?
+    [[ "$TRACE_COMMANDS" == "1" ]] || return 0
+    [[ "${__IN_TRACE:-0}" == "1" ]] && return 0
+    __IN_TRACE=1
+    printf '[%s] [CMD] %s\n' "$(ts_utc)" "$BASH_COMMAND" | tee -a "$GLOBAL_LOG" >&2
+    __IN_TRACE=0
+    return "$__trace_rc"
+}
+
+error_handler() {
+    local exit_code=$?
+    local line_no="${BASH_LINENO[0]:-unknown}"
+    local source_file="${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}"
+    log_error "Abbruch mit Exit-Code $exit_code in ${source_file}:${line_no}"
+    log_error "Fehlgeschlagener Befehl: ${BASH_COMMAND}"
+    log_running_processes "error"
+    exit "$exit_code"
+}
+
+trap trace_preexec DEBUG
+trap error_handler ERR
+
+if [[ "$DEBUG" == "1" ]]; then
+    export PS4='+ [$(date -u +"%Y-%m-%dT%H:%M:%SZ")] [xtrace:${BASH_SOURCE##*/}:${LINENO}] '
+    set -x
+    log_info "Debug-Modus aktiviert (DEBUG=1)"
+fi
 
 is_number() {
     local value="${1:-}"
@@ -342,49 +428,53 @@ is_crs_v4_available() {
 
 ensure_crs_v3() {
     if is_crs_v3_available; then
+        log_info "CRS v3 bereits vorhanden, überspringe Download"
         return 0
     fi
 
-    log "CRS v3 not found -> triggering download"
+    log_step "CRS v3 Download"
+    log_info "CRS v3 not found -> triggering download"
     if [[ ! -x "$DOWNLOAD_CRS_V3_SCRIPT" ]]; then
-        log "ERROR: CRS v3 download script is not executable: $DOWNLOAD_CRS_V3_SCRIPT"
+        log_error "CRS v3 download script is not executable: $DOWNLOAD_CRS_V3_SCRIPT"
         return 1
     fi
     if ! "$DOWNLOAD_CRS_V3_SCRIPT" >> "$GLOBAL_LOG" 2>&1; then
-        log "ERROR: CRS v3 download failed"
+        log_error "CRS v3 download failed"
         return 1
     fi
 
     if ! is_crs_v3_available; then
-        log "ERROR: CRS v3 download failed"
+        log_error "CRS v3 download failed"
         return 1
     fi
 
-    log "CRS v3 download completed"
+    log_info "CRS v3 download completed"
     return 0
 }
 
 ensure_crs_v4() {
     if is_crs_v4_available; then
+        log_info "CRS v4 bereits vorhanden, überspringe Download"
         return 0
     fi
 
-    log "CRS v4 not found -> triggering download"
+    log_step "CRS v4 Download"
+    log_info "CRS v4 not found -> triggering download"
     if [[ ! -x "$DOWNLOAD_CRS_V4_SCRIPT" ]]; then
-        log "ERROR: CRS v4 download script is not executable: $DOWNLOAD_CRS_V4_SCRIPT"
+        log_error "CRS v4 download script is not executable: $DOWNLOAD_CRS_V4_SCRIPT"
         return 1
     fi
     if ! "$DOWNLOAD_CRS_V4_SCRIPT" >> "$GLOBAL_LOG" 2>&1; then
-        log "ERROR: CRS v4 download failed"
+        log_error "CRS v4 download failed"
         return 1
     fi
 
     if ! is_crs_v4_available; then
-        log "ERROR: CRS v4 download failed"
+        log_error "CRS v4 download failed"
         return 1
     fi
 
-    log "CRS v4 download completed"
+    log_info "CRS v4 download completed"
     return 0
 }
 
@@ -530,7 +620,7 @@ run_variant() {
     local vstart_ns="$(date +%s%N)"
     local vstart_iso="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-    log "START variant=$variant"
+    log_step "START variant=$variant"
     printf '[%s] start variant=%s\n' "$vstart_iso" "$variant" >> "$variant_log"
 
     if ! validate_variant_dependencies "$variant"; then
@@ -552,6 +642,8 @@ run_variant() {
     write_variant_metadata "$variant" "$variant_dir"
 
     local bench_cmd=("$BENCH_BIN" "$BENCH_ITERATIONS" "--scenario" "legacy-full" "--rules-file" "$BASIC_RULES")
+    log_info "Starte benchmark binary für variant=$variant"
+    log_running_processes "before benchmark variant=$variant"
     printf 'command=%q ' "${bench_cmd[@]}" >> "$commands_log"
     printf '\n' >> "$commands_log"
 
@@ -565,6 +657,7 @@ run_variant() {
         VARIANT_DURATION_NS["$variant"]=$(( $(date +%s%N) - vstart_ns ))
         return 1
     fi
+    log_running_processes "after benchmark variant=$variant"
 
     local elapsed_s avg_ns throughput interventions
     elapsed_s="$(awk '/elapsed_seconds:/ {print $2}' "$benchmark_raw" | tail -n1)"
@@ -582,9 +675,12 @@ run_variant() {
     local scenario size include_invalid output json_exit process_ns total_ns rss_kb success_count error_count derived_tps total_dynamic rss_dynamic derived_tps_fmt
 
     for size in "${SIZES[@]}"; do
+        log_step "JSON-Benchmark variant=$variant size=$size"
         for scenario in "${VALID_SCENARIOS[@]}"; do
             include_invalid="no"
             local json_cmd=("$JSON_BENCH_BIN" "--scenario" "$scenario" "--iterations" "$JSON_ITERATIONS" "--target-bytes" "$size" "--output" "json")
+            log_info "JSON benchmark start variant=$variant scenario=$scenario size=$size include_invalid=$include_invalid"
+            log_running_processes "before json scenario=$scenario size=$size"
             printf 'command=%q ' "${json_cmd[@]}" >> "$commands_log"
             printf '\n' >> "$commands_log"
 
@@ -594,6 +690,7 @@ run_variant() {
                 json_exit=$?
             fi
             printf 'exit_code=%s\n' "$json_exit" >> "$commands_log"
+            log_running_processes "after json scenario=$scenario size=$size"
 
             if [[ "$json_exit" -ne 0 ]]; then
                 printf '[%s] json_benchmark failed variant=%s scenario=%s size=%s include_invalid=%s exit=%s\n' \
@@ -627,6 +724,8 @@ run_variant() {
         for scenario in "${INVALID_SCENARIOS[@]}"; do
             include_invalid="yes"
             local json_cmd=("$JSON_BENCH_BIN" "--scenario" "$scenario" "--include-invalid" "--iterations" "$JSON_ITERATIONS" "--target-bytes" "$size" "--output" "json")
+            log_info "JSON benchmark start variant=$variant scenario=$scenario size=$size include_invalid=$include_invalid"
+            log_running_processes "before json invalid scenario=$scenario size=$size"
             printf 'command=%q ' "${json_cmd[@]}" >> "$commands_log"
             printf '\n' >> "$commands_log"
 
@@ -636,6 +735,7 @@ run_variant() {
                 json_exit=$?
             fi
             printf 'exit_code=%s\n' "$json_exit" >> "$commands_log"
+            log_running_processes "after json invalid scenario=$scenario size=$size"
 
             if [[ "$json_exit" -ne 0 ]]; then
                 printf '[%s] json_benchmark failed variant=%s scenario=%s size=%s include_invalid=%s exit=%s\n' \
@@ -711,10 +811,13 @@ run_variant() {
 }
 
 preflight_checks() {
+    log_step "Preflight checks"
+    log_info "Prüfe Binärdateien und Konfigurationsdateien"
     [[ -x "$BENCH_BIN" ]] || { echo "Fehler: benchmark binary fehlt: $BENCH_BIN" >&2; exit 1; }
     [[ -x "$JSON_BENCH_BIN" ]] || { echo "Fehler: json_benchmark binary fehlt: $JSON_BENCH_BIN" >&2; exit 1; }
     [[ -f "$BASIC_RULES" ]] || { echo "Fehler: rules file fehlt: $BASIC_RULES" >&2; exit 1; }
     [[ -f "$JSON_RULES" ]] || { echo "Fehler: rules file fehlt: $JSON_RULES" >&2; exit 1; }
+    log_info "Preflight checks abgeschlossen"
 }
 
 write_global_metadata() {
@@ -931,14 +1034,17 @@ build_comparison_outputs() {
 }
 
 main() {
+    log_step "Initialisierung"
+    log_info "Konfiguration: DEBUG=$DEBUG TRACE_COMMANDS=$TRACE_COMMANDS VERBOSE=$VERBOSE"
+    log_info "Artefakte: RESULTS_ROOT=$RESULTS_ROOT"
     preflight_checks
     write_global_metadata
     collect_system_metadata
     ensure_crs_v3
     ensure_crs_v4
 
-    log "Benchmark Gesamtlauf gestartet"
-    log "Results root: $RESULTS_ROOT"
+    log_step "Benchmark Gesamtlauf gestartet"
+    log_info "Results root: $RESULTS_ROOT"
 
     local overall_status="ok"
     local variant
@@ -946,7 +1052,7 @@ main() {
     for variant in "${VARIANTS[@]}"; do
         if ! run_variant "$variant"; then
             overall_status="failed"
-            log "Variant failed: $variant"
+            log_error "Variant failed: $variant"
         fi
     done
 
@@ -965,11 +1071,11 @@ main() {
         echo "overall_status=$overall_status"
     } >> "$RUN_META"
 
-    log "Benchmark Gesamtlauf beendet"
-    log "overall_status=$overall_status"
-    log "total_duration=$total_duration_fmt"
-    log "comparison_csv=$GLOBAL_STRUCTURED"
-    log "summary_report=$GLOBAL_REPORT"
+    log_step "Benchmark Gesamtlauf beendet"
+    log_info "overall_status=$overall_status"
+    log_info "total_duration=$total_duration_fmt"
+    log_info "comparison_csv=$GLOBAL_STRUCTURED"
+    log_info "summary_report=$GLOBAL_REPORT"
 
     if [[ "$overall_status" != "ok" ]]; then
         return 1
