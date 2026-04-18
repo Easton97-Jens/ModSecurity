@@ -16,6 +16,7 @@
 #ifndef SRC_UTILS_JSON_WRITER_H_
 #define SRC_UTILS_JSON_WRITER_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <string_view>

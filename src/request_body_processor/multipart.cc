@@ -15,6 +15,7 @@
 
 #include "src/request_body_processor/multipart.h"
 
+#include <cstddef>
 #include <time.h>
 #include <stdio.h>
 #include <string.h>

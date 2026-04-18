@@ -13,11 +13,14 @@
  *
  */
 
+#include <cstddef>
+#include <memory>
 #include <string>
 #include <iostream>
 #include <list>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #ifndef SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
 #define SRC_REQUEST_BODY_PROCESSOR_MULTIPART_H_
