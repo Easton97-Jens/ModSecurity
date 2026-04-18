@@ -90,8 +90,10 @@ std::string benchmarkBackend() {
     return "simdjson";
 #elif defined(MSC_JSON_BACKEND_JSONCONS)
     return "jsoncons";
+#elif defined(WITH_YAJL) || defined(HAVE_YAJL)
+    return "yajl";
 #else
-#error "A JSON backend must be selected at build time."
+    return "legacy-unknown";
 #endif
 }
 
