@@ -129,6 +129,7 @@ Default output root:
 Structure:
 - `run.log`: global run log
 - `run_metadata.txt`: global metadata
+- `system_info.txt`: run-time system/environment data (OS, kernel, host, CPU, RAM, virtualization hint)
 - `comparison.csv`: structured variant comparison
 - `report_summary.txt`: human-readable summary
 - `<variant>/`
@@ -164,6 +165,14 @@ Reasoning: reports should be readable while preserving raw values in raw/CSV fil
 - Global: start/end, status, report paths.
 - Per variant: start/end, commands, exit codes, errors, metadata.
 - Effective per-variant rule files are archived in `config/` to preserve exact run configuration.
+- The system baseline is captured per run in `system_info.txt` and referenced/partly mirrored in `run_metadata.txt`:
+  - distribution/version from `/etc/os-release` (when available),
+  - kernel/platform from `uname`,
+  - host/UTC timestamp/user context,
+  - CPU data from `lscpu` and/or `/proc/cpuinfo`,
+  - RAM from `/proc/meminfo`,
+  - optional virtualization hint from reliable indicators.
+- These values are factual environment metadata and do not, by themselves, prove “real hardware”.
 
 ## 11. Error Handling
 - `set -euo pipefail` is enabled.

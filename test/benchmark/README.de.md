@@ -130,6 +130,7 @@ Standard-Ausgabeort:
 Struktur:
 - `run.log`: globales Protokoll
 - `run_metadata.txt`: globale Metadaten
+- `system_info.txt`: System-/Umgebungsdaten des Laufs (OS, Kernel, Host, CPU, RAM, Virtualisierungshinweis)
 - `comparison.csv`: strukturierter Variantenvergleich
 - `report_summary.txt`: menschenlesbare Zusammenfassung
 - `<variant>/`
@@ -165,6 +166,14 @@ Warum: Die Reports sollen direkt lesbar sein, ohne Rohwerte zu verlieren (Rohwer
 - Global: Start/Ende, Status, Report-Pfade.
 - Pro Variante: Start/Ende, Kommandos, Exit-Codes, Fehler, Metadaten.
 - Effektive Rule-Dateien pro Variante werden archiviert (`config/`), damit die exakte Konfiguration nachvollziehbar bleibt.
+- Systembasis wird je Lauf separat protokolliert (`system_info.txt`) und in `run_metadata.txt` referenziert/teilweise gespiegelt:
+  - Distribution/Version aus `/etc/os-release` (falls vorhanden),
+  - Kernel/Plattform aus `uname`,
+  - Host/UTC-Zeit/Benutzerkontext,
+  - CPU-Daten aus `lscpu` und/oder `/proc/cpuinfo`,
+  - RAM aus `/proc/meminfo`,
+  - optionaler Virtualisierungshinweis aus belastbaren Indikatoren.
+- Diese Daten dokumentieren technische Fakten der Laufumgebung; sie beweisen nicht automatisch „echte Hardware“.
 
 ## 11. Fehlerbehandlung
 - `set -euo pipefail` aktiv.
@@ -212,4 +221,3 @@ Nicht Ziel dieses Systems (im Code nicht implementiert):
 - Keine erfundenen Features beschrieben.
 - Alle Hauptkomponenten entsprechen den Dateien/Skripten im Verzeichnis.
 - Deutsche und englische Sektion sind strukturell gleich.
-

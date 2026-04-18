@@ -18,6 +18,7 @@ GLOBAL_LOG="$RESULTS_ROOT/run.log"
 GLOBAL_REPORT="$RESULTS_ROOT/report_summary.txt"
 GLOBAL_STRUCTURED="$RESULTS_ROOT/comparison.csv"
 RUN_META="$RESULTS_ROOT/run_metadata.txt"
+SYSTEM_INFO_FILE="$RESULTS_ROOT/system_info.txt"
 
 BACKUP_DIR="$WORK_ROOT/original_rules"
 
@@ -727,7 +728,163 @@ write_global_metadata() {
         echo "json_iterations=$JSON_ITERATIONS"
         echo "sizes=${SIZES[*]}"
         echo "variants=${VARIANTS[*]}"
+        echo "system_info_file=$SYSTEM_INFO_FILE"
     } > "$RUN_META"
+}
+
+collect_system_metadata() {
+    local os_pretty="not_available"
+    local os_name="not_available"
+    local os_version="not_available"
+    local os_version_id="not_available"
+
+    local uname_s="not_available"
+    local uname_r="not_available"
+    local uname_m="not_available"
+    local uname_a="not_available"
+
+    local host_name="not_available"
+    local run_utc_now="not_available"
+    local user_name="not_available"
+
+    local cpu_model="not_available"
+    local cpu_arch="not_available"
+    local cpu_logical="not_available"
+    local cpu_physical_cores="not_available"
+    local cpu_freq_mhz="not_available"
+
+    local ram_total_kb="not_available"
+    local virtualization_hint="not_available"
+
+    if [[ -r "/etc/os-release" ]]; then
+        os_pretty="$(awk -F= '/^PRETTY_NAME=/{gsub(/"/,"",$2); print $2; exit}' /etc/os-release)"
+        os_name="$(awk -F= '/^NAME=/{gsub(/"/,"",$2); print $2; exit}' /etc/os-release)"
+        os_version="$(awk -F= '/^VERSION=/{gsub(/"/,"",$2); print $2; exit}' /etc/os-release)"
+        os_version_id="$(awk -F= '/^VERSION_ID=/{gsub(/"/,"",$2); print $2; exit}' /etc/os-release)"
+        os_pretty="${os_pretty:-not_available}"
+        os_name="${os_name:-not_available}"
+        os_version="${os_version:-not_available}"
+        os_version_id="${os_version_id:-not_available}"
+    fi
+
+    uname_s="$(uname -s 2>/dev/null || echo not_available)"
+    uname_r="$(uname -r 2>/dev/null || echo not_available)"
+    uname_m="$(uname -m 2>/dev/null || echo not_available)"
+    uname_a="$(uname -a 2>/dev/null || echo not_available)"
+
+    host_name="$(hostname 2>/dev/null || echo not_available)"
+    run_utc_now="$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo not_available)"
+    user_name="${USER:-$(id -un 2>/dev/null || echo not_available)}"
+
+    if command -v lscpu >/dev/null 2>&1; then
+        cpu_model="$(LC_ALL=C lscpu 2>/dev/null | awk -F: '/Model name:/{sub(/^[ \t]+/,"",$2); print $2; exit}')"
+        cpu_arch="$(LC_ALL=C lscpu 2>/dev/null | awk -F: '/Architecture:/{sub(/^[ \t]+/,"",$2); print $2; exit}')"
+        cpu_logical="$(LC_ALL=C lscpu 2>/dev/null | awk -F: '/^CPU\\(s\\):/{sub(/^[ \t]+/,"",$2); print $2; exit}')"
+        local cores_per_socket sockets
+        cores_per_socket="$(LC_ALL=C lscpu 2>/dev/null | awk -F: '/Core\\(s\\) per socket:/{sub(/^[ \t]+/,"",$2); print $2; exit}')"
+        sockets="$(LC_ALL=C lscpu 2>/dev/null | awk -F: '/Socket\\(s\\):/{sub(/^[ \t]+/,"",$2); print $2; exit}')"
+        if [[ "$cores_per_socket" =~ ^[0-9]+$ ]] && [[ "$sockets" =~ ^[0-9]+$ ]]; then
+            cpu_physical_cores="$((cores_per_socket * sockets))"
+        fi
+        cpu_freq_mhz="$(LC_ALL=C lscpu 2>/dev/null | awk -F: '
+            /CPU max MHz:/{sub(/^[ \t]+/,"",$2); if ($2 != "") {print $2; exit}}
+            /CPU MHz:/{sub(/^[ \t]+/,"",$2); if ($2 != "") {print $2; exit}}
+        ')"
+    fi
+
+    if [[ "$cpu_model" == "not_available" || -z "$cpu_model" ]] && [[ -r "/proc/cpuinfo" ]]; then
+        cpu_model="$(awk -F: '/^model name/{sub(/^[ \t]+/,"",$2); print $2; exit}' /proc/cpuinfo)"
+    fi
+    if [[ "$cpu_arch" == "not_available" || -z "$cpu_arch" ]]; then
+        cpu_arch="$uname_m"
+    fi
+    if [[ "$cpu_logical" == "not_available" || -z "$cpu_logical" ]]; then
+        if command -v getconf >/dev/null 2>&1; then
+            cpu_logical="$(getconf _NPROCESSORS_ONLN 2>/dev/null || true)"
+        fi
+        if [[ -z "$cpu_logical" ]] && command -v nproc >/dev/null 2>&1; then
+            cpu_logical="$(nproc 2>/dev/null || true)"
+        fi
+        if [[ -z "$cpu_logical" ]] && [[ -r "/proc/cpuinfo" ]]; then
+            cpu_logical="$(awk -F: '/^processor/{count++} END{if (count>0) print count}' /proc/cpuinfo)"
+        fi
+    fi
+    if [[ "$cpu_physical_cores" == "not_available" || -z "$cpu_physical_cores" ]] && [[ -r "/proc/cpuinfo" ]]; then
+        cpu_physical_cores="$(awk -F: '
+            /^physical id/{pid=$2; gsub(/^[ \t]+/,"",pid)}
+            /^cpu cores/{cores=$2; gsub(/^[ \t]+/,"",cores); if (pid != "" && cores ~ /^[0-9]+$/) map[pid]=cores}
+            END {sum=0; for (k in map) sum+=map[k]; if (sum>0) print sum}
+        ' /proc/cpuinfo)"
+    fi
+    if [[ "$cpu_freq_mhz" == "not_available" || -z "$cpu_freq_mhz" ]] && [[ -r "/proc/cpuinfo" ]]; then
+        cpu_freq_mhz="$(awk -F: '/^cpu MHz/{sub(/^[ \t]+/,"",$2); print $2; exit}' /proc/cpuinfo)"
+    fi
+
+    cpu_model="${cpu_model:-not_available}"
+    cpu_arch="${cpu_arch:-not_available}"
+    cpu_logical="${cpu_logical:-not_available}"
+    cpu_physical_cores="${cpu_physical_cores:-not_available}"
+    cpu_freq_mhz="${cpu_freq_mhz:-not_available}"
+
+    if [[ -r "/proc/meminfo" ]]; then
+        ram_total_kb="$(awk '/^MemTotal:/{print $2; exit}' /proc/meminfo)"
+        ram_total_kb="${ram_total_kb:-not_available}"
+    fi
+
+    if command -v systemd-detect-virt >/dev/null 2>&1; then
+        local virt_out
+        virt_out="$(systemd-detect-virt 2>/dev/null || true)"
+        if [[ -n "$virt_out" && "$virt_out" != "none" ]]; then
+            virtualization_hint="$virt_out"
+        fi
+    fi
+    if [[ "$virtualization_hint" == "not_available" ]]; then
+        if [[ -f "/.dockerenv" ]]; then
+            virtualization_hint="docker_env_file_detected"
+        elif [[ -r "/proc/1/cgroup" ]] && grep -Eq '(docker|containerd|kubepods|lxc)' /proc/1/cgroup; then
+            virtualization_hint="container_cgroup_detected"
+        else
+            virtualization_hint="not_detected"
+        fi
+    fi
+
+    {
+        echo "system_info_collected_utc=$run_utc_now"
+        echo "os_pretty_name=$os_pretty"
+        echo "os_name=$os_name"
+        echo "os_version=$os_version"
+        echo "os_version_id=$os_version_id"
+        echo "uname_s=$uname_s"
+        echo "uname_r=$uname_r"
+        echo "uname_m=$uname_m"
+        echo "uname_a=$uname_a"
+        echo "hostname=$host_name"
+        echo "user_name=$user_name"
+        echo "cpu_model=$cpu_model"
+        echo "cpu_architecture=$cpu_arch"
+        echo "cpu_logical_count=$cpu_logical"
+        echo "cpu_physical_cores=$cpu_physical_cores"
+        echo "cpu_frequency_mhz=$cpu_freq_mhz"
+        echo "ram_total_kb=$ram_total_kb"
+        echo "virtualization_hint=$virtualization_hint"
+    } > "$SYSTEM_INFO_FILE"
+
+    {
+        echo "system_info_collected_utc=$run_utc_now"
+        echo "system_os_pretty_name=$os_pretty"
+        echo "system_uname_s=$uname_s"
+        echo "system_uname_r=$uname_r"
+        echo "system_uname_m=$uname_m"
+        echo "system_hostname=$host_name"
+        echo "system_cpu_model=$cpu_model"
+        echo "system_cpu_architecture=$cpu_arch"
+        echo "system_cpu_logical_count=$cpu_logical"
+        echo "system_cpu_physical_cores=$cpu_physical_cores"
+        echo "system_ram_total_kb=$ram_total_kb"
+        echo "system_virtualization_hint=$virtualization_hint"
+    } >> "$RUN_META"
+
+    log "System metadata collected: $SYSTEM_INFO_FILE"
 }
 
 build_comparison_outputs() {
@@ -776,6 +933,7 @@ build_comparison_outputs() {
 main() {
     preflight_checks
     write_global_metadata
+    collect_system_metadata
     ensure_crs_v3
     ensure_crs_v4
 
