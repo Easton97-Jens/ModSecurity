@@ -34,7 +34,14 @@
 #include "modsecurity/modsecurity.h"
 #include "modsecurity/rules_set.h"
 #include "modsecurity/transaction.h"
+
+#if defined(__has_include)
+#if __has_include("src/request_body_processor/json_instrumentation.h")
 #include "src/request_body_processor/json_instrumentation.h"
+#define MSC_HAVE_JSON_INSTRUMENTATION_HEADER 1
+#endif
+#endif
+
 
 #ifndef MSC_JSON_BENCHMARK_RULES_DIR
 #error "MSC_JSON_BENCHMARK_RULES_DIR must be defined by the build system."
@@ -437,7 +444,8 @@ void printJson(const Options &options, const std::string &body,
         metrics.parse_error_count, first);
     printJsonNumericField("ru_maxrss_kb", currentMaxRssKb(), first);
 
-#ifdef MSC_JSON_AUDIT_INSTRUMENTATION
+#if defined(MSC_JSON_AUDIT_INSTRUMENTATION)
+#if defined(MSC_HAVE_JSON_INSTRUMENTATION_HEADER)
     const modsecurity::RequestBodyProcessor::JsonInstrumentationMetrics
         instrumentation =
             modsecurity::RequestBodyProcessor::jsonInstrumentationSnapshot();
@@ -478,6 +486,7 @@ void printJson(const Options &options, const std::string &body,
         instrumentation.jsoncons_token_sync_steps, first);
     printJsonNumericField("jsoncons_token_exact_advance_steps",
         instrumentation.jsoncons_token_exact_advance_steps, first);
+#endif
 #endif
 
     std::cout << "}" << std::endl;
@@ -522,7 +531,9 @@ int main(int argc, const char *argv[]) {
             return 1;
         }
 
+#if defined(MSC_HAVE_JSON_INSTRUMENTATION_HEADER)
         modsecurity::RequestBodyProcessor::jsonInstrumentationReset();
+#endif
         const Metrics metrics = runBenchmark(&modsec, &rules, body, options);
 
         if (options.output_json) {
