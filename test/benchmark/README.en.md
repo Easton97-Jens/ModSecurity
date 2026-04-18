@@ -90,12 +90,12 @@ Short parameter explanation:
 - `--rules-file`: path to the rules file loaded for this run.
 
 Output summary includes:
-- `scenario`
-- `rules_file`
-- `elapsed_seconds`
-- `avg_transaction_ns`
-- `throughput_tx_per_sec`
-- `interventions`
+- `scenario`: indicates which benchmark flow actually ran (`legacy-full` or `request-only`), so results are tied to a specific transaction path.
+- `rules_file`: indicates which rule file was loaded; this is required to interpret results against a concrete ruleset.
+- `elapsed_seconds`: total loop runtime across all iterations; for equal iteration counts, lower values indicate faster overall execution.
+- `avg_transaction_ns`: average per-transaction duration in nanoseconds; this normalizes runtime to a single transaction cost.
+- `throughput_tx_per_sec`: runtime-derived throughput in transactions per second; higher values indicate more processed transactions per unit time.
+- `interventions`: number of detected intervention events during the run; higher values indicate more frequent rule-triggered flow interventions.
 
 #### `json_benchmark`
 Examples:
@@ -107,20 +107,12 @@ cd test/benchmark
 ```
 
 Key parameters:
-- `--scenario NAME` (required)
-- `--iterations N`
-- `--target-bytes N`
-- `--depth N`
-- `--include-invalid` (required for `truncated`/`malformed`)
-- `--output json`
-
-Short parameter explanation:
-- `--scenario`: selects which JSON scenario is generated/tested.
-- `--iterations`: positive integer; number of executions for the selected scenario.
-- `--target-bytes`: target payload size for size-based scenarios (for example `large-object`, `numbers`, `utf8`).
-- `--depth`: nesting depth for `deep-nesting`.
-- `--include-invalid`: explicitly enables invalid JSON scenarios (`truncated`, `malformed`).
-- `--output json`: emits machine-readable JSON metrics (used by the runner parser).
+- `--scenario NAME` (required): selects the JSON scenario whose body is generated and measured; without it, the benchmark does not start.
+- `--iterations N`: sets the number of repetitions; higher values typically stabilize averages but increase runtime.
+- `--target-bytes N`: sets target payload size for size-driven scenarios; this controls JSON processing workload size.
+- `--depth N`: sets nesting depth for `deep-nesting`; relevant when evaluating deeply nested JSON structures.
+- `--include-invalid`: enables intentionally invalid JSON scenarios (`truncated`, `malformed`) and is required for those scenarios.
+- `--output json`: switches to machine-readable JSON output; important for automated parsing in the runner.
 
 ### B) Full runner (`test.sh`)
 ```bash

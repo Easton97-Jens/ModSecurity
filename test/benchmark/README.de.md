@@ -91,12 +91,12 @@ Kurzer Parameterhinweis:
 - `--rules-file`: Pfad zur Rule-Datei, die der Lauf laden soll.
 
 Ausgabe enthält eine Summary mit:
-- `scenario`
-- `rules_file`
-- `elapsed_seconds`
-- `avg_transaction_ns`
-- `throughput_tx_per_sec`
-- `interventions`
+- `scenario`: zeigt, welcher Benchmark-Ablauf tatsächlich verwendet wurde (`legacy-full` oder `request-only`); damit ist klar, auf welchen Transaktionspfad sich die Messung bezieht.
+- `rules_file`: zeigt die geladene Rule-Datei; dieser Wert ist wichtig, um Messergebnisse einer konkreten Regelbasis zuzuordnen.
+- `elapsed_seconds`: gesamte Laufzeit des Loops über alle Iterationen; bei gleicher Iterationszahl bedeuten kleinere Werte schnellere Gesamtausführung.
+- `avg_transaction_ns`: durchschnittliche Zeit pro Transaktion in Nanosekunden; dieser Wert normalisiert die Laufzeit auf eine Einzeltransaktion.
+- `throughput_tx_per_sec`: aus der Laufzeit abgeleiteter Durchsatz in Transaktionen pro Sekunde; höhere Werte bedeuten mehr verarbeitete Transaktionen pro Zeit.
+- `interventions`: Anzahl erkannter Interventionsereignisse im Lauf; ein hoher Wert zeigt, dass Regeln häufiger in den Request-/Response-Fluss eingegriffen haben.
 
 #### `json_benchmark`
 Beispiele:
@@ -108,20 +108,12 @@ cd test/benchmark
 ```
 
 Wichtige Parameter:
-- `--scenario NAME` (Pflicht)
-- `--iterations N`
-- `--target-bytes N`
-- `--depth N`
-- `--include-invalid` (erforderlich für `truncated`/`malformed`)
-- `--output json`
-
-Kurzer Parameterhinweis:
-- `--scenario`: bestimmt, welches JSON-Szenario erzeugt/getestet wird.
-- `--iterations`: positive Ganzzahl; wie oft das Szenario ausgeführt wird.
-- `--target-bytes`: Zielgröße für größenbasierte Szenarien (z. B. `large-object`, `numbers`, `utf8`).
-- `--depth`: Tiefe für `deep-nesting`.
-- `--include-invalid`: erlaubt explizit ungültige JSON-Szenarien (`truncated`, `malformed`).
-- `--output json`: gibt Metriken als JSON-Objekt aus (für Runner-Parsing).
+- `--scenario NAME` (Pflicht): wählt das JSON-Szenario, dessen Body erzeugt und gemessen wird; ohne diesen Parameter startet der Benchmark nicht.
+- `--iterations N`: bestimmt die Anzahl der Wiederholungen; größere Werte stabilisieren typischerweise den Mittelwert, erhöhen aber die Laufzeit.
+- `--target-bytes N`: setzt die Zielgröße für größenabhängige Szenarien; damit wird der Lastumfang der JSON-Verarbeitung gesteuert.
+- `--depth N`: setzt die Verschachtelungstiefe für `deep-nesting`; relevant zur Bewertung tiefer JSON-Strukturen.
+- `--include-invalid`: aktiviert absichtlich ungültige JSON-Szenarien (`truncated`, `malformed`) und ist für diese Szenarien erforderlich.
+- `--output json`: schaltet auf maschinenlesbare JSON-Ausgabe um; wichtig für automatisches Parsing im Runner.
 
 ### B) Vollständiger Runner (`test.sh`)
 ```bash
