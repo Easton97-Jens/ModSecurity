@@ -142,6 +142,100 @@ Warum Größen/Szenarien getrennt:
 - gültige Szenarien zeigen Normalpfade,
 - ungültige Szenarien prüfen Fehlerpfade des JSON-Parsers.
 
+### Konfigurierbare Parameter / Umgebungsvariablen
+
+#### `RESULTS_ROOT`
+- **Standard:** `test/benchmark/results/<utc_timestamp>` (im Skript aus `BENCH_DIR/results/$RUN_TS_UTC` abgeleitet)
+- **Bedeutung:** Zielverzeichnis für alle erzeugten Artefakte (`run.log`, `comparison.csv`, Variantendaten usw.).
+- **Wann ändern:** Wenn Ergebnisse an einem festen oder externen Pfad abgelegt werden sollen.
+- **Beispiel:**
+  ```bash
+  RESULTS_ROOT=/tmp/modsec-bench-results ./test.sh
+  ```
+
+#### `BENCH_ITERATIONS`
+- **Standard:** `1000000`
+- **Bedeutung:** Iterationszahl für den `benchmark`-Lauf pro Variante.
+- **Wann ändern:** Für schnellere Smoke-Läufe (kleiner) oder stabilere Messungen (größer).
+- **Beispiel:**
+  ```bash
+  BENCH_ITERATIONS=200000 ./test.sh
+  ```
+
+#### `JSON_ITERATIONS`
+- **Standard:** `100`
+- **Bedeutung:** Iterationszahl für jeden `json_benchmark`-Aufruf pro Größe/Szenario und Variante.
+- **Wann ändern:** Für kürzere Testläufe oder höhere statistische Stabilität.
+- **Beispiel:**
+  ```bash
+  JSON_ITERATIONS=20 ./test.sh
+  ```
+
+#### `CRS_V3_SETUP`
+- **Standard:** `test/benchmark/owasp-v3/crs-setup.conf.example`
+- **Bedeutung:** Pfad zur CRS-v3-Setup-Datei, die für die Variante `crs_v3` eingebunden wird.
+- **Wann ändern:** Wenn CRS v3 an einem abweichenden Ort liegt.
+- **Beispiel:**
+  ```bash
+  CRS_V3_SETUP=/opt/crs-v3/crs-setup.conf.example ./test.sh
+  ```
+
+#### `CRS_V3_RULES_GLOB`
+- **Standard:** `test/benchmark/owasp-v3/rules/*.conf`
+- **Bedeutung:** Glob-Muster für CRS-v3-Regeldateien in `crs_v3`.
+- **Wann ändern:** Bei anderer CRS-v3-Verzeichnisstruktur.
+- **Beispiel:**
+  ```bash
+  CRS_V3_RULES_GLOB="/opt/crs-v3/rules/*.conf" ./test.sh
+  ```
+
+#### `CRS_V4_SETUP`
+- **Standard:** `test/benchmark/owasp-v4/crs-setup.conf.example`
+- **Bedeutung:** Pfad zur CRS-v4-Setup-Datei für die Variante `crs_v4`.
+- **Wann ändern:** Wenn CRS v4 nicht im Standardpfad liegt.
+- **Beispiel:**
+  ```bash
+  CRS_V4_SETUP=/opt/crs-v4/crs-setup.conf.example ./test.sh
+  ```
+
+#### `CRS_V4_RULES_GLOB`
+- **Standard:** `test/benchmark/owasp-v4/rules/*.conf`
+- **Bedeutung:** Glob-Muster für CRS-v4-Regeldateien in `crs_v4`.
+- **Wann ändern:** Bei abweichender Ablagestruktur der CRS-v4-Regeln.
+- **Beispiel:**
+  ```bash
+  CRS_V4_RULES_GLOB="/opt/crs-v4/rules/*.conf" ./test.sh
+  ```
+
+#### Feste Listen im Skript (`SIZES`, `VALID_SCENARIOS`, `INVALID_SCENARIOS`)
+- **Standardwerte:**  
+  - `SIZES=(256 4096 51200 1048576)`  
+  - `VALID_SCENARIOS=(utf8 numbers deep-nesting large-object)`  
+  - `INVALID_SCENARIOS=(truncated malformed)`
+- **Bedeutung:** Definieren die getesteten Größen/Szenarien im Runner.
+- **Hinweis:** Diese Listen sind im aktuellen Skript fest definiert und nicht als Umgebungsvariablen überschreibbar.
+
+### Beispiele für angepasste Läufe
+
+#### Weniger Iterationen (schneller Smoke-Run)
+```bash
+BENCH_ITERATIONS=1000 JSON_ITERATIONS=5 ./test.sh
+```
+
+#### Eigener Ergebnisordner
+```bash
+RESULTS_ROOT=/tmp/modsec-bench ./test.sh
+```
+
+#### Eigene CRS-Pfade
+```bash
+CRS_V3_SETUP=/opt/crs-v3/crs-setup.conf.example \
+CRS_V3_RULES_GLOB="/opt/crs-v3/rules/*.conf" \
+CRS_V4_SETUP=/opt/crs-v4/crs-setup.conf.example \
+CRS_V4_RULES_GLOB="/opt/crs-v4/rules/*.conf" \
+./test.sh
+```
+
 ## 5. Varianten
 | Variante | Regelzustand |
 |---|---|
