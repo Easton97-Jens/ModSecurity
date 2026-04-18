@@ -5,7 +5,8 @@ noinst_PROGRAMS = \
 	json_benchmark
 
 EXTRA_DIST = \
-	README.md \
+	README.de.md \
+	README.en.md \
 	basic_rules.conf \
 	json_benchmark_rules.conf \
 	run-json-benchmarks.sh \
