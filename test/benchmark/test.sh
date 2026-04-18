@@ -34,6 +34,15 @@ CRS_V3_SETUP="${CRS_V3_SETUP:-$BENCH_DIR/owasp-v3/crs-setup.conf.example}"
 CRS_V3_RULES_GLOB="${CRS_V3_RULES_GLOB:-$BENCH_DIR/owasp-v3/rules/*.conf}"
 CRS_V4_SETUP="${CRS_V4_SETUP:-$BENCH_DIR/owasp-v4/crs-setup.conf.example}"
 CRS_V4_RULES_GLOB="${CRS_V4_RULES_GLOB:-$BENCH_DIR/owasp-v4/rules/*.conf}"
+DOWNLOAD_CRS_V3_SCRIPT="$BENCH_DIR/download-owasp-v3-rules.sh"
+DOWNLOAD_CRS_V4_SCRIPT="$BENCH_DIR/download-owasp-v4-rules.sh"
+
+# Automatic CRS bootstrap:
+# - If CRS v3/v4 setup file or rules are missing, this script triggers the
+#   corresponding download script before benchmark execution starts.
+# - If CRS artifacts already exist, nothing is downloaded (idempotent behavior).
+# - You can override paths via:
+#   CRS_V3_SETUP, CRS_V3_RULES_GLOB, CRS_V4_SETUP, CRS_V4_RULES_GLOB.
 
 mkdir -p "$RESULTS_ROOT" "$WORK_ROOT" "$BACKUP_DIR"
 
@@ -315,6 +324,66 @@ validate_variant_dependencies() {
             ;;
     esac
 
+    return 0
+}
+
+is_crs_v3_available() {
+    [[ -f "$CRS_V3_SETUP" ]] || return 1
+    compgen -G "$CRS_V3_RULES_GLOB" > /dev/null || return 1
+    return 0
+}
+
+is_crs_v4_available() {
+    [[ -f "$CRS_V4_SETUP" ]] || return 1
+    compgen -G "$CRS_V4_RULES_GLOB" > /dev/null || return 1
+    return 0
+}
+
+ensure_crs_v3() {
+    if is_crs_v3_available; then
+        return 0
+    fi
+
+    log "CRS v3 not found -> triggering download"
+    if [[ ! -x "$DOWNLOAD_CRS_V3_SCRIPT" ]]; then
+        log "ERROR: CRS v3 download script is not executable: $DOWNLOAD_CRS_V3_SCRIPT"
+        return 1
+    fi
+    if ! "$DOWNLOAD_CRS_V3_SCRIPT" >> "$GLOBAL_LOG" 2>&1; then
+        log "ERROR: CRS v3 download failed"
+        return 1
+    fi
+
+    if ! is_crs_v3_available; then
+        log "ERROR: CRS v3 download failed"
+        return 1
+    fi
+
+    log "CRS v3 download completed"
+    return 0
+}
+
+ensure_crs_v4() {
+    if is_crs_v4_available; then
+        return 0
+    fi
+
+    log "CRS v4 not found -> triggering download"
+    if [[ ! -x "$DOWNLOAD_CRS_V4_SCRIPT" ]]; then
+        log "ERROR: CRS v4 download script is not executable: $DOWNLOAD_CRS_V4_SCRIPT"
+        return 1
+    fi
+    if ! "$DOWNLOAD_CRS_V4_SCRIPT" >> "$GLOBAL_LOG" 2>&1; then
+        log "ERROR: CRS v4 download failed"
+        return 1
+    fi
+
+    if ! is_crs_v4_available; then
+        log "ERROR: CRS v4 download failed"
+        return 1
+    fi
+
+    log "CRS v4 download completed"
     return 0
 }
 
@@ -707,6 +776,8 @@ build_comparison_outputs() {
 main() {
     preflight_checks
     write_global_metadata
+    ensure_crs_v3
+    ensure_crs_v4
 
     log "Benchmark Gesamtlauf gestartet"
     log "Results root: $RESULTS_ROOT"
