@@ -18,8 +18,10 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <chrono>
+#include <vector>
 
 #include "modsecurity/rules_set.h"
 #include "modsecurity/modsecurity.h"
@@ -31,7 +33,8 @@ namespace {
 constexpr const char *kRequestUri = "/test.pl?param1=test&para2=test2";
 constexpr const char *kClientIp = "198.51.100.10";  // RFC 5737 documentation range
 constexpr const char *kServerIp = "198.51.100.20";  // RFC 5737 documentation range
-constexpr const char *kRulesFile = "basic_rules.conf";
+constexpr const char *kDefaultRulesFile = "basic_rules.conf";
+constexpr const char *kDefaultScenario = "legacy-full";
 
 }  // namespace
 
@@ -47,153 +50,291 @@ unsigned char response_body[] = "" \
     "  </soap:Body>\n\r" \
     "</soap:Envelope>\n\r";
 
-const char* const help_message = "Usage: benchmark [num_iterations|-h|-?|--help]";
+const char* const help_message =
+    "Usage: benchmark [num_iterations] "
+    "[--scenario legacy-full|request-only] "
+    "[--rules-file PATH] "
+    "[-h|-?|--help]";
 
-int main(int argc, const char *argv[]) {
+struct BenchmarkConfig {
+    unsigned long long numRequests = 1000000;
+    std::string scenarioName = kDefaultScenario;
+    std::string rulesFile = kDefaultRulesFile;
+};
 
-    unsigned long long NUM_REQUESTS(1000000);
+struct BenchmarkCounters {
+    unsigned long long interventions = 0;
+};
 
-    if (argc > 1) {
-        if (0 == strcmp(argv[1], "-h") ||
-            0 == strcmp(argv[1], "-?") ||
-            0 == strcmp(argv[1], "--help")) {
-            std::cout << help_message << std::endl;
-            return 0;
+struct BenchmarkRunSummary {
+    BenchmarkConfig config;
+    BenchmarkCounters counters;
+    std::chrono::nanoseconds elapsed = std::chrono::nanoseconds::zero();
+};
+
+class ScenarioProvider {
+ public:
+    virtual ~ScenarioProvider() = default;
+    virtual const char *name() const = 0;
+    virtual bool execute(Transaction *transaction,
+        modsecurity::ModSecurityIntervention *intervention,
+        BenchmarkCounters *counters) const = 0;
+};
+
+class LegacyFullScenario : public ScenarioProvider {
+ public:
+    const char *name() const override {
+        return "legacy-full";
+    }
+
+    bool execute(Transaction *transaction,
+        modsecurity::ModSecurityIntervention *intervention,
+        BenchmarkCounters *counters) const override {
+        transaction->processConnection(kClientIp, 12345, kServerIp, 80);
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
         }
-        errno = 0;
-        unsigned long long upper = strtoull(argv[1], 0, 10);
-        if (!errno && upper) {
-            NUM_REQUESTS = upper;
-        } else {
+
+        transaction->processURI(kRequestUri, "GET", "1.1");
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->addRequestHeader("Host", "net.tutsplus.com");
+        transaction->addRequestHeader("User-Agent",
+            "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) "
+            "Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)");
+        transaction->addRequestHeader("Accept",
+            "text/html,application/xhtml+xml,application/xml;"
+            "q=0.9,*/*;q=0.8");
+        transaction->addRequestHeader("Accept-Language", "en-us,en;q=0.5");
+        transaction->addRequestHeader("Accept-Encoding", "gzip,deflate");
+        transaction->addRequestHeader("Accept-Charset",
+            "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+        transaction->addRequestHeader("Keep-Alive", "300");
+        transaction->addRequestHeader("Connection", "keep-alive");
+        transaction->addRequestHeader("Cookie",
+            "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120");
+        transaction->addRequestHeader("Pragma", "no-cache");
+        transaction->addRequestHeader("Cache-Control", "no-cache");
+        transaction->processRequestHeaders();
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->processRequestBody();
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->addResponseHeader("HTTP/1.1", "200 OK");
+        transaction->addResponseHeader("Content-Type", "text/xml; charset=utf-8");
+        transaction->addResponseHeader("Content-Length", "200");
+        transaction->processResponseHeaders(200, "HTTP 1.2");
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->appendResponseBody(response_body, strlen((const char*)response_body));
+        transaction->processResponseBody();
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        return true;
+    }
+};
+
+class RequestOnlyScenario : public ScenarioProvider {
+ public:
+    const char *name() const override {
+        return "request-only";
+    }
+
+    bool execute(Transaction *transaction,
+        modsecurity::ModSecurityIntervention *intervention,
+        BenchmarkCounters *counters) const override {
+        transaction->processConnection(kClientIp, 12345, kServerIp, 80);
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->processURI(kRequestUri, "GET", "1.1");
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->addRequestHeader("Host", "net.tutsplus.com");
+        transaction->addRequestHeader("User-Agent", "ModSecurity-benchmark/request-only");
+        transaction->addRequestHeader("Accept", "*/*");
+        transaction->processRequestHeaders();
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        transaction->processRequestBody();
+        if (transaction->intervention(intervention)) {
+            std::cout << "There is an intervention" << std::endl;
+            counters->interventions++;
+            return false;
+        }
+
+        return true;
+    }
+};
+
+bool parseBenchmarkConfig(int argc, const char *argv[], BenchmarkConfig *config) {
+    bool positionalIterationsConsumed = false;
+    for (int i = 1; i < argc; i++) {
+        const std::string argument(argv[i]);
+        if (argument == "-h" || argument == "-?" || argument == "--help") {
+            std::cout << help_message << std::endl;
+            return false;
+        }
+
+        if (argument == "--scenario") {
+            if (i + 1 >= argc) {
+                std::cerr << "Missing value for --scenario\n" << help_message << std::endl;
+                return false;
+            }
+            config->scenarioName = argv[++i];
+            continue;
+        }
+
+        if (argument == "--rules-file") {
+            if (i + 1 >= argc) {
+                std::cerr << "Missing value for --rules-file\n" << help_message << std::endl;
+                return false;
+            }
+            config->rulesFile = argv[++i];
+            continue;
+        }
+
+        if (!positionalIterationsConsumed) {
+            errno = 0;
+            unsigned long long upper = strtoull(argv[i], 0, 10);
+            if (!errno && upper) {
+                config->numRequests = upper;
+                positionalIterationsConsumed = true;
+                continue;
+            }
             if (errno) {
                 perror("Invalid number of iterations");
             } else {
-                std::cerr << "Failed to convert '" << argv[1] << "' to integer value" << std::endl
-                          << help_message << std::endl;
-                return -1;
+                std::cerr << "Failed to convert '" << argv[i]
+                          << "' to integer value" << std::endl;
             }
+            return false;
         }
+
+        std::cerr << "Unknown argument: " << argument << std::endl
+                  << help_message << std::endl;
+        return false;
     }
-    std::cout << "Doing " << NUM_REQUESTS << " transactions...\n";
-    modsecurity::ModSecurity *modsec;
-    modsecurity::RulesSet *rules;
+    return true;
+}
+
+std::unique_ptr<ScenarioProvider> createScenarioProvider(
+    const std::string& scenarioName) {
+    if (scenarioName == "legacy-full") {
+        return std::unique_ptr<ScenarioProvider>(new LegacyFullScenario());
+    }
+
+    if (scenarioName == "request-only") {
+        return std::unique_ptr<ScenarioProvider>(new RequestOnlyScenario());
+    }
+
+    return nullptr;
+}
+
+void printReport(const BenchmarkRunSummary& summary) {
+    const long double elapsed_seconds =
+        static_cast<long double>(summary.elapsed.count()) / 1000000000.0L;
+    const long double avg_tx_ns =
+        static_cast<long double>(summary.elapsed.count())
+        / static_cast<long double>(summary.config.numRequests);
+    const long double tx_per_sec =
+        static_cast<long double>(summary.config.numRequests) / elapsed_seconds;
+
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "Summary:\n";
+    std::cout << "  scenario: " << summary.config.scenarioName << "\n";
+    std::cout << "  rules_file: " << summary.config.rulesFile << "\n";
+    std::cout << "  elapsed_seconds: " << elapsed_seconds << "\n";
+    std::cout << "  avg_transaction_ns: " << avg_tx_ns << "\n";
+    std::cout << "  throughput_tx_per_sec: " << tx_per_sec << "\n";
+    std::cout << "  interventions: " << summary.counters.interventions << "\n";
+}
+
+int main(int argc, const char *argv[]) {
+    BenchmarkConfig config;
+    if (!parseBenchmarkConfig(argc, argv, &config)) {
+        return 0;
+    }
+    std::unique_ptr<ScenarioProvider> scenario =
+        createScenarioProvider(config.scenarioName);
+    if (!scenario) {
+        std::cerr << "Unknown scenario '" << config.scenarioName << "'." << std::endl;
+        std::cerr << "Available scenarios: legacy-full, request-only" << std::endl;
+        return -1;
+    }
+
+    std::cout << "Doing " << config.numRequests << " transactions...\n";
+    std::cout << "Scenario: " << scenario->name() << "\n";
+    std::cout << "Rules file: " << config.rulesFile << "\n";
+    modsecurity::ModSecurity *modsec = new modsecurity::ModSecurity();
+    modsecurity::RulesSet *rules = new modsecurity::RulesSet();
     modsecurity::ModSecurityIntervention it;
     modsecurity::intervention::clean(&it);
-    modsec = new modsecurity::ModSecurity();
-    modsec->setConnectorInformation("ModSecurity-benchmark v0.0.1-alpha" \
+    modsec->setConnectorInformation("ModSecurity-benchmark v0.0.1-alpha"
             " (ModSecurity benchmark utility)");
 
-    rules = new modsecurity::RulesSet();
-    if (rules->loadFromUri(kRulesFile) < 0) {
+    if (rules->loadFromUri(config.rulesFile.c_str()) < 0) {
         std::cout << "Problems loading the rules..." << std::endl;
         std::cout << rules->m_parserError.str() << std::endl;
+        delete rules;
+        delete modsec;
         return -1;
     }
 
     // Start timing after one-time setup to measure only transaction processing.
     const auto benchmark_start = std::chrono::steady_clock::now();
+    BenchmarkCounters counters;
 
-    for (unsigned long long i = 0; i < NUM_REQUESTS; i++) {
-        //std::cout << "Proceeding with request " << i << std::endl;
-
+    for (unsigned long long i = 0; i < config.numRequests; i++) {
         Transaction *modsecTransaction = new Transaction(modsec, rules, NULL);
-        modsecTransaction->processConnection(kClientIp, 12345, kServerIp, 80);
-
-        if (modsecTransaction->intervention(&it)) {
-            std::cout << "There is an intervention" << std::endl;
-            goto next_request;
-        }
-        modsecTransaction->processURI(kRequestUri, "GET", "1.1");
-        if (modsecTransaction->intervention(&it)) {
-            std::cout << "There is an intervention" << std::endl;
-            goto next_request;
-        }
-
-        modsecTransaction->addRequestHeader("Host",
-            "net.tutsplus.com");
-        modsecTransaction->addRequestHeader("User-Agent",
-            "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) " \
-            "Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)");
-        modsecTransaction->addRequestHeader("Accept",
-            "text/html,application/xhtml+xml,application/xml;" \
-            "q=0.9,*/*;q=0.8");
-        modsecTransaction->addRequestHeader("Accept-Language",
-            "en-us,en;q=0.5");
-        modsecTransaction->addRequestHeader("Accept-Encoding",
-            "gzip,deflate");
-        modsecTransaction->addRequestHeader("Accept-Charset",
-            "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
-        modsecTransaction->addRequestHeader("Keep-Alive",
-            "300");
-        modsecTransaction->addRequestHeader("Connection",
-            "keep-alive");
-        modsecTransaction->addRequestHeader("Cookie",
-            "PHPSESSID=r2t5uvjq435r4q7ib3vtdjq120");
-        modsecTransaction->addRequestHeader("Pragma",
-            "no-cache");
-        modsecTransaction->addRequestHeader("Cache-Control",
-            "no-cache");
-        modsecTransaction->processRequestHeaders();
-
-        if (modsecTransaction->intervention(&it)) {
-            std::cout << "There is an intervention" << std::endl;
-            goto next_request;
-        }
-
-
-        modsecTransaction->processRequestBody();
-
-        if (modsecTransaction->intervention(&it)) {
-            std::cout << "There is an intervention" << std::endl;
-            goto next_request;
-        }
-
-        modsecTransaction->addResponseHeader("HTTP/1.1",
-            "200 OK");
-        modsecTransaction->addResponseHeader("Content-Type",
-            "text/xml; charset=utf-8");
-        modsecTransaction->addResponseHeader("Content-Length",
-            "200");
-
-        modsecTransaction->processResponseHeaders(200, "HTTP 1.2");
-
-        if (modsecTransaction->intervention(&it)) {
-            std::cout << "There is an intervention" << std::endl;
-            goto next_request;
-        }
-
-
-        modsecTransaction->appendResponseBody(response_body,
-            strlen((const char*)response_body));
-        modsecTransaction->processResponseBody();
-
-        if (modsecTransaction->intervention(&it)) {
-            std::cout << "There is an intervention" << std::endl;
-            goto next_request;
-        }
-
-next_request:
+        scenario->execute(modsecTransaction, &it, &counters);
         modsecTransaction->processLogging();
         delete modsecTransaction;
         modsecurity::intervention::free(&it);
         modsecurity::intervention::clean(&it);
     }
 
+    BenchmarkRunSummary summary;
+    summary.config = config;
+    summary.counters = counters;
+    summary.elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now() - benchmark_start);
+
     delete rules;
     delete modsec;
-
-    const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::steady_clock::now() - benchmark_start);
-    const long double elapsed_seconds =
-        static_cast<long double>(elapsed.count()) / 1000000000.0L;
-    const long double avg_tx_ns = static_cast<long double>(elapsed.count())
-        / static_cast<long double>(NUM_REQUESTS);
-    const long double tx_per_sec = static_cast<long double>(NUM_REQUESTS)
-        / elapsed_seconds;
-
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Summary:\n";
-    std::cout << "  elapsed_seconds: " << elapsed_seconds << "\n";
-    std::cout << "  avg_transaction_ns: " << avg_tx_ns << "\n";
-    std::cout << "  throughput_tx_per_sec: " << tx_per_sec << "\n";
+    printReport(summary);
 }
