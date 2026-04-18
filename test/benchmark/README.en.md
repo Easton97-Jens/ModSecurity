@@ -51,6 +51,21 @@ make check
 - `make`: builds the library and benchmark binaries.
 - `make check`: runs available checks.
 
+### Fallback: if benchmark binaries were not built by `make`
+Check whether binaries exist:
+```bash
+ls -l test/benchmark/benchmark test/benchmark/json_benchmark
+```
+
+If one binary is missing or not executable, rebuild only the benchmark binaries:
+```bash
+make -C test/benchmark benchmark json_benchmark
+```
+
+Order/dependency note:
+- If `./configure` or the main build has not been run yet, use the full build flow first (above).
+- `make -C test/benchmark ...` is a targeted rebuild fallback, not a replacement for missing project configuration.
+
 ## 4. Running Benchmarks
 ### A) Direct usage
 
@@ -68,6 +83,11 @@ Supported parameters (per code usage string):
 - optional positional iteration count
 - `--scenario legacy-full|request-only`
 - `--rules-file PATH`
+
+Short parameter explanation:
+- `num_iterations` (positional): positive integer; controls how many loop transactions are measured.
+- `--scenario`: selects the flow (`legacy-full` with request+response phases or `request-only` with request phases).
+- `--rules-file`: path to the rules file loaded for this run.
 
 Output summary includes:
 - `scenario`
@@ -94,6 +114,14 @@ Key parameters:
 - `--include-invalid` (required for `truncated`/`malformed`)
 - `--output json`
 
+Short parameter explanation:
+- `--scenario`: selects which JSON scenario is generated/tested.
+- `--iterations`: positive integer; number of executions for the selected scenario.
+- `--target-bytes`: target payload size for size-based scenarios (for example `large-object`, `numbers`, `utf8`).
+- `--depth`: nesting depth for `deep-nesting`.
+- `--include-invalid`: explicitly enables invalid JSON scenarios (`truncated`, `malformed`).
+- `--output json`: emits machine-readable JSON metrics (used by the runner parser).
+
 ### B) Full runner (`test.sh`)
 ```bash
 cd test/benchmark
@@ -101,6 +129,25 @@ cd test/benchmark
 ```
 
 `test.sh` exists to produce a standardized multi-variant run with isolated logs/artifacts and a combined comparison view. It is broader and more reproducible than manual one-off runs.
+
+`test.sh` starts:
+- one `benchmark` run per variant,
+- multiple `json_benchmark` runs per variant across fixed sizes and scenarios,
+- parsing/CSV generation plus global comparison output.
+
+Default script configuration:
+- variants: `baseline`, `crs_v3`, `crs_v4`
+- sizes: `256`, `4096`, `51200`, `1048576`
+- valid JSON scenarios: `utf8`, `numbers`, `deep-nesting`, `large-object`
+- invalid JSON scenarios: `truncated`, `malformed` (run with `--include-invalid`)
+- iterations:
+  - `BENCH_ITERATIONS` default: `1000000`
+  - `JSON_ITERATIONS` default: `100`
+
+Why separate sizes/scenarios:
+- different sizes expose scaling behavior (small to large payloads),
+- valid scenarios represent normal parsing paths,
+- invalid scenarios exercise parser/error handling paths.
 
 ## 5. Variants
 | Variant | Rule state |
@@ -116,11 +163,16 @@ Separation is guaranteed by:
 
 ## 6. Execution Flow
 1. Build (see section 3).
-2. `test.sh` starts, creates output layout and backups.
-3. Per variant: dependency check, rule preparation, `benchmark` run, `json_benchmark` runs.
-4. Metric parsing and aggregation into CSV/TXT outputs.
-5. Global comparison files are generated.
-6. Original rule files are restored via `trap`.
+2. `test.sh` starts with preflight checks (binaries and rule files exist / are usable).
+3. `test.sh` can auto-download missing CRS v3/v4 rules (only when missing).
+4. Original rule files are backed up; restore is handled via `trap`.
+5. Per variant:
+   - rule preparation (baseline/crs_v3/crs_v4),
+   - `benchmark` run,
+   - `json_benchmark` runs across all configured sizes and scenarios.
+6. JSON output is parsed; per-variant metrics are written to CSV/TXT artifacts.
+7. Global comparison artifacts are generated (`comparison.csv`, `report_summary.txt`).
+8. Original rule files are restored at the end.
 
 ## 7. Output & Results
 Default output root:
@@ -142,15 +194,18 @@ Structure:
 
 ## 8. Metrics
 ### `benchmark`
-- `elapsed_seconds`: total runtime for all iterations.
-- `avg_transaction_ns`: average time per transaction in ns.
-- `throughput_tx_per_sec`: transactions per second.
+- `elapsed_seconds`: total runtime of the benchmark loop; with the same iteration count, lower is faster.
+- `avg_transaction_ns`: average transaction duration in ns (`elapsed / iterations`).
+- `throughput_tx_per_sec`: processed transactions per second; higher is better.
 - `interventions`: number of detected interventions.
 
 ### `json_benchmark`
-- `append_request_body_ns`, `process_request_body_ns`, `total_transaction_ns`
-- `parse_success_count`, `parse_error_count`
-- `ru_maxrss_kb`
+- `append_request_body_ns`: cumulative time spent in `appendRequestBody` across all iterations.
+- `process_request_body_ns`: cumulative time spent in `processRequestBody` across all iterations.
+- `total_transaction_ns`: cumulative end-to-end JSON transaction time across all iterations.
+- `parse_success_count`: number of iterations with successful JSON processing outcome.
+- `parse_error_count`: number of iterations with JSON error outcome.
+- `ru_maxrss_kb`: process-reported max RSS in KB.
 
 The runner records these per scenario/size and adds derived/formatted fields (for example `total_transaction_dynamic`, `derived_throughput_tx_per_sec`).
 

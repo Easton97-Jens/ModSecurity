@@ -52,6 +52,21 @@ make check
 - `make`: baut Bibliothek und Benchmark-Binaries.
 - `make check`: führt die vorhandenen Checks aus.
 
+### Fallback: Wenn Benchmark-Binaries nach `make` fehlen
+So prüfst du, ob die Binaries gebaut wurden:
+```bash
+ls -l test/benchmark/benchmark test/benchmark/json_benchmark
+```
+
+Wenn eine Datei fehlt oder nicht ausführbar ist, kannst du gezielt nur die Benchmark-Binaries nachbauen:
+```bash
+make -C test/benchmark benchmark json_benchmark
+```
+
+Hinweis zur Reihenfolge:
+- Wenn `./configure` oder der Hauptbuild noch nicht gelaufen sind, zuerst den vollständigen Build-Flow ausführen (oben).
+- Der `make -C test/benchmark ...`-Befehl ist als Nachbau/Fallback gedacht, nicht als Ersatz für fehlende Konfiguration.
+
 ## 4. Benchmarks ausführen
 ### A) Direkte Nutzung
 
@@ -69,6 +84,11 @@ Unterstützte Parameter (laut Usage im Code):
 - optionale Iterationszahl (positional)
 - `--scenario legacy-full|request-only`
 - `--rules-file PATH`
+
+Kurzer Parameterhinweis:
+- `num_iterations` (positional): positive Ganzzahl; steuert, wie viele Transaktionen im Loop gemessen werden.
+- `--scenario`: wählt den Ablauf (`legacy-full` mit Request+Response-Phasen oder `request-only` mit Request-Phasen).
+- `--rules-file`: Pfad zur Rule-Datei, die der Lauf laden soll.
 
 Ausgabe enthält eine Summary mit:
 - `scenario`
@@ -95,6 +115,14 @@ Wichtige Parameter:
 - `--include-invalid` (erforderlich für `truncated`/`malformed`)
 - `--output json`
 
+Kurzer Parameterhinweis:
+- `--scenario`: bestimmt, welches JSON-Szenario erzeugt/getestet wird.
+- `--iterations`: positive Ganzzahl; wie oft das Szenario ausgeführt wird.
+- `--target-bytes`: Zielgröße für größenbasierte Szenarien (z. B. `large-object`, `numbers`, `utf8`).
+- `--depth`: Tiefe für `deep-nesting`.
+- `--include-invalid`: erlaubt explizit ungültige JSON-Szenarien (`truncated`, `malformed`).
+- `--output json`: gibt Metriken als JSON-Objekt aus (für Runner-Parsing).
+
 ### B) Vollständiger Runner (`test.sh`)
 ```bash
 cd test/benchmark
@@ -102,6 +130,25 @@ cd test/benchmark
 ```
 
 `test.sh` existiert, um einen standardisierten Vergleichslauf über alle Varianten mit getrennten Logs/Artefakten und zusammengefasstem Vergleich zu erzeugen. Das ist umfangreicher und reproduzierbarer als manuelle Einzelaufrufe.
+
+`test.sh` startet:
+- einen `benchmark`-Lauf pro Variante,
+- mehrere `json_benchmark`-Läufe pro Variante über feste Größen und Szenarien,
+- Parsing/CSV-Erzeugung und globale Vergleichsausgabe.
+
+Standardkonfiguration aus dem Skript:
+- Varianten: `baseline`, `crs_v3`, `crs_v4`
+- Größen: `256`, `4096`, `51200`, `1048576`
+- gültige JSON-Szenarien: `utf8`, `numbers`, `deep-nesting`, `large-object`
+- ungültige JSON-Szenarien: `truncated`, `malformed` (werden mit `--include-invalid` gefahren)
+- Iterationen:
+  - `BENCH_ITERATIONS` Standard: `1000000`
+  - `JSON_ITERATIONS` Standard: `100`
+
+Warum Größen/Szenarien getrennt:
+- unterschiedliche Größen zeigen Skalierungseffekte (klein bis groß),
+- gültige Szenarien zeigen Normalpfade,
+- ungültige Szenarien prüfen Fehlerpfade des JSON-Parsers.
 
 ## 5. Varianten
 | Variante | Regelzustand |
@@ -117,11 +164,16 @@ Trennung wird sichergestellt durch:
 
 ## 6. Ablauf (Execution Flow)
 1. Build (siehe Abschnitt 3).
-2. `test.sh` startet, erstellt Ergebnisstruktur und Backups.
-3. Pro Variante: Dependency-Check, Rule-Vorbereitung, `benchmark`-Run, `json_benchmark`-Runs.
-4. Parsing und Aggregation der Metriken in CSV/TXT.
-5. Erzeugung globaler Vergleichsdateien.
-6. Restore der ursprünglichen Rule-Dateien über `trap`.
+2. `test.sh` startet mit Preflight-Prüfungen (Binaries/Rule-Dateien vorhanden und ausführbar/lesbar).
+3. `test.sh` kann fehlende CRS v3/v4 Rules automatisch nachladen (nur wenn sie fehlen).
+4. Original-Regeldateien werden gesichert (Backup), spätere Wiederherstellung via `trap`.
+5. Pro Variante:
+   - Regelvorbereitung (baseline/crs_v3/crs_v4),
+   - `benchmark`-Lauf,
+   - `json_benchmark`-Läufe über alle Größen und Szenarien.
+6. JSON-Ausgaben werden geparst; Metriken werden in CSV/TXT pro Variante geschrieben.
+7. Globaler Vergleich (`comparison.csv`, `report_summary.txt`) wird erzeugt.
+8. Am Ende werden die ursprünglichen Regeldateien wiederhergestellt.
 
 ## 7. Outputs & Ergebnisse
 Standard-Ausgabeort:
@@ -143,15 +195,18 @@ Struktur:
 
 ## 8. Metriken
 ### `benchmark`
-- `elapsed_seconds`: gesamte Laufzeit aller Iterationen.
-- `avg_transaction_ns`: durchschnittliche Zeit pro Transaktion in ns.
-- `throughput_tx_per_sec`: Transaktionen pro Sekunde.
+- `elapsed_seconds`: gesamte Laufzeit des Benchmark-Loops; je kleiner bei gleicher Iterationszahl, desto schneller der Lauf.
+- `avg_transaction_ns`: durchschnittliche Transaktionsdauer in ns (`elapsed / iterations`).
+- `throughput_tx_per_sec`: verarbeitete Transaktionen pro Sekunde; höher ist besser.
 - `interventions`: Anzahl erkannter Interventionsereignisse.
 
 ### `json_benchmark`
-- `append_request_body_ns`, `process_request_body_ns`, `total_transaction_ns`
-- `parse_success_count`, `parse_error_count`
-- `ru_maxrss_kb`
+- `append_request_body_ns`: kumulierte Zeit für `appendRequestBody` über alle Iterationen.
+- `process_request_body_ns`: kumulierte Zeit für `processRequestBody` über alle Iterationen.
+- `total_transaction_ns`: kumulierte Gesamtdauer der JSON-Transaktionen über alle Iterationen.
+- `parse_success_count`: Anzahl Iterationen mit erfolgreicher JSON-Verarbeitung.
+- `parse_error_count`: Anzahl Iterationen mit JSON-Fehlerergebnis.
+- `ru_maxrss_kb`: vom Prozess gemeldeter maximaler RSS-Wert in KB.
 
 Im Runner werden diese Werte pro Szenario/Größe erfasst und um Format-/Derived-Felder ergänzt (z. B. `total_transaction_dynamic`, `derived_throughput_tx_per_sec`).
 
