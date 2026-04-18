@@ -113,7 +113,16 @@ The script scales time units dynamically:
 - `< 1,000,000,000 ns` → `ms`
 - otherwise `s`
 
-For second-based values, it internally converts to ns and applies the same rendering logic.
+The implementation now uses a single nanosecond-based pipeline:
+- `format_duration_from_ns()` is the central formatter.
+- `format_time_dynamic_from_ns()` and `format_seconds_dynamic()` are wrappers sharing the same logic.
+
+Boundary rounding:
+- values are rounded to 2 decimals by default (configurable),
+- if rounding crosses the current unit boundary (`>= 1000`), output is promoted to the next unit,
+- example: `999.999 us` is rendered as `1.00 ms`.
+
+Invalid inputs (empty, non-numeric, negative) return `n/a`.
 
 ## Robust helper functions
 - `format_memory_kb(value, decimals)`:

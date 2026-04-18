@@ -114,7 +114,16 @@ Das Skript nutzt dynamische Skalierung:
 - `< 1.000.000.000 ns` → `ms`
 - sonst `s`
 
-Für Sekundenwerte wird intern auf ns skaliert und anschließend gleich gerendert.
+Die Implementierung verwendet eine einheitliche Pipeline über Nanosekunden:
+- `format_duration_from_ns()` ist die zentrale Funktion.
+- `format_time_dynamic_from_ns()` und `format_seconds_dynamic()` sind Wrapper, die dieselbe Formatierungslogik nutzen.
+
+Boundary-Rounding:
+- Es wird auf 2 Dezimalstellen (konfigurierbar) gerundet.
+- Wenn die Rundung den Grenzwert einer Einheit überschreitet (`>= 1000`), wird automatisch in die nächste Einheit gewechselt.
+- Beispiel: `999.999 us` wird als `1.00 ms` dargestellt.
+
+Ungültige Eingaben (leer, nicht numerisch, negative Werte) liefern `n/a`.
 
 ## Robuste Hilfsfunktionen
 - `format_memory_kb(value, decimals)`:

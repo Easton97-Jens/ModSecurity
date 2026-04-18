@@ -62,37 +62,95 @@ is_number() {
     [[ "$value" =~ ^-?[0-9]+([.][0-9]+)?$ ]]
 }
 
-format_time_dynamic_from_ns() {
-    local ns="$1"
-    awk -v ns="$ns" '
+format_duration_from_ns() {
+    local ns="${1:-}"
+    local decimals="${2:-2}"
+    local forced_unit="${3:-}"
+
+    if [[ -z "$ns" ]] || ! is_number "$ns"; then
+        echo "n/a"
+        return 1
+    fi
+    if [[ -z "$decimals" ]] || ! [[ "$decimals" =~ ^[0-9]+$ ]]; then
+        echo "n/a"
+        return 1
+    fi
+    if awk -v v="$ns" 'BEGIN {exit !(v < 0)}'; then
+        echo "n/a"
+        return 1
+    fi
+    if [[ -n "$forced_unit" ]] && [[ ! "$forced_unit" =~ ^(ns|us|ms|s)$ ]]; then
+        echo "n/a"
+        return 1
+    fi
+
+    awk -v ns="$ns" -v d="$decimals" -v forced="$forced_unit" '
+    function round_to(value, precision, factor) {
+        factor = 10 ^ precision
+        return int(value * factor + 0.5) / factor
+    }
     BEGIN {
-        if (ns < 1000) {
-            printf "%.2f ns", ns
-        } else if (ns < 1000000) {
-            printf "%.2f us", ns / 1000
-        } else if (ns < 1000000000) {
-            printf "%.2f ms", ns / 1000000
+        unit_count = 4
+        unit_name[1] = "ns"; unit_scale[1] = 1
+        unit_name[2] = "us"; unit_scale[2] = 1000
+        unit_name[3] = "ms"; unit_scale[3] = 1000000
+        unit_name[4] = "s";  unit_scale[4] = 1000000000
+
+        idx = 1
+        if (forced != "") {
+            for (i = 1; i <= unit_count; i++) {
+                if (unit_name[i] == forced) {
+                    idx = i
+                    break
+                }
+            }
         } else {
-            printf "%.2f s", ns / 1000000000
+            if (ns >= 1000000000) {
+                idx = 4
+            } else if (ns >= 1000000) {
+                idx = 3
+            } else if (ns >= 1000) {
+                idx = 2
+            } else {
+                idx = 1
+            }
         }
+
+        value = ns / unit_scale[idx]
+        rounded = round_to(value, d)
+
+        # Smart boundary handling:
+        # if rounding crosses 1000 in this unit, switch to next unit.
+        while (forced == "" && idx < unit_count && rounded >= 1000) {
+            idx++
+            value = ns / unit_scale[idx]
+            rounded = round_to(value, d)
+        }
+
+        fmt = "%." d "f %s"
+        printf fmt, rounded, unit_name[idx]
     }'
 }
 
+format_time_dynamic_from_ns() {
+    local ns="${1:-}"
+    local decimals="${2:-2}"
+    local forced_unit="${3:-}"
+    format_duration_from_ns "$ns" "$decimals" "$forced_unit"
+}
+
 format_seconds_dynamic() {
-    local sec="$1"
-    awk -v s="$sec" '
-    BEGIN {
-        ns = s * 1000000000
-        if (ns < 1000) {
-            printf "%.2f ns", ns
-        } else if (ns < 1000000) {
-            printf "%.2f us", ns / 1000
-        } else if (ns < 1000000000) {
-            printf "%.2f ms", ns / 1000000
-        } else {
-            printf "%.2f s", s
-        }
-    }'
+    local sec="${1:-}"
+    local decimals="${2:-2}"
+    local forced_unit="${3:-}"
+
+    if [[ -z "$sec" ]] || ! is_number "$sec"; then
+        echo "n/a"
+        return 1
+    fi
+    local ns
+    ns="$(awk -v s="$sec" 'BEGIN { printf "%.12f", s * 1000000000 }')"
+    format_duration_from_ns "$ns" "$decimals" "$forced_unit"
 }
 
 format_memory_kb() {
