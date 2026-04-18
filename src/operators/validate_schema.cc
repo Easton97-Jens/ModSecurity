@@ -42,72 +42,23 @@ bool ValidateSchema::init(const std::string &file, std::string *error) {
 bool ValidateSchema::evaluate(Transaction *transaction,
     const std::string &str) {
 
-    if (transaction->m_xml->m_data.doc == NULL) {
+    if (!transaction->m_xml->hasDocument()) {
         ms_dbg_a(transaction, 4, "XML document tree could not be found for " \
             "schema validation.");
         return true;
     }
 
-    if (transaction->m_xml->m_data.well_formed != 1) {
+    if (!transaction->m_xml->isWellFormed()) {
         ms_dbg_a(transaction, 4, "XML: Schema validation failed because " \
             "content is not well formed.");
         return true;
     }
 
-    xmlSchemaParserCtxtPtr parserCtx = xmlSchemaNewParserCtxt(m_resource.c_str());
-    if (parserCtx == NULL) {
-        std::stringstream err;
-        err << "XML: Failed to load Schema from file: ";
-        err << m_resource;
-        err << ". ";
-        if (m_err.empty() == false) {
-            err << m_err;
+    m_err.clear();
+    if (!transaction->m_xml->validateDocumentAgainstSchema(m_resource, &m_err)) {
+        if (!m_err.empty()) {
+            ms_dbg_a(transaction, 4, m_err);
         }
-        ms_dbg_a(transaction, 4, err.str());
-        return true;
-    }
-
-    xmlSchemaSetParserErrors(parserCtx,
-        (xmlSchemaValidityErrorFunc)error_load,
-        (xmlSchemaValidityWarningFunc)warn_load, &m_err);
-
-    xmlSchemaPtr schema = xmlSchemaParse(parserCtx);
-    if (schema == NULL) {
-        std::stringstream err;
-        err << "XML: Failed to load Schema: ";
-        err << m_resource;
-        err << ".";
-        if (m_err.empty() == false) {
-            err << " " << m_err;
-        }
-        ms_dbg_a(transaction, 4, err.str());
-        xmlSchemaFreeParserCtxt(parserCtx);
-        return true;
-    }
-
-    xmlSchemaValidCtxtPtr validCtx = xmlSchemaNewValidCtxt(schema);
-    if (validCtx == NULL) {
-        std::stringstream err("XML: Failed to create validation context.");
-        if (m_err.empty() == false) {
-            err << " " << m_err;
-        }
-        ms_dbg_a(transaction, 4, err.str());
-        xmlSchemaFree(schema);
-        xmlSchemaFreeParserCtxt(parserCtx);
-        return true;
-    }
-
-    /* Send validator errors/warnings to msr_log */
-    xmlSchemaSetValidErrors(validCtx,
-        (xmlSchemaValidityErrorFunc)error_runtime,
-        (xmlSchemaValidityWarningFunc)warn_runtime, transaction);
-
-    int rc = xmlSchemaValidateDoc(validCtx, transaction->m_xml->m_data.doc);
-
-    xmlSchemaFreeValidCtxt(validCtx);
-    xmlSchemaFree(schema);
-    xmlSchemaFreeParserCtxt(parserCtx);
-    if (rc != 0) {
         ms_dbg_a(transaction, 4, "XML: Schema validation failed.");
         return true; /* No match. */
     } else {

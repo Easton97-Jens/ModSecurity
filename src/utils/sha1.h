@@ -16,7 +16,9 @@
 #ifndef SRC_UTILS_SHA1_H_
 #define SRC_UTILS_SHA1_H_
 
+#include <cstddef>
 #include <string>
+#include <string_view>
 #include <cassert>
 
 #include "src/utils/string.h"

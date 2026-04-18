@@ -15,38 +15,261 @@
 
 #include "src/request_body_processor/xml.h"
 
-#include <list>
-#include <iostream>
+#include <cstddef>
+#include <cstdarg>
+#include <cctype>
+#include <cstdio>
+#include <cstring>
+#include <mutex>
 #include <string>
+#include <vector>
+
+#include "modsecurity/rules_set.h"
+#include "modsecurity/rules_set_properties.h"
+#include "modsecurity/transaction.h"
 
 
-namespace modsecurity {
-namespace RequestBodyProcessor {
+namespace modsecurity::RequestBodyProcessor {
 
 #ifdef WITH_LIBXML2
+namespace {
+struct XmlSecurityPolicy {
+    bool deny_all_external_resources{false};
+};
+
+constexpr int kLibxmlResourceLoaderApiVersion = 21400;
+
+constexpr int kXmlParserCommonOptions = XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+constexpr int kXmlParserMandatorySecurityOptions = XML_PARSE_NONET;
+
+bool isRemoteResource(const char *url) {
+    if (url == nullptr) {
+        return false;
+    }
+
+    const char *scheme_end = std::strstr(url, "://");
+    if (scheme_end == nullptr || scheme_end == url) {
+        return false;
+    }
+
+    std::string scheme(url, static_cast<std::size_t>(scheme_end - url));
+    for (char &character : scheme) {
+        character = static_cast<char>(std::tolower(
+            static_cast<unsigned char>(character)));
+    }
+
+    return scheme == "http"
+        || scheme == "https"
+        || scheme == "ftp"
+        || scheme == "ftps"
+        || scheme == "sftp";
+}
+
+#if LIBXML_VERSION >= 21400
+xmlParserErrors xmlBackendResourceLoader(void *ctxt, const char *url,
+    const char *, xmlResourceType, xmlParserInputFlags flags,
+    xmlParserInput **out) {
+    if (out == nullptr) {
+        return XML_ERR_ARGUMENT;
+    }
+    *out = nullptr;
+
+    const auto *policy = reinterpret_cast<const XmlSecurityPolicy *>(ctxt);
+    if (policy != nullptr && policy->deny_all_external_resources) {
+        return XML_IO_LOAD_ERROR;
+    }
+
+    if (isRemoteResource(url)) {
+        return XML_IO_NETWORK_ATTEMPT;
+    }
+
+    xmlParserErrors parser_error = xmlNewInputFromUrl(url, flags, out);
+    if (parser_error != XML_ERR_OK || *out == nullptr) {
+        return XML_IO_LOAD_ERROR;
+    }
+
+    return XML_ERR_OK;
+}
+#endif
+
+thread_local const XmlSecurityPolicy *g_xml_external_entity_policy = nullptr;
+std::mutex g_xml_external_entity_loader_mutex;
+
+xmlParserInputPtr xmlExternalEntityLoaderFallback(const char *url,
+    const char *id, xmlParserCtxtPtr ctxt) {
+    const XmlSecurityPolicy *policy = g_xml_external_entity_policy;
+    if (policy != nullptr && policy->deny_all_external_resources) {
+        return nullptr;
+    }
+
+    if (isRemoteResource(url)) {
+        return nullptr;
+    }
+
+    xmlExternalEntityLoader default_loader = xmlGetExternalEntityLoader();
+    if (default_loader == nullptr || default_loader == xmlExternalEntityLoaderFallback) {
+        return nullptr;
+    }
+
+    return default_loader(url, id, ctxt);
+}
+
+class ScopedExternalEntityLoaderFallback {
+ public:
+    explicit ScopedExternalEntityLoaderFallback(const XmlSecurityPolicy *policy)
+        : m_policy(policy) {
+        if (m_policy == nullptr || !m_policy->deny_all_external_resources) {
+            return;
+        }
+
+        m_lock = std::unique_lock<std::mutex>(g_xml_external_entity_loader_mutex);
+        m_previous_policy = g_xml_external_entity_policy;
+        g_xml_external_entity_policy = m_policy;
+        m_previous_loader = xmlGetExternalEntityLoader();
+        xmlSetExternalEntityLoader(xmlExternalEntityLoaderFallback);
+        m_active = true;
+    }
+
+    ~ScopedExternalEntityLoaderFallback() {
+        if (!m_active) {
+            return;
+        }
+
+        xmlSetExternalEntityLoader(m_previous_loader);
+        g_xml_external_entity_policy = m_previous_policy;
+    }
+
+ private:
+    const XmlSecurityPolicy *m_policy = nullptr;
+    const XmlSecurityPolicy *m_previous_policy = nullptr;
+    xmlExternalEntityLoader m_previous_loader = nullptr;
+    std::unique_lock<std::mutex> m_lock;
+    bool m_active = false;
+};
+
+void initializeSecurityPolicy(XmlSecurityPolicy *policy) {
+    if (policy == nullptr) {
+        return;
+    }
+
+#ifndef XML_PARSE_NO_XXE
+    policy->deny_all_external_resources = true;
+#endif
+}
+
+bool finalizeArgsParsingContext(xml_data *data, std::string *error) {
+    if (xmlParseChunk(data->parsing_ctx_arg, nullptr, 0, 1) == 0) {
+        xmlFreeParserCtxt(data->parsing_ctx_arg);
+        data->parsing_ctx_arg = nullptr;
+        return true;
+    }
+
+    if (!data->xml_error.empty()) {
+        error->assign(data->xml_error);
+    } else {
+        error->assign("XML: Failed to parse document for ARGS.");
+    }
+    xmlFreeParserCtxt(data->parsing_ctx_arg);
+    data->parsing_ctx_arg = nullptr;
+    return false;
+}
+
+void configureParserSecurityPolicy(xmlParserCtxtPtr ctx,
+    XmlSecurityPolicy *policy) {
+    if (ctx == nullptr) {
+        return;
+    }
+
+    int options = kXmlParserCommonOptions | kXmlParserMandatorySecurityOptions;
+#ifdef XML_PARSE_NO_XXE
+    options |= XML_PARSE_NO_XXE;
+#endif
+#if LIBXML_VERSION >= 21400
+    xmlCtxtSetOptions(ctx, ctx->options | options);
+#else
+    xmlCtxtUseOptions(ctx, ctx->options | options);
+#endif
+
+    if (policy != nullptr) {
+        initializeSecurityPolicy(policy);
+#if LIBXML_VERSION >= 21400
+        xmlCtxtSetResourceLoader(ctx, xmlBackendResourceLoader, policy);
+#endif
+    }
+}
+
+void appendToString(void *ctx, const std::string &message) {
+    auto *value = reinterpret_cast<std::string *>(ctx);
+    if (value != nullptr) {
+        value->append(message);
+    }
+}
+
+void debugTransactionMessage(const void *ctx, const std::string &message) {
+    auto *tx = reinterpret_cast<const Transaction *>(ctx);
+    if (tx != nullptr) {
+        ms_dbg_a(tx, 4, message);
+    }
+}
+
+template <typename Sink>
+void xmlErrorCallback(void *ctx, Sink sink, const char *prefix,
+    const char *msg, va_list args) {
+    if (ctx == nullptr || msg == nullptr) {
+        return;
+    }
+
+    char buf[1024];
+    const auto len = vsnprintf(buf, sizeof(buf), msg, args);
+    if (len > 0) {
+        sink(ctx, std::string(prefix) + std::string(buf));
+    }
+}
+
+void schemaParserError(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, appendToString, "XML Error: ", msg, args);
+    va_end(args);
+}
+
+void schemaParserWarning(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, appendToString, "XML Warning: ", msg, args);
+    va_end(args);
+}
+
+void schemaRuntimeError(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, debugTransactionMessage, "XML Error: ", msg, args);
+    va_end(args);
+}
+
+void schemaRuntimeWarning(void *ctx, const char *msg, ...) {
+    va_list args;
+    va_start(args, msg);
+    xmlErrorCallback(ctx, debugTransactionMessage, "XML Warning: ", msg, args);
+    va_end(args);
+}
+}  // namespace
 
 /*
 * NodeData for parsing XML into args
 */
-NodeData::NodeData() {
-    has_child = false;
-}
+NodeData::NodeData() = default;
 
-NodeData::~NodeData() {};
+NodeData::~NodeData() = default;
 
 /*
 * XMLNodes for parsing XML into args
 */
 XMLNodes::XMLNodes(Transaction *transaction) 
-    : nodes{},
-    node_depth(0),
-    currpath(""),
-    currval(""),
-    currval_is_set(false),
-    m_transaction(transaction)
+    : m_transaction(transaction)
     {}
 
-XMLNodes::~XMLNodes() {};
+XMLNodes::~XMLNodes() = default;
 
 /*
 * SAX handler for parsing XML into args
@@ -57,59 +280,56 @@ class MSCSAXHandler {
 
             std::string name = reinterpret_cast<const char*>(localname);
 
-            XMLNodes* xml_data = static_cast<XMLNodes*>(ctx);
+            auto *xml_data = static_cast<XMLNodes*>(ctx);
             xml_data->nodes.push_back(std::make_shared<NodeData>());
             xml_data->node_depth++;
-            // FIXME - later if we want to check the depth of XML tree
-            /* if (max_depth > 0 && max_depth > xml_data->node_depth) {
-                std::cout << "Depth of XML tree reached the given maximum value " << xml_data->node_depth << std::endl;
-                exit(1);
-            } */
             // if it's not the first (root) item, then append a '.'
             // note, the condition should always be true because there is always a pseudo root element: 'xml'
             if (xml_data->nodes.size() > 1) {
                 xml_data->currpath.append(".");
-                xml_data->nodes[xml_data->nodes.size()-2]->has_child = true;
+                const std::size_t parent_index = xml_data->nodes.size() - 2;
+                xml_data->nodes[parent_index]->has_child = true;
             }
             xml_data->currpath.append(name);
             // set the current value empty
             // this is necessary because if there is any text between the tags (new line, etc)
             // it will be added to the current value
-            xml_data->currval = "";
+            xml_data->currval.clear();
             xml_data->currval_is_set = false;
         }
 
         void onEndElement(void * ctx, const xmlChar *localname) {
             std::string name = reinterpret_cast<const char*>(localname);
-            XMLNodes* xml_data = static_cast<XMLNodes*>(ctx);
-            const std::shared_ptr<NodeData>& nd = xml_data->nodes[xml_data->nodes.size()-1];
-            if (nd->has_child == false) {
+            auto *xml_data = static_cast<XMLNodes*>(ctx);
+            if (const auto &nd =
+                    xml_data->nodes.back();
+                    !nd->has_child && !xml_data->m_transaction->addArgument(
+                        "XML", xml_data->currpath, xml_data->currval, 0)) {
                 // check the return value
                 // if false, then stop parsing
                 // this means the number of arguments reached the limit
-                if (xml_data->m_transaction->addArgument("XML", xml_data->currpath, xml_data->currval, 0) == false) {
-                    xmlStopParser(xml_data->parsing_ctx_arg);
-                }
+                xmlStopParser(xml_data->parsing_ctx_arg);
             }
-            if (xml_data->currpath.length() > 0) {
+            if (!xml_data->currpath.empty()) {
                 // set an offset to store whether this is the first item, in order to know whether to remove the '.'
-                int offset = (xml_data->nodes.size() > 1) ? 1 : 0;
-                xml_data->currpath.erase(xml_data->currpath.length() - (name.length()+offset));
+                const std::size_t offset = (xml_data->nodes.size() > 1) ? 1 : 0;
+                xml_data->currpath.erase(
+                    xml_data->currpath.size() - (name.size() + offset));
             }
             xml_data->nodes.pop_back();
             xml_data->node_depth--;
-            xml_data->currval = "";
+            xml_data->currval.clear();
             xml_data->currval_is_set = false;
         }
 
         void onCharacters(void *ctx, const xmlChar *ch, int len) {
-            XMLNodes* xml_data = static_cast<XMLNodes*>(ctx);
+            auto *xml_data = static_cast<XMLNodes*>(ctx);
             std::string content(reinterpret_cast<const char *>(ch), len);
 
             // libxml2 SAX parser will call this function multiple times
             // during the parsing of a single node, if the value has multibyte
             // characters, so we need to concatenate the values
-            if (xml_data->currval_is_set == false) {
+            if (!xml_data->currval_is_set) {
                 xml_data->currval = content;
                 xml_data->currval_is_set = true;
             } else {
@@ -121,66 +341,55 @@ class MSCSAXHandler {
 extern "C" {
     void MSC_startElement(void *userData,
         const xmlChar *name,
-        const xmlChar *prefix,
-        const xmlChar *URI,
-        int nb_namespaces,
-        const xmlChar **namespaces,
-        int nb_attributes,
-        int nb_defaulted,
-        const xmlChar **attributes) {
+        const xmlChar *,
+        const xmlChar *,
+        int,
+        const xmlChar **,
+        int,
+        int,
+        const xmlChar **) {
 
-            MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
+            auto *handler = static_cast<MSCSAXHandler*>(userData);
             handler->onStartElement(userData, name);
     }
 
     void MSC_endElement(
         void *userData,
         const xmlChar *name,
-        const xmlChar* prefix,
-        const xmlChar* URI) {
+        const xmlChar*,
+        const xmlChar*) {
 
-            MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
+            auto *handler = static_cast<MSCSAXHandler*>(userData);
             handler->onEndElement(userData, name);
     }
 
     void MSC_xmlcharacters(void *userData, const xmlChar *ch, int len) {
-        MSCSAXHandler* handler = static_cast<MSCSAXHandler*>(userData);
+        auto *handler = static_cast<MSCSAXHandler*>(userData);
         handler->onCharacters(userData, ch, len);
     }
 }
 
 XML::XML(Transaction *transaction)
-    : m_transaction(transaction) {
-    m_data.doc = NULL;
-    m_data.parsing_ctx = NULL;
-    m_data.sax_handler = NULL;
-    m_data.xml_error = "";
-    m_data.parsing_ctx_arg = NULL;
-    m_data.xml_parser_state = NULL;
-}
+    : m_transaction(transaction) { }
 
 
 XML::~XML() {
-    if (m_data.parsing_ctx != NULL) {
+    if (m_data.parsing_ctx != nullptr) {
         xmlFreeParserCtxt(m_data.parsing_ctx);
-        m_data.parsing_ctx = NULL;
+        m_data.parsing_ctx = nullptr;
     }
-    if (m_data.doc != NULL) {
+    if (m_data.doc != nullptr) {
         xmlFreeDoc(m_data.doc);
-        m_data.doc = NULL;
+        m_data.doc = nullptr;
     }
 }
 
 bool XML::init() {
-    //xmlParserInputBufferCreateFilenameFunc entity;
-    if (m_transaction->m_rules->m_secXMLExternalEntity
-        == RulesSetProperties::TrueConfigBoolean) {
-        /*entity = */xmlParserInputBufferCreateFilenameDefault(
-            __xmlParserInputBufferCreateFilename);
-    } else {
-        /*entity = */xmlParserInputBufferCreateFilenameDefault(
-            this->unloadExternalEntity);
-    }
+#ifndef XML_PARSE_NO_XXE
+    ms_dbg_a(m_transaction, 3, "XML: XML_PARSE_NO_XXE is not available in this "
+        "libxml2 build; external resources are denied via the XML backend "
+        "resource loader fallback.");
+#endif
     if (m_transaction->m_secXMLParseXmlIntoArgs
         == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs ||
         m_transaction->m_secXMLParseXmlIntoArgs
@@ -198,8 +407,6 @@ bool XML::init() {
 
         // set the parser state struct
         m_data.xml_parser_state                  = std::make_unique<XMLNodes>(m_transaction);
-        m_data.xml_parser_state->node_depth      = 0;
-        m_data.xml_parser_state->currval         = "";
         // the XML will contain at least one node, which is the pseudo root node 'xml'
         m_data.xml_parser_state->currpath        = "xml.";
     }
@@ -208,74 +415,65 @@ bool XML::init() {
 }
 
 
-xmlParserInputBufferPtr XML::unloadExternalEntity(const char *URI,
-    xmlCharEncoding enc) {
-    return NULL;
-}
-
-
 bool XML::processChunk(const char *buf, unsigned int size,
     std::string *error) {
+    static XmlSecurityPolicy main_policy;
+    static XmlSecurityPolicy args_policy;
+
     /* We want to initialise our parsing context here, to
      * enable us to pass it the first chunk of data so that
      * it can attempt to auto-detect the encoding.
      */
-    if (m_data.parsing_ctx == NULL && m_data.parsing_ctx_arg == NULL) {
+    if (m_data.parsing_ctx == nullptr && m_data.parsing_ctx_arg == nullptr) {
         /* First invocation. */
 
         ms_dbg_a(m_transaction, 4, "XML: Initialising parser.");
 
-        /* NOTE When Sax interface is used libxml will not
-         *      create the document object, but we need it.
-
-        msr->xml->sax_handler = (xmlSAXHandler *)apr_pcalloc(msr->mp,
-            sizeof(xmlSAXHandler));
-        if (msr->xml->sax_handler == NULL) return -1;
-        msr->xml->sax_handler->error = xml_receive_sax_error;
-        msr->xml->sax_handler->warning = xml_receive_sax_error;
-        msr->xml->parsing_ctx = xmlCreatePushParserCtxt(msr->xml->sax_handler,
-            msr, buf, size, "body.xml");
-
-        */
-
         if (m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
-            m_data.parsing_ctx = xmlCreatePushParserCtxt(NULL, NULL,
+            initializeSecurityPolicy(&main_policy);
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_main_create(&main_policy);
+            m_data.parsing_ctx = xmlCreatePushParserCtxt(nullptr, nullptr,
                 buf, size, "body.xml");
 
-            if (m_data.parsing_ctx == NULL) {
+            if (m_data.parsing_ctx == nullptr) {
                 ms_dbg_a(m_transaction, 4,
                     "XML: Failed to create parsing context.");
                 error->assign("XML: Failed to create parsing context.");
                 return false;
             }
-            // disable parser errors being printed to stderr
-            m_data.parsing_ctx->options |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+            configureParserSecurityPolicy(m_data.parsing_ctx, &main_policy);
         }
 
         if (m_transaction->m_secXMLParseXmlIntoArgs
             == RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs ||
             m_transaction->m_secXMLParseXmlIntoArgs
             == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs) {
+            initializeSecurityPolicy(&args_policy);
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_args_create(&args_policy);
             m_data.parsing_ctx_arg = xmlCreatePushParserCtxt(
                 m_data.sax_handler.get(),
                 m_data.xml_parser_state.get(),
                 buf,
                 size,
-                NULL);
-            if (m_data.parsing_ctx_arg == NULL) {
+                nullptr);
+            if (m_data.parsing_ctx_arg == nullptr) {
                 error->assign("XML: Failed to create parsing context for ARGS.");
                 return false;
             }
-            // disable parser errors being printed to stderr
-            m_data.parsing_ctx_arg->options |= XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+            configureParserSecurityPolicy(m_data.parsing_ctx_arg, &args_policy);
         }
 
         return true;
     }
 
     /* Not a first invocation. */
-    if (m_data.parsing_ctx != NULL &&
+    ScopedExternalEntityLoaderFallback external_entity_loader_guard_main(
+        &main_policy);
+
+    if (m_data.parsing_ctx != nullptr &&
         m_transaction->m_secXMLParseXmlIntoArgs
         != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
         xmlParseChunk(m_data.parsing_ctx, buf, size, 0);
@@ -287,7 +485,10 @@ bool XML::processChunk(const char *buf, unsigned int size,
         }
     }
 
-    if (m_data.parsing_ctx_arg != NULL &&
+    ScopedExternalEntityLoaderFallback external_entity_loader_guard_args(
+        &args_policy);
+
+    if (m_data.parsing_ctx_arg != nullptr &&
         (
             m_transaction->m_secXMLParseXmlIntoArgs
               == RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs
@@ -309,12 +510,15 @@ bool XML::processChunk(const char *buf, unsigned int size,
 
 bool XML::complete(std::string *error) {
     /* Only if we have a context, meaning we've done some work. */
-    if (m_data.parsing_ctx != NULL || m_data.parsing_ctx_arg != NULL) {
-        if (m_data.parsing_ctx != NULL &&
+    if (m_data.parsing_ctx != nullptr || m_data.parsing_ctx_arg != nullptr) {
+        if (m_data.parsing_ctx != nullptr &&
             m_transaction->m_secXMLParseXmlIntoArgs
             != RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs) {
+            static XmlSecurityPolicy main_policy;
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_main(&main_policy);
             /* This is how we signal the end of parsing to libxml. */
-            xmlParseChunk(m_data.parsing_ctx, NULL, 0, 1);
+            xmlParseChunk(m_data.parsing_ctx, nullptr, 0, 1);
 
             /* Preserve the results for our reference. */
             m_data.well_formed = m_data.parsing_ctx->wellFormed;
@@ -322,7 +526,7 @@ bool XML::complete(std::string *error) {
 
             /* Clean up everything else. */
             xmlFreeParserCtxt(m_data.parsing_ctx);
-            m_data.parsing_ctx = NULL;
+            m_data.parsing_ctx = nullptr;
             ms_dbg_a(m_transaction, 4, "XML: Parsing complete (well_formed " \
                 + std::to_string(m_data.well_formed) + ").");
 
@@ -332,7 +536,7 @@ bool XML::complete(std::string *error) {
                 return false;
             }
         }
-        if (m_data.parsing_ctx_arg != NULL &&
+        if (m_data.parsing_ctx_arg != nullptr &&
             (
                 m_transaction->m_secXMLParseXmlIntoArgs
                   == RulesSetProperties::OnlyArgsConfigXMLParseXmlIntoArgs
@@ -340,27 +544,176 @@ bool XML::complete(std::string *error) {
                 m_transaction->m_secXMLParseXmlIntoArgs
                   == RulesSetProperties::TrueConfigXMLParseXmlIntoArgs)
             ) {
+            static XmlSecurityPolicy args_policy;
+            ScopedExternalEntityLoaderFallback
+                external_entity_loader_guard_args(&args_policy);
             /* This is how we signale the end of parsing to libxml. */
-            if (xmlParseChunk(m_data.parsing_ctx_arg, NULL, 0, 1) != 0) {
-                if (m_data.xml_error != "") {
-                    error->assign(m_data.xml_error);
-                }
-                else {
-                    error->assign("XML: Failed to parse document for ARGS.");
-                }
-                xmlFreeParserCtxt(m_data.parsing_ctx_arg);
-                m_data.parsing_ctx_arg = NULL;
+            if (!finalizeArgsParsingContext(&m_data, error)) {
                 return false;
             }
-            xmlFreeParserCtxt(m_data.parsing_ctx_arg);
-            m_data.parsing_ctx_arg = NULL;
         }
     }
 
     return true;
 }
 
+bool XML::hasDocument() const {
+    return m_data.doc != nullptr;
+}
+
+bool XML::isWellFormed() const {
+    return m_data.well_formed == 1;
+}
+
+bool XML::validateDocumentAgainstDtd(const std::string &resource) const {
+    xmlDtdPtr dtd = xmlParseDTD(nullptr,
+        reinterpret_cast<const xmlChar *>(resource.c_str()));
+    if (dtd == nullptr) {
+        ms_dbg_a(m_transaction, 4, std::string("XML: Failed to load DTD: ")
+            + resource);
+        return false;
+    }
+
+    xmlValidCtxtPtr validation_context = xmlNewValidCtxt();
+    if (validation_context == nullptr) {
+        ms_dbg_a(m_transaction, 4, "XML: Failed to create a validation context.");
+        xmlFreeDtd(dtd);
+        return false;
+    }
+
+    validation_context->error = reinterpret_cast<xmlValidityErrorFunc>(
+        schemaRuntimeError);
+    validation_context->warning = reinterpret_cast<xmlValidityWarningFunc>(
+        schemaRuntimeWarning);
+    validation_context->userData = m_transaction;
+
+    const bool valid = xmlValidateDtd(validation_context, m_data.doc, dtd) != 0;
+
+    xmlFreeValidCtxt(validation_context);
+    xmlFreeDtd(dtd);
+
+    return valid;
+}
+
+bool XML::validateDocumentAgainstSchema(const std::string &resource,
+    std::string *load_error) const {
+    static XmlSecurityPolicy schema_policy;
+    xmlSchemaParserCtxtPtr parser_context = xmlSchemaNewParserCtxt(
+        resource.c_str());
+    if (parser_context == nullptr) {
+        if (load_error != nullptr) {
+            load_error->assign("XML: Failed to load Schema from file: "
+                + resource);
+        }
+        return false;
+    }
+
+    std::string parser_messages;
+    xmlSchemaSetParserErrors(parser_context,
+        reinterpret_cast<xmlSchemaValidityErrorFunc>(schemaParserError),
+        reinterpret_cast<xmlSchemaValidityWarningFunc>(schemaParserWarning),
+        &parser_messages);
+#if LIBXML_VERSION >= 21400
+    xmlSchemaSetResourceLoader(parser_context, xmlBackendResourceLoader,
+        &schema_policy);
+#else
+    schema_policy.deny_all_external_resources = true;
 #endif
 
-}  // namespace RequestBodyProcessor
-}  // namespace modsecurity
+    ScopedExternalEntityLoaderFallback external_entity_loader_guard_schema(
+        &schema_policy);
+    xmlSchemaPtr schema = xmlSchemaParse(parser_context);
+    if (schema == nullptr) {
+        if (load_error != nullptr) {
+            load_error->assign("XML: Failed to load Schema: " + resource + ". "
+                + parser_messages);
+        }
+        xmlSchemaFreeParserCtxt(parser_context);
+        return false;
+    }
+
+    xmlSchemaValidCtxtPtr validation_context = xmlSchemaNewValidCtxt(schema);
+    if (validation_context == nullptr) {
+        if (load_error != nullptr) {
+            load_error->assign("XML: Failed to create validation context. "
+                + parser_messages);
+        }
+        xmlSchemaFree(schema);
+        xmlSchemaFreeParserCtxt(parser_context);
+        return false;
+    }
+
+    xmlSchemaSetValidErrors(validation_context,
+        reinterpret_cast<xmlSchemaValidityErrorFunc>(schemaRuntimeError),
+        reinterpret_cast<xmlSchemaValidityWarningFunc>(schemaRuntimeWarning),
+        m_transaction);
+    const bool valid = xmlSchemaValidateDoc(validation_context, m_data.doc) == 0;
+
+    xmlSchemaFreeValidCtxt(validation_context);
+    xmlSchemaFree(schema);
+    xmlSchemaFreeParserCtxt(parser_context);
+    return valid;
+}
+
+bool XML::evaluateXPath(const std::string &expression,
+    const std::vector<NamespaceDecl> &namespaces, std::vector<std::string> *values,
+    std::string *error) const {
+    if (values == nullptr) {
+        if (error != nullptr) {
+            error->assign("XML: Internal error: output collection is null.");
+        }
+        return false;
+    }
+
+    xmlXPathContextPtr xpath_context = xmlXPathNewContext(m_data.doc);
+    if (xpath_context == nullptr) {
+        if (error != nullptr) {
+            error->assign("XML: Unable to create new XPath context.");
+        }
+        return false;
+    }
+
+    for (const NamespaceDecl &namespace_decl : namespaces) {
+        if (xmlXPathRegisterNs(xpath_context,
+                reinterpret_cast<const xmlChar *>(namespace_decl.prefix.c_str()),
+                reinterpret_cast<const xmlChar *>(namespace_decl.href.c_str()))
+            != 0) {
+            if (error != nullptr) {
+                error->assign("Failed to register XML namespace href \""
+                    + namespace_decl.href + "\" prefix \""
+                    + namespace_decl.prefix + "\".");
+            }
+            xmlXPathFreeContext(xpath_context);
+            return false;
+        }
+    }
+
+    xmlXPathObjectPtr xpath_object = xmlXPathEvalExpression(
+        reinterpret_cast<const xmlChar *>(expression.c_str()), xpath_context);
+    if (xpath_object == nullptr) {
+        if (error != nullptr) {
+            error->assign("XML: Unable to evaluate xpath expression.");
+        }
+        xmlXPathFreeContext(xpath_context);
+        return false;
+    }
+
+    xmlNodeSetPtr nodes = xpath_object->nodesetval;
+    if (nodes != nullptr) {
+        for (int index = 0; index < nodes->nodeNr; ++index) {
+            xmlChar *content = xmlNodeGetContent(nodes->nodeTab[index]);
+            if (content != nullptr) {
+                values->emplace_back(reinterpret_cast<const char *>(content));
+                xmlFree(content);
+            }
+        }
+    }
+
+    xmlXPathFreeObject(xpath_object);
+    xmlXPathFreeContext(xpath_context);
+    return true;
+}
+
+#endif
+
+}  // namespace modsecurity::RequestBodyProcessor

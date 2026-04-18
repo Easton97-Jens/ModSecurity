@@ -76,7 +76,7 @@ jobs:
                                   libmaxminddb-dev:${{ matrix.platform.arch }} \
                                   libpcre2-dev:${{ matrix.platform.arch }} \
                                   pcre2-utils:${{ matrix.platform.arch }} \
-                                  bison flex python3 python3-venv
+                                  bison flex python3 python3-venv cmake
       - name: Setup Dependencies (x32)
         if: ${{ matrix.platform.label == 'x32' }}
         run: |
