@@ -1,0 +1,39 @@
+name: MSVC Code Analysis
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze (MSVC C++ Code Analysis)
+    runs-on: windows-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+
+    env:
+      build: ${{ github.workspace }}/build
+      config: Debug
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Configure CMake
+        run: cmake -B ${{ env.build }} -DCMAKE_BUILD_TYPE=${{ env.config }}
+
+      - name: Run MSVC Code Analysis
+        id: run-analysis
+        uses: microsoft/msvc-code-analysis-action@v0.1.1
+        with:
+          cmakeBuildDirectory: ${{ env.build }}
+          buildConfiguration: ${{ env.config }}
+          ruleset: NativeRecommendedRules.ruleset
+
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: ${{ steps.run-analysis.outputs.sarif }}
