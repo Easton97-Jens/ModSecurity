@@ -1,0 +1,2 @@
+variant,iterations,elapsed_seconds,elapsed_dynamic,avg_transaction_ns,avg_dynamic,throughput_tx_per_sec,throughput_formatted,interventions
+baseline,1000000,75.15,75.15 s,75145.18,75.15 us,13307.57,13307.57 tx/s,0

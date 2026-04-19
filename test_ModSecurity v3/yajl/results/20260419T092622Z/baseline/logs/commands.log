@@ -1,0 +1,50 @@
+command=/root/git3/ModSecurity/test/benchmark/benchmark command=1000000 command=--scenario command=legacy-full command=--rules-file command=/root/git3/ModSecurity/test/benchmark/basic_rules.conf 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=utf8 command=--iterations command=100 command=--target-bytes command=256 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=numbers command=--iterations command=100 command=--target-bytes command=256 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=deep-nesting command=--iterations command=100 command=--target-bytes command=256 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=large-object command=--iterations command=100 command=--target-bytes command=256 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=truncated command=--include-invalid command=--iterations command=100 command=--target-bytes command=256 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=malformed command=--include-invalid command=--iterations command=100 command=--target-bytes command=256 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=utf8 command=--iterations command=100 command=--target-bytes command=4096 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=numbers command=--iterations command=100 command=--target-bytes command=4096 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=deep-nesting command=--iterations command=100 command=--target-bytes command=4096 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=large-object command=--iterations command=100 command=--target-bytes command=4096 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=truncated command=--include-invalid command=--iterations command=100 command=--target-bytes command=4096 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=malformed command=--include-invalid command=--iterations command=100 command=--target-bytes command=4096 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=utf8 command=--iterations command=100 command=--target-bytes command=51200 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=numbers command=--iterations command=100 command=--target-bytes command=51200 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=deep-nesting command=--iterations command=100 command=--target-bytes command=51200 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=large-object command=--iterations command=100 command=--target-bytes command=51200 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=truncated command=--include-invalid command=--iterations command=100 command=--target-bytes command=51200 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=malformed command=--include-invalid command=--iterations command=100 command=--target-bytes command=51200 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=utf8 command=--iterations command=100 command=--target-bytes command=1048576 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=numbers command=--iterations command=100 command=--target-bytes command=1048576 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=deep-nesting command=--iterations command=100 command=--target-bytes command=1048576 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=large-object command=--iterations command=100 command=--target-bytes command=1048576 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=truncated command=--include-invalid command=--iterations command=100 command=--target-bytes command=1048576 command=--output command=json 
+exit_code=0
+command=/root/git3/ModSecurity/test/benchmark/json_benchmark command=--scenario command=malformed command=--include-invalid command=--iterations command=100 command=--target-bytes command=1048576 command=--output command=json 
+exit_code=0
