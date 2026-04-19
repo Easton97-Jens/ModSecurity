@@ -1,0 +1,129 @@
+name: Flawfinder Security Scan
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  flawfinder:
+    runs-on: ubuntu-latest
+    env:
+      REPORT_FILE: flawfinder-report.txt
+      BRANCH_NAME: security/auto-findings
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Flawfinder
+        run: python3 -m pip install flawfinder
+
+      - name: Run Flawfinder scan
+        run: flawfinder . | tee "$REPORT_FILE"
+
+      - name: Evaluate findings
+        id: evaluate
+        shell: bash
+        run: |
+          set -euo pipefail
+          HITS_LINE="$(grep -E '^Hits = [0-9]+' "$REPORT_FILE" || true)"
+          if [ -z "$HITS_LINE" ]; then
+            echo "findings_count=unknown" >> "$GITHUB_OUTPUT"
+            echo "has_findings=false" >> "$GITHUB_OUTPUT"
+          else
+            HITS_COUNT="$(echo "$HITS_LINE" | sed -E 's/^Hits = ([0-9]+).*/\1/')"
+            echo "findings_count=$HITS_COUNT" >> "$GITHUB_OUTPUT"
+            if [ "$HITS_COUNT" -gt 0 ]; then
+              echo "has_findings=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "has_findings=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: Prepare PR content
+        if: steps.evaluate.outputs.has_findings == 'true'
+        shell: bash
+        run: |
+          {
+            echo "# Security Scan Findings"
+            echo
+            echo "Scanner: Flawfinder"
+            echo "Findings: ${{ steps.evaluate.outputs.findings_count }}"
+            echo
+            echo "## Full Report"
+            echo '```text'
+            cat "$REPORT_FILE"
+            echo '```'
+          } > security-scan-report.md
+
+      - name: Commit report to dedicated branch
+        id: commit_report
+        if: steps.evaluate.outputs.has_findings == 'true' && github.event_name == 'push'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH_NAME"
+          git add "$REPORT_FILE" security-scan-report.md
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Add latest security scan findings"
+            git push --force-with-lease origin "HEAD:$BRANCH_NAME"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update pull request
+        if: steps.evaluate.outputs.has_findings == 'true' && github.event_name == 'push'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:${process.env.BRANCH_NAME}`;
+            const base = context.payload.repository.default_branch;
+            const title = 'Security Scan Findings';
+            const fs = require('fs');
+            const body = fs.readFileSync('security-scan-report.md', 'utf8');
+
+            const { data: pulls } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head,
+              base
+            });
+
+            if (pulls.length > 0) {
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: pulls[0].number,
+                title,
+                body
+              });
+            } else {
+              await github.rest.pulls.create({
+                owner,
+                repo,
+                title,
+                head: process.env.BRANCH_NAME,
+                base,
+                body
+              });
+            }
+
+      - name: Upload Flawfinder report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flawfinder-report
+          if-no-files-found: warn
+          path: |
+            flawfinder-report.txt
+            security-scan-report.md
