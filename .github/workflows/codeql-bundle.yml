@@ -1,0 +1,37 @@
+name: CodeQL Bundle
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-codeql-bundle:
+    name: Build custom CodeQL bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate CodeQL packs configuration
+        run: |
+          if [ -z "${{ vars.CODEQL_BUNDLE_PACKS }}" ]; then
+            echo "Keine verlässlichen projektspezifischen CodeQL-Pack- oder Workspace-Informationen ableitbar"
+            echo "Setze Repository Variable CODEQL_BUNDLE_PACKS (kommagetrennte CodeQL-Packs)."
+            exit 1
+          fi
+
+      - id: download-bundle
+        uses: advanced-security/codeql-bundle-action/download-bundle@v2
+        with:
+          tag: latest
+
+      - id: create-bundle
+        uses: advanced-security/codeql-bundle-action/create-bundle@v2
+        with:
+          bundle-path: ${{ steps.download-bundle.outputs.bundle-path }}
+          packs: ${{ vars.CODEQL_BUNDLE_PACKS }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: codeql-bundle
+          path: ${{ steps.create-bundle.outputs.output-path }}
