@@ -1,0 +1,10 @@
+Doing 1000000 transactions...
+Scenario: legacy-full
+Rules file: /root/git3/ModSecurity2-simdjson/test/benchmark/basic_rules.conf
+Summary:
+  scenario: legacy-full
+  rules_file: /root/git3/ModSecurity2-simdjson/test/benchmark/basic_rules.conf
+  elapsed_seconds: 2105.06
+  avg_transaction_ns: 2105058.59
+  throughput_tx_per_sec: 475.05
+  interventions: 0

@@ -1,0 +1,10 @@
+Doing 1000000 transactions...
+Scenario: legacy-full
+Rules file: /root/git3/ModSecurity3-jsoncons/test/benchmark/basic_rules.conf
+Summary:
+  scenario: legacy-full
+  rules_file: /root/git3/ModSecurity3-jsoncons/test/benchmark/basic_rules.conf
+  elapsed_seconds: 2065.45
+  avg_transaction_ns: 2065445.41
+  throughput_tx_per_sec: 484.16
+  interventions: 0

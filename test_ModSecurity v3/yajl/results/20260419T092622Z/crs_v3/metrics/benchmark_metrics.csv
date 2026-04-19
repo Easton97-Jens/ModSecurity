@@ -1,0 +1,2 @@
+variant,iterations,elapsed_seconds,elapsed_dynamic,avg_transaction_ns,avg_dynamic,throughput_tx_per_sec,throughput_formatted,interventions
+crs_v3,1000000,2070.86,2070.86 s,2070860.85,2.07 ms,482.89,482.89 tx/s,0
