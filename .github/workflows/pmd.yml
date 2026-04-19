@@ -1,0 +1,142 @@
+name: Security scan with auto-PR
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+
+jobs:
+  codeql-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: c-cpp
+          build-mode: none
+
+      - name: Analyze with CodeQL
+        uses: github/codeql-action/analyze@v4
+
+      - name: Collect CodeQL alerts for current ref
+        id: collect
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p security
+
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${GITHUB_REPOSITORY}/code-scanning/alerts?state=open&tool_name=CodeQL&ref=refs/heads/${REF_NAME}&per_page=100" \
+            > security/codeql-alerts.json
+
+          ALERT_COUNT=$(python3 - <<'PY'
+          import json
+          with open('security/codeql-alerts.json', 'r', encoding='utf-8') as f:
+              alerts = json.load(f)
+          print(len(alerts))
+          PY
+          )
+
+          {
+            echo "# CodeQL Findings"
+            echo
+            echo "- Repository: ${GITHUB_REPOSITORY}"
+            echo "- Ref: refs/heads/${REF_NAME}"
+            echo "- Commit: ${SHA}"
+            echo "- Open alerts: ${ALERT_COUNT}"
+            echo
+            echo "Diese Datei wird automatisch aus dem CodeQL-Scan erzeugt."
+          } > security/codeql-findings.md
+
+          echo "alert_count=${ALERT_COUNT}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit findings report to branch
+        id: commit_findings
+        if: ${{ github.event_name != 'pull_request' && steps.collect.outputs.alert_count != '0' }}
+        env:
+          BRANCH_NAME: security/auto-findings
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "${BRANCH_NAME}"
+          git add security/codeql-alerts.json security/codeql-findings.md
+
+          if git diff --cached --quiet; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git commit -m "Add CodeQL findings report"
+          git push --force --set-upstream origin "${BRANCH_NAME}"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update pull request
+        if: ${{ github.event_name != 'pull_request' && steps.collect.outputs.alert_count != '0' }}
+        uses: actions/github-script@v7
+        env:
+          ALERT_COUNT: ${{ steps.collect.outputs.alert_count }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:security/auto-findings`;
+            const base = context.payload.repository.default_branch;
+            const title = 'Security Scan Findings';
+            const body = [
+              'Automatisch erzeugter Pull Request mit CodeQL-Scan-Ergebnissen.',
+              '',
+              `Open alerts: ${process.env.ALERT_COUNT}`,
+              '',
+              'Enthaltene Dateien:',
+              '- `security/codeql-findings.md`',
+              '- `security/codeql-alerts.json`'
+            ].join('\n');
+
+            const existing = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head,
+              base
+            });
+
+            if (existing.data.length > 0) {
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: existing.data[0].number,
+                title,
+                body
+              });
+              core.info(`Updated PR #${existing.data[0].number}`);
+            } else {
+              const created = await github.rest.pulls.create({
+                owner,
+                repo,
+                title,
+                head: 'security/auto-findings',
+                base,
+                body
+              });
+              core.info(`Created PR #${created.data.number}`);
+            }
