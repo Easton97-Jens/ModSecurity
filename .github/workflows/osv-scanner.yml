@@ -1,0 +1,173 @@
+name: Security Scan Auto PR
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '30 12 * * 1'
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+  security-events: write
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    outputs:
+      findings_count: ${{ steps.collect.outputs.findings_count }}
+      report_path: ${{ steps.collect.outputs.report_path }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: c-cpp
+          build-mode: none
+
+      - name: Analyze with CodeQL
+        uses: github/codeql-action/analyze@v4
+
+      - name: Collect findings for current ref
+        id: collect
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ github.ref }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          REPORT_PATH="security/codeql-findings.md"
+          mkdir -p "$(dirname "$REPORT_PATH")"
+
+          API_PATH="/repos/${REPOSITORY}/code-scanning/alerts?state=open&ref=${REF}&tool_name=CodeQL&per_page=100"
+
+          FINDINGS_COUNT="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$API_PATH" \
+            --jq 'length')"
+
+          {
+            echo "# CodeQL Findings"
+            echo
+            echo "- Repository: ${REPOSITORY}"
+            echo "- Ref: ${REF}"
+            echo "- Open findings (CodeQL): ${FINDINGS_COUNT}"
+            echo
+            if [ "$FINDINGS_COUNT" -gt 0 ]; then
+              gh api \
+                -H 'Accept: application/vnd.github+json' \
+                -H 'X-GitHub-Api-Version: 2022-11-28' \
+                "$API_PATH" \
+                --jq '.[] | "- [#\(.number)](\(.html_url)) | severity=\(.rule.severity // \"n/a\") | rule=\(.rule.id // \"n/a\") | path=\(.most_recent_instance.location.path // \"n/a\")"'
+            else
+              echo "Keine offenen CodeQL-Findings für diese Ref."
+            fi
+          } > "$REPORT_PATH"
+
+          echo "findings_count=${FINDINGS_COUNT}" >> "$GITHUB_OUTPUT"
+          echo "report_path=${REPORT_PATH}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload findings report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-findings-report
+          path: ${{ steps.collect.outputs.report_path }}
+
+  create-or-update-pr:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    if: ${{ needs.security-scan.outputs.findings_count != '0' && github.event_name != 'pull_request' && github.ref != 'refs/heads/security/auto-findings' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download findings report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: codeql-findings-report
+
+      - name: Prepare branch with report
+        env:
+          REPORT_PATH: ${{ needs.security-scan.outputs.report_path }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B security/auto-findings
+
+          if [ ! -f "$REPORT_PATH" ]; then
+            echo "Expected report file '$REPORT_PATH' not found."
+            exit 1
+          fi
+
+          git add "$REPORT_PATH"
+
+          if git diff --cached --quiet; then
+            echo "No report changes to commit."
+            echo "skip_push=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git commit -m "Add CodeQL findings report"
+          git push --force-with-lease origin security/auto-findings
+
+      - name: Create or update pull request
+        if: ${{ env.skip_push != 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          OWNER="${REPOSITORY%/*}"
+          REPO="${REPOSITORY#*/}"
+          HEAD_BRANCH="security/auto-findings"
+
+          PR_BODY_FILE="pr-body.md"
+          {
+            echo "## Security Scan Findings"
+            echo
+            echo "Automatisch erzeugter Pull Request mit aktuellem CodeQL-Report."
+            echo
+            echo "- Workflow: \\`${GITHUB_WORKFLOW}\\`"
+            echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Branch: \\`${HEAD_BRANCH}\\`"
+            echo
+            echo "Der Report liegt in \\`security/codeql-findings.md\\`."
+          } > "$PR_BODY_FILE"
+
+          EXISTING_PR_NUMBER="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "/repos/${OWNER}/${REPO}/pulls?state=open&head=${OWNER}:${HEAD_BRANCH}&base=${DEFAULT_BRANCH}" \
+            --jq '.[0].number // empty')"
+
+          if [ -n "$EXISTING_PR_NUMBER" ]; then
+            gh api \
+              -X PATCH \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "/repos/${OWNER}/${REPO}/pulls/${EXISTING_PR_NUMBER}" \
+              -f title='Security Scan Findings' \
+              -f body="$(cat "$PR_BODY_FILE")"
+          else
+            gh api \
+              -X POST \
+              -H 'Accept: application/vnd.github+json' \
+              -H 'X-GitHub-Api-Version: 2022-11-28' \
+              "/repos/${OWNER}/${REPO}/pulls" \
+              -f title='Security Scan Findings' \
+              -f head="${HEAD_BRANCH}" \
+              -f base="${DEFAULT_BRANCH}" \
+              -f body="$(cat "$PR_BODY_FILE")"
+          fi
