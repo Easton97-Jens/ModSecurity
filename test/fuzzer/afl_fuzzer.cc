@@ -122,8 +122,15 @@ using namespace modsecurity;
 #include <signal.h>
 #include <string.h>
 
+#ifndef __AFL_LOOP
+#define __AFL_LOOP(x) (1)
+#endif
+
 inline void op_test(const std::string &opName, const std::string &s) {
     Operator *op = Operator::instantiate(opName, "");
+    if (op == nullptr) {
+        return;
+    }
     op->init("", nullptr);
     op->evaluate(nullptr, nullptr, s, nullptr);
     delete op;
@@ -142,7 +149,12 @@ int main(int argc, char** argv) {
         memset(buf, 0, 128);
         read_bytes = read(STDIN_FILENO, buf, 128);
 
-        std::string currentString = std::string(read_bytes, 128);
+        if (read_bytes <= 0) {
+            continue;
+        }
+
+        std::string currentString =
+            std::string(reinterpret_cast<const char *>(buf), read_bytes);
         const std::string& s = currentString;
 #if 0
         std::string z = lastString;
