@@ -1,0 +1,280 @@
+name: Fuzzing Smoke Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_minutes:
+        description: "How many minutes AFL++ should fuzz"
+        required: false
+        default: "10"
+      fail_on_hangs:
+        description: "Fail workflow when AFL++ reports hangs"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+  schedule:
+    - cron: "0 2 * * 0"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzzing-smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  fuzzing-smoke:
+    name: AFL++ fuzzing smoke test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    env:
+      AFL_SKIP_CPUFREQ: "1"
+      AFL_NO_AFFINITY: "1"
+      AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES: "1"
+      AFL_NO_UI: "1"
+      AFL_FAST_CAL: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Detect latest Lua packages
+        id: detect_lua
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo apt-get update -y -qq
+
+          CANDIDATES="$(apt-cache pkgnames | grep -E '^liblua[0-9]+\.[0-9]+-dev$' || true)"
+
+          if [ -z "$CANDIDATES" ]; then
+            echo "No libluaX.Y-dev package found"
+            exit 1
+          fi
+
+          BEST_PKG="$(
+            printf '%s\n' "$CANDIDATES" \
+            | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1 &/' \
+            | sort -V \
+            | tail -n1 \
+            | awk '{print $2}'
+          )"
+
+          if [ -z "$BEST_PKG" ]; then
+            echo "Failed to determine Lua dev package"
+            printf '%s\n' "$CANDIDATES"
+            exit 1
+          fi
+
+          BEST_VER="$(printf '%s\n' "$BEST_PKG" | sed -E 's/^liblua([0-9]+\.[0-9]+)-dev$/\1/')"
+          LUA_PKG="lua$BEST_VER"
+
+          echo "lua_dev_pkg=$BEST_PKG" >> "$GITHUB_OUTPUT"
+          echo "lua_pkg=$LUA_PKG" >> "$GITHUB_OUTPUT"
+
+          echo "Using Lua dev package: $BEST_PKG"
+          echo "Using Lua interpreter: $LUA_PKG"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            build-essential \
+            afl++ \
+            clang \
+            libtool \
+            pkg-config \
+            libyajl-dev \
+            libcurl4-openssl-dev \
+            liblmdb-dev \
+            ${{ steps.detect_lua.outputs.lua_dev_pkg }} \
+            ${{ steps.detect_lua.outputs.lua_pkg }} \
+            libmaxminddb-dev \
+            libpcre2-dev \
+            libxml2-dev \
+            libfuzzy-dev \
+            pcre2-utils \
+            libpcre3-dev \
+            bison \
+            flex \
+            python3 \
+            python3-venv
+
+      - name: Show Lua installation
+        shell: bash
+        run: |
+          which lua || true
+          lua -v || true
+          dpkg -l | grep lua || true
+
+      - name: Build ModSecurity with AFL++ instrumentation
+        shell: bash
+        env:
+          CC: afl-clang-fast
+          CXX: afl-clang-fast++
+        run: |
+          set -euo pipefail
+          ./build.sh
+          ./configure \
+            --enable-afl-fuzz \
+            --enable-parser-generation \
+            --enable-assertions=yes
+          make -j"$(nproc)"
+
+      - name: Locate AFL fuzzer target
+        id: target
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CANDIDATES=(
+            "./test/fuzzer/afl_fuzzer"
+            "./test/fuzzer/.libs/afl_fuzzer"
+          )
+
+          TARGET=""
+          for candidate in "${CANDIDATES[@]}"; do
+            if [ -x "$candidate" ]; then
+              TARGET="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$TARGET" ]; then
+            echo "Could not find test/fuzzer/afl_fuzzer"
+            find . -path "*afl_fuzzer*" -maxdepth 6 -print || true
+            exit 1
+          fi
+
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "Using AFL target: $TARGET"
+
+      - name: Create seed corpus
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf fuzz-in fuzz-out
+          mkdir -p fuzz-in fuzz-out
+
+          # Keep seeds small because the existing ModSecurity AFL harness reads 128 bytes.
+          printf '' > fuzz-in/empty
+          printf 'abc' > fuzz-in/plain
+          printf '../../etc/passwd' > fuzz-in/path-traversal
+          printf '%s' '<script>alert(1)</script>' > fuzz-in/xss
+          printf "%s" "' OR '1'='1" > fuzz-in/sqli
+          printf '%s' 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' > fuzz-in/max-128-a
+          printf '%s' '%u0101%u4141%2f%2e%2e%2f' > fuzz-in/url-encoded
+          printf '%s' '\x00\xff\xfe\xfd{{{{[[[[' > fuzz-in/binary-ish
+          printf '%s' 'SecRule ARGS "@rx ^(a+)+$" "id:1,phase:2,deny"' > fuzz-in/rule-ish
+          printf '%s' '../../../../../../../../../../tmp/a' > fuzz-in/deep-path
+          printf '%s' '() { :;}; echo vulnerable' > fuzz-in/shellshock-ish
+
+          ls -la fuzz-in
+
+      - name: Dry-run fuzzer target
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 10s "${{ steps.target.outputs.target }}" < fuzz-in/plain
+
+      - name: Run AFL++ smoke fuzzing
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          RUN_MINUTES="${{ github.event.inputs.run_minutes }}"
+          if [ -z "$RUN_MINUTES" ]; then
+            RUN_MINUTES="10"
+          fi
+
+          if ! [[ "$RUN_MINUTES" =~ ^[0-9]+$ ]]; then
+            echo "run_minutes must be a positive integer"
+            exit 1
+          fi
+
+          if [ "$RUN_MINUTES" -lt 1 ]; then
+            echo "run_minutes must be >= 1"
+            exit 1
+          fi
+
+          echo "Running AFL++ for ${RUN_MINUTES} minute(s)"
+
+          # timeout returns 124 when it stops AFL after the requested smoke window.
+          # That is expected and should not fail the workflow.
+          set +e
+          timeout "${RUN_MINUTES}m" \
+            afl-fuzz \
+              -i fuzz-in \
+              -o fuzz-out \
+              -m none \
+              -t 1000+ \
+              -- "${{ steps.target.outputs.target }}"
+          AFL_EXIT=$?
+          set -e
+
+          if [ "$AFL_EXIT" -ne 0 ] && [ "$AFL_EXIT" -ne 124 ]; then
+            echo "afl-fuzz exited with unexpected code: $AFL_EXIT"
+            exit "$AFL_EXIT"
+          fi
+
+      - name: Summarize AFL++ results
+        id: summary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "AFL++ output tree:"
+          find fuzz-out -maxdepth 4 -type f | sort || true
+
+          CRASH_COUNT="$(find fuzz-out -path '*/crashes/id:*' -type f | wc -l | tr -d ' ')"
+          HANG_COUNT="$(find fuzz-out -path '*/hangs/id:*' -type f | wc -l | tr -d ' ')"
+
+          echo "crash_count=$CRASH_COUNT" >> "$GITHUB_OUTPUT"
+          echo "hang_count=$HANG_COUNT" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "## AFL++ fuzzing smoke result"
+            echo
+            echo "- Crashes: \`$CRASH_COUNT\`"
+            echo "- Hangs: \`$HANG_COUNT\`"
+            echo "- Target: \`${{ steps.target.outputs.target }}\`"
+            echo "- Lua dev package: \`${{ steps.detect_lua.outputs.lua_dev_pkg }}\`"
+            echo "- Lua interpreter: \`${{ steps.detect_lua.outputs.lua_pkg }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload AFL++ corpus and findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: afl-fuzz-results-${{ github.run_id }}
+          path: |
+            fuzz-in
+            fuzz-out
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Fail on AFL++ crashes
+        if: steps.summary.outputs.crash_count != '0'
+        shell: bash
+        run: |
+          echo "AFL++ found ${{ steps.summary.outputs.crash_count }} crash(es). Download the afl-fuzz-results artifact."
+          exit 1
+
+      - name: Fail on AFL++ hangs when enabled
+        if: github.event.inputs.fail_on_hangs == 'true' && steps.summary.outputs.hang_count != '0'
+        shell: bash
+        run: |
+          echo "AFL++ found ${{ steps.summary.outputs.hang_count }} hang(s). Download the afl-fuzz-results artifact."
+          exit 1
