@@ -180,9 +180,12 @@ ACTION_TRANSFORMATION_UTF8_TO_UNICODE           (?i:t:utf8toUnicode)
 
 
 VARIABLE_ARGS_COMBINED_SIZE               (?i:ARGS_COMBINED_SIZE)
-VARIABLE_ARGS_GET_NAMES                   (?i:ARGS_GET_NAMES(?:_RAW)?)
-VARIABLE_ARGS_NAMES                       (?i:ARGS_NAMES(?:_RAW)?)
-VARIABLE_ARGS_POST_NAMES                  (?i:ARGS_POST_NAMES(?:_RAW)?)
+VARIABLE_ARGS_GET_NAMES_RAW               (?i:ARGS_GET_NAMES_RAW)
+VARIABLE_ARGS_GET_NAMES                   (?i:ARGS_GET_NAMES)
+VARIABLE_ARGS_NAMES_RAW                   (?i:ARGS_NAMES_RAW)
+VARIABLE_ARGS_NAMES                       (?i:ARGS_NAMES)
+VARIABLE_ARGS_POST_NAMES_RAW              (?i:ARGS_POST_NAMES_RAW)
+VARIABLE_ARGS_POST_NAMES                  (?i:ARGS_POST_NAMES)
 VARIABLE_AUTH_TYPE                        (?i:AUTH_TYPE)
 VARIABLE_FILES_COMBINED_SIZE              (?i:FILES_COMBINED_SIZE)
 VARIABLE_FILES_TMP_NAMES                  (?i:FILES_TMPNAMES)
@@ -247,9 +250,12 @@ VARIABLE_UNIQUE_ID                        (?i:UNIQUE_ID)
 VARIABLE_URL_ENCODED_ERROR                (?i:URLENCODED_ERROR)
 VARIABLE_USER_ID                          (?i:USERID)
 VARIABLE_WEBSERVER_ERROR_LOG              (?i:WEBSERVER_ERROR_LOG)
-VARIABLE_ARGS                             (?i:ARGS(?:_RAW)?)
-VARIABLE_ARGS_POST                        (?i:ARGS_POST(?:_RAW)?)
-VARIABLE_ARGS_GET                         (?i:ARGS_GET(?:_RAW)?)
+VARIABLE_ARGS_RAW                         (?i:ARGS_RAW)
+VARIABLE_ARGS                             (?i:ARGS)
+VARIABLE_ARGS_POST_RAW                    (?i:ARGS_POST_RAW)
+VARIABLE_ARGS_POST                        (?i:ARGS_POST)
+VARIABLE_ARGS_GET_RAW                     (?i:ARGS_GET_RAW)
+VARIABLE_ARGS_GET                         (?i:ARGS_GET)
 VARIABLE_FILES_SIZES                      (?i:FILES_SIZES)
 VARIABLE_FILES_NAMES                      (?i:FILES_NAMES)
 VARIABLE_FILES_TMP_CONTENT                (?i:FILES_TMP_CONTENT)
@@ -911,10 +917,16 @@ EQUALS_MINUS                            (?i:=\-)
 <EXPECTING_VARIABLE,EXPECTING_ACTION_PREDICATE_VARIABLE>{
 .                                           { BEGIN(LEXING_ERROR_VARIABLE); yyless(0); }
 {VARIABLE_ARGS_COMBINED_SIZE}               { return p::make_VARIABLE_ARGS_COMBINED_SIZE(*driver.loc.back()); }
+{VARIABLE_ARGS_GET_NAMES_RAW}               { return p::make_VARIABLE_ARGS_GET_NAMES_RAW(*driver.loc.back()); }
+{VARIABLE_ARGS_GET_NAMES_RAW}[:.]           { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET_NAMES_RAW(*driver.loc.back()); }
 {VARIABLE_ARGS_GET_NAMES}                   { return p::make_VARIABLE_ARGS_GET_NAMES(*driver.loc.back()); }
 {VARIABLE_ARGS_GET_NAMES}[:.]               { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET_NAMES(*driver.loc.back()); }
+{VARIABLE_ARGS_NAMES_RAW}                   { return p::make_VARIABLE_ARGS_NAMES_RAW(*driver.loc.back()); }
+{VARIABLE_ARGS_NAMES_RAW}[:.]               { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_NAMES_RAW(*driver.loc.back()); }
 {VARIABLE_ARGS_NAMES}                       { return p::make_VARIABLE_ARGS_NAMES(*driver.loc.back()); }
 {VARIABLE_ARGS_NAMES}[:.]                   { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_NAMES(*driver.loc.back()); }
+{VARIABLE_ARGS_POST_NAMES_RAW}              { return p::make_VARIABLE_ARGS_POST_NAMES_RAW(*driver.loc.back()); }
+{VARIABLE_ARGS_POST_NAMES_RAW}[:.]          { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST_NAMES_RAW(*driver.loc.back()); }
 {VARIABLE_ARGS_POST_NAMES}                  { return p::make_VARIABLE_ARGS_POST_NAMES(*driver.loc.back()); }
 {VARIABLE_ARGS_POST_NAMES}[:.]              { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST_NAMES(*driver.loc.back()); }
 {VARIABLE_AUTH_TYPE}                        { return p::make_VARIABLE_AUTH_TYPE(*driver.loc.back()); }
@@ -983,10 +995,16 @@ EQUALS_MINUS                            (?i:=\-)
 {VARIABLE_URL_ENCODED_ERROR}                { return p::make_VARIABLE_URL_ENCODED_ERROR(*driver.loc.back()); }
 {VARIABLE_USER_ID}                          { return p::make_VARIABLE_USER_ID(*driver.loc.back()); }
 {VARIABLE_WEB_APP_ID}                       { return p::make_VARIABLE_WEB_APP_ID(*driver.loc.back()); }
+{VARIABLE_ARGS_RAW}                         { return p::make_VARIABLE_ARGS_RAW(*driver.loc.back()); }
+{VARIABLE_ARGS_RAW}[:.]                     { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_RAW(*driver.loc.back()); }
 {VARIABLE_ARGS}                             { return p::make_VARIABLE_ARGS(*driver.loc.back()); }
 {VARIABLE_ARGS}[:.]                         { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS(*driver.loc.back()); }
+{VARIABLE_ARGS_GET_RAW}                     { return p::make_VARIABLE_ARGS_GET_RAW(*driver.loc.back()); }
+{VARIABLE_ARGS_GET_RAW}[:.]                 { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET_RAW(*driver.loc.back()); }
 {VARIABLE_ARGS_GET}                         { return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
 {VARIABLE_ARGS_GET}[:.]                     { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_GET(*driver.loc.back()); }
+{VARIABLE_ARGS_POST_RAW}                    { return p::make_VARIABLE_ARGS_POST_RAW(*driver.loc.back()); }
+{VARIABLE_ARGS_POST_RAW}[:.]                { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST_RAW(*driver.loc.back()); }
 {VARIABLE_ARGS_POST}                        { return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
 {VARIABLE_ARGS_POST}[:.]                    { BEGINX(EXPECTING_VAR_PARAMETER); return p::make_VARIABLE_ARGS_POST(*driver.loc.back()); }
 {VARIABLE_FILES_SIZES}                      { return p::make_VARIABLE_FILES_SIZES(*driver.loc.back()); }
@@ -1371,4 +1389,3 @@ void Driver::scan_end () {
 }
 
 }
-
