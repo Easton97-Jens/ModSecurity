@@ -263,8 +263,8 @@ bool Transaction::extractArguments(const std::string &orig,
     for (const auto &t : key_value_sets) {
         const auto sep2 = '=';
         auto [key, value] = utils::string::ssplit_pair(t, sep2);
-
-        addRawArgument(this, orig, key, value, offset);
+        std::string keyRaw = key;
+        std::string valueRaw = value;
 
         int invalid_count;
         utils::urldecode_nonstrict_inplace(key, invalid_count);
@@ -274,7 +274,9 @@ bool Transaction::extractArguments(const std::string &orig,
             m_variableUrlEncodedError.set("1", m_variableOffset);
         }
 
-        addArgument(orig, key, value, offset);
+        if (addArgument(orig, key, value, offset)) {
+            addRawArgument(this, orig, keyRaw, valueRaw, offset);
+        }
         offset = offset + t.size() + 1;
     }
 
