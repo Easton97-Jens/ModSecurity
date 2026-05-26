@@ -5,6 +5,8 @@
 #include "src/request_body_processor/json_instrumentation.h"
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 
 namespace modsecurity::RequestBodyProcessor {
 namespace {

@@ -16,6 +16,7 @@
 #include "src/variables/variable.h"
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 #include <list>
