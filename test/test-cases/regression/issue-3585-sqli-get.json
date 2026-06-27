@@ -1,0 +1,113 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi GET id comment/case bypass carrier - raw t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358501,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi GET id comment/case bypass carrier - lowercase + compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358502,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi GET id comment/case bypass carrier - removeComments + compressWhitespace + lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358503,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  }
+]
