@@ -18,7 +18,7 @@
         ""
       ]
     },
-    "title": "Issue #3587 SQLi POST urlencoded id comment/case bypass carrier - raw t:none",
+    "title": "Issue #3587 SQLi form-urlencoded comment/case UNION SELECT baseline - t:none",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -61,7 +61,7 @@
         ""
       ]
     },
-    "title": "Issue #3587 SQLi POST urlencoded id comment/case bypass carrier - lowercase + compressWhitespace",
+    "title": "Issue #3587 SQLi form-urlencoded comment/case UNION SELECT baseline - t:lowercase,t:compressWhitespace",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -104,7 +104,7 @@
         ""
       ]
     },
-    "title": "Issue #3587 SQLi POST urlencoded id comment/case bypass carrier - removeComments + compressWhitespace + lowercase",
+    "title": "Issue #3587 SQLi form-urlencoded comment/case UNION SELECT baseline - t:removeComments,t:compressWhitespace,t:lowercase",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -126,6 +126,909 @@
       "SecRuleEngine On",
       "SecRequestBodyAccess On",
       "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358703,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded comment/case UNION SELECT baseline - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "62"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358704,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded hex literals with LIKE operator rewrite - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "22"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+0x1+LIKE+0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358705,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded hex literals with LIKE operator rewrite - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "22"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+0x1+LIKE+0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358706,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded hex literals with LIKE operator rewrite - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "22"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+0x1+LIKE+0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358707,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded hex literals with LIKE operator rewrite - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "22"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+0x1+LIKE+0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358708,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded alternative whitespace hex LIKE rewrite - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "30"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1%09OR%0A0x1%0BLIKE%0C0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358709,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded alternative whitespace hex LIKE rewrite - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "30"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1%09OR%0A0x1%0BLIKE%0C0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358710,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded alternative whitespace hex LIKE rewrite - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "30"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1%09OR%0A0x1%0BLIKE%0C0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358711,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded alternative whitespace hex LIKE rewrite - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "30"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1%09OR%0A0x1%0BLIKE%0C0x1"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358712,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded boolean OR False scalar rewrite - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "15"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+false"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358713,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded boolean OR False scalar rewrite - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "15"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+false"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358714,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded boolean OR False scalar rewrite - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "15"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+false"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358715,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded boolean OR False scalar rewrite - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "15"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=0x1+OR+false"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358716,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded comments between SQL tokens - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%2F%2A%2A%2FOR%2F%2A%2A%2Ffalse"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358717,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded comments between SQL tokens - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%2F%2A%2A%2FOR%2F%2A%2A%2Ffalse"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358718,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded comments between SQL tokens - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%2F%2A%2A%2FOR%2F%2A%2A%2Ffalse"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358719,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded comments between SQL tokens - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%2F%2A%2A%2FOR%2F%2A%2A%2Ffalse"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358720,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded not-equals with nested sleep SELECT - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%3C%3Esleep%28%28SELECT+5%29%29"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358721,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded not-equals with nested sleep SELECT - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%3C%3Esleep%28%28SELECT+5%29%29"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358722,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded not-equals with nested sleep SELECT - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%3C%3Esleep%28%28SELECT+5%29%29"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358723,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3587 SQLi form-urlencoded not-equals with nested sleep SELECT - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Length": "35"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "id=1%3C%3Esleep%28%28SELECT+5%29%29"
+      ]
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule ARGS_POST:id \"@detectSQLi\" \"id:358724,phase:2,capture,deny,status:403,t:sqlHexDecode\""
     ]
   }
 ]
