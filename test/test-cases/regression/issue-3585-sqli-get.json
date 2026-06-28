@@ -103,7 +103,7 @@
       "method": "GET"
     },
     "expected": {
-      "http_code": 403
+      "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
@@ -288,7 +288,7 @@
       "method": "GET"
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
@@ -584,7 +584,7 @@
       "method": "GET"
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
@@ -880,7 +880,7 @@
       "method": "GET"
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",

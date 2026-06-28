@@ -120,7 +120,7 @@
       ]
     },
     "expected": {
-      "http_code": 403
+      "http_code": 200
     },
     "rules": [
       "SecRuleEngine On",
@@ -335,7 +335,7 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
@@ -507,7 +507,7 @@
       ]
     },
     "expected": {
-      "http_code": 200
+      "http_code": 403
     },
     "rules": [
       "SecRuleEngine On",
