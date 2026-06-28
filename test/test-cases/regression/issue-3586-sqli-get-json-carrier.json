@@ -18,7 +18,7 @@
         ""
       ]
     },
-    "title": "Issue #3586 SQLi GET data percent-encoded JSON carrier stays ARGS_GET:data, not JSON body",
+    "title": "Issue #3586 SQLi GET data percent-encoded JSON carrier stays ARGS_GET:data, not JSON body (current carrier behavior / known limitation: not detected)",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -55,7 +55,7 @@
         ""
       ]
     },
-    "title": "Issue #3586 comparison POST application/json with JSON processor exposes json.id",
+    "title": "Issue #3586 comparison POST application/json with JSON processor exposes json.id (known limitation: parsed json.id is not detected)",
     "request": {
       "headers": {
         "Host": "localhost",

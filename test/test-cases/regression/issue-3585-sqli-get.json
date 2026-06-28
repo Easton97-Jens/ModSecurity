@@ -92,7 +92,7 @@
         ""
       ]
     },
-    "title": "Issue #3585 SQLi comment/case UNION SELECT baseline - t:removeComments,t:compressWhitespace,t:lowercase",
+    "title": "Issue #3585 SQLi comment/case UNION SELECT baseline - t:removeComments,t:compressWhitespace,t:lowercase (known limitation: not detected)",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -314,7 +314,7 @@
         ""
       ]
     },
-    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:none",
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:none (known limitation: not detected)",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -351,7 +351,7 @@
         ""
       ]
     },
-    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:lowercase,t:compressWhitespace",
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:lowercase,t:compressWhitespace (known limitation: not detected)",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -388,7 +388,7 @@
         ""
       ]
     },
-    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:removeComments,t:compressWhitespace,t:lowercase",
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:removeComments,t:compressWhitespace,t:lowercase (known limitation: not detected)",
     "request": {
       "headers": {
         "Host": "localhost",
@@ -425,7 +425,7 @@
         ""
       ]
     },
-    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:sqlHexDecode",
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:sqlHexDecode (known limitation: not detected)",
     "request": {
       "headers": {
         "Host": "localhost",
