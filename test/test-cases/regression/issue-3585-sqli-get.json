@@ -1,0 +1,890 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comment/case UNION SELECT baseline - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358501,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comment/case UNION SELECT baseline - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358502,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comment/case UNION SELECT baseline - t:removeComments,t:compressWhitespace,t:lowercase (known limitation: not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358503,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comment/case UNION SELECT baseline - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FUnIoN%2F%2A%2A%2FSeLeCt%2F%2A%2A%2F1%2C2%2C3--",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358504,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi hex literals with LIKE operator rewrite - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%200x1%20LIKE%200x1",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358505,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi hex literals with LIKE operator rewrite - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%200x1%20LIKE%200x1",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358506,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi hex literals with LIKE operator rewrite - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%200x1%20LIKE%200x1",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358507,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi hex literals with LIKE operator rewrite - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%200x1%20LIKE%200x1",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358508,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:none (known limitation: not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%20false",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358509,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:lowercase,t:compressWhitespace (known limitation: not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%20false",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358510,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:removeComments,t:compressWhitespace,t:lowercase (known limitation: not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%20false",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358511,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi boolean OR False scalar rewrite - t:sqlHexDecode (known limitation: not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20OR%20false",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358512,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi not-equals operator with nested SELECT scalar - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20%3C%3E%20%28SELECT%201%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358513,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi not-equals operator with nested SELECT scalar - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20%3C%3E%20%28SELECT%201%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358514,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi not-equals operator with nested SELECT scalar - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20%3C%3E%20%28SELECT%201%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358515,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi not-equals operator with nested SELECT scalar - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=0x1%20%3C%3E%20%28SELECT%201%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358516,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi function argument nested SELECT scalar - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%20OR%20sleep%28%28SELECT%205%29%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358517,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi function argument nested SELECT scalar - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%20OR%20sleep%28%28SELECT%205%29%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358518,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi function argument nested SELECT scalar - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%20OR%20sleep%28%28SELECT%205%29%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358519,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi function argument nested SELECT scalar - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%20OR%20sleep%28%28SELECT%205%29%29",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358520,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comments between tokens plus not-equals and hex literal - t:none",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FOR%2F%2A%2A%2F%28SELECT%2F%2A%2A%2F1%29%3C%3E0x0",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358521,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comments between tokens plus not-equals and hex literal - t:lowercase,t:compressWhitespace",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FOR%2F%2A%2A%2F%28SELECT%2F%2A%2A%2F1%29%3C%3E0x0",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358522,phase:2,capture,deny,status:403,t:lowercase,t:compressWhitespace\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comments between tokens plus not-equals and hex literal - t:removeComments,t:compressWhitespace,t:lowercase",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FOR%2F%2A%2A%2F%28SELECT%2F%2A%2A%2F1%29%3C%3E0x0",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358523,phase:2,capture,deny,status:403,t:removeComments,t:compressWhitespace,t:lowercase\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3585 SQLi comments between tokens plus not-equals and hex literal - t:sqlHexDecode",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?id=1%2F%2A%2A%2FOR%2F%2A%2A%2F%28SELECT%2F%2A%2A%2F1%29%3C%3E0x0",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 403
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:id \"@detectSQLi\" \"id:358524,phase:2,capture,deny,status:403,t:sqlHexDecode\""
+    ]
+  }
+]

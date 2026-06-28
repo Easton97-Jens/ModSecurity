@@ -1,0 +1,83 @@
+[
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3586 SQLi GET data percent-encoded JSON carrier stays ARGS_GET:data, not JSON body (current carrier behavior / known limitation: not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*"
+      },
+      "uri": "/?data=%7B%22id%22%3A%221%20OR%20JSON_EXTRACT%28%27%7B%5C%22foo%5C%22%3A1%7D%27%2C%27%24.foo%27%29%3D1%22%7D",
+      "method": "GET"
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRule ARGS_GET:data \"@detectSQLi\" \"id:358601,phase:2,capture,deny,status:403,t:none\""
+    ]
+  },
+  {
+    "enabled": 1,
+    "version_min": 300000,
+    "client": {
+      "ip": "200.249.12.31",
+      "port": 123
+    },
+    "server": {
+      "ip": "200.249.12.31",
+      "port": 80
+    },
+    "response": {
+      "headers": {
+        "Content-Length": "0"
+      },
+      "body": [
+        ""
+      ]
+    },
+    "title": "Issue #3586 comparison POST application/json with JSON processor exposes json.id (known limitation: parsed json.id is not detected)",
+    "request": {
+      "headers": {
+        "Host": "localhost",
+        "User-Agent": "curl/7.38.0",
+        "Accept": "*/*",
+        "Content-Type": "application/json",
+        "Content-Length": "51"
+      },
+      "uri": "/",
+      "method": "POST",
+      "body": [
+        "{\"id\":\"1 OR JSON_EXTRACT('{\\\"foo\\\":1}','$.foo')=1\"}"
+      ]
+    },
+    "expected": {
+      "http_code": 200
+    },
+    "rules": [
+      "SecRuleEngine On",
+      "SecRequestBodyAccess On",
+      "SecRule REQUEST_HEADERS:Content-Type \"application/json\" \"id:358602,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON\"",
+      "SecRule ARGS:json.id \"@detectSQLi\" \"id:358603,phase:2,capture,deny,status:403,t:none\""
+    ]
+  }
+]
