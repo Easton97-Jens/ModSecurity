@@ -343,15 +343,6 @@ int Transaction::processURI(const char *uri, const char *method,
     m_uri = uri;
     std::string uri_s(uri);
 
-    // any uri-fragment that was received should only be retained in
-    // - m_uri
-    // - m_variableRequestURIRaw
-    // - m_variableRequestLine
-    size_t pos_raw_fragment = uri_s.find("#");
-    if (pos_raw_fragment != std::string::npos) {
-        uri_s = uri_s.substr(0, pos_raw_fragment);
-    }
-
     size_t pos_raw_query = uri_s.find("?");
 
     std::string path_info_raw;
