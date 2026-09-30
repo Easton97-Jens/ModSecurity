@@ -306,9 +306,11 @@ void RuleWithActions::executeAction(Transaction *trans,
         return;
     }
 
-    if (defaultContext && !containsBlock) {
+    if (defaultContext && !containsBlock
+            && m_disruptiveAction != nullptr
+            && *m_disruptiveAction->m_name.get() != "block") {
         ms_dbg_a(trans, 4, "Ignoring action: " + *a->m_name.get() + \
-            " (rule does not cotains block)");
+            " (rule has explicit disruptive action)");
         return;
     }
 
