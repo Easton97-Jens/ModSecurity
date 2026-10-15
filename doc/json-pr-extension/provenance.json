@@ -445,7 +445,8 @@
         "en"
       ]
     },
-    "history": "Both exports start fresh independent histories so English bundles contain no deleted German documents from earlier drafts."
+    "history": "Both exports start fresh independent histories so English bundles contain no deleted German documents from earlier drafts.",
+    "snapshot_note": "Historical ZIP/bundle preparation snapshot. The active English distribution is now targeted at the standalone fork branch recorded in fork_publication below; no new GitHub repository was created."
   },
   "integration_patch": {
     "path_in_exports": "patches/native-regressions.patch",
@@ -592,5 +593,46 @@
     "request": "One English-only repository, one including German as well.",
     "source_documents": "Canonical fork retains all German originals and English translations. Only the English export is localized; immutable source provenance is recorded.",
     "tests": "No request fixture, assertion, production source or YAJL behavior changed."
+  },
+  "fork_publication": {
+    "repository": "https://github.com/Easton97-Jens/ModSecurity",
+    "branch": "test/json-yajl-english-only-20261015",
+    "branch_url": "https://github.com/Easton97-Jens/ModSecurity/tree/test/json-yajl-english-only-20261015",
+    "prepared_english_base_commit": "55dff1f618fc4e67828d64e909a8cb690b79ac31",
+    "local_worktree": "/workspace/work/json-yajl-pr-expansion/english-fork-branch",
+    "languages": [
+      "en"
+    ],
+    "layout": "Independent standalone test/documentation tree; engine built separately at original8271c9d3. Existing fork branches are not merged, reset or rewritten.",
+    "publication_verification": "The handover records the final commit read back from the remote after the explicit normal push. No recursive self-SHA is embedded here.",
+    "validation": "Test/fixture/report/build/run files are byte-identical to the previously verified51-file English export; only publication documentation changed.",
+    "latest_functional_validation": {
+      "validated_utc": "2026-10-15T15:18:01.838877+00:00",
+      "command": "python3 test/json-baseline/tools/run_all.py --probes /workspace/work/json-yajl-pr-expansion/portable-probes-02 --output /workspace/work/json-yajl-pr-expansion/english-fork-validation --profile all",
+      "cwd": "/workspace/work/json-yajl-pr-expansion/english-fork-branch",
+      "counts": {
+        "PASS": 405,
+        "FAIL": 20,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "exit": 1,
+      "characterization": {
+        "PASS": 399,
+        "FAIL": 0,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "requirements": {
+        "PASS": 6,
+        "FAIL": 20,
+        "SKIP": 0,
+        "BLOCKED": 0,
+        "XFAIL": 0
+      },
+      "scope": "Reused prebuilt probes whose C++ source hashes match this branch; source/submodules/library/hash/activeJSON rechecked. Existing exact case reports and expectations are unchanged; requirements remain ordinary FAIL."
+    }
   }
 }

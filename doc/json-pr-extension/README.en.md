@@ -7,14 +7,18 @@ This extension adds independently implemented tests inspired by
 and [airween's comment](https://github.com/owasp-modsecurity/ModSecurity/issues/3308#issuecomment-6142615388).
 The tests exercise ModSecurity itself. YAJL and production code are unchanged.
 
-The two standalone repositories, provisionally named
-`ModSecurity-JSON-Tests-DE` and `ModSecurity-JSON-Tests-EN`, are prepared as local
-deliverables. **Neither new GitHub repository has been created or published.**
-Both prepared repositories contain the same executable tests. The German
-repository contains the complete historical and new documentation in German and
-English; the English repository contains **only the complete English versions**.
-This is separate from any publication of the task branch in the existing
-ModSecurity fork.
+The complete English-only distribution is provided as a dedicated branch in the
+existing fork: [test/json-yajl-english-only-20261015](https://github.com/Easton97-Jens/ModSecurity/tree/test/json-yajl-english-only-20261015).
+It contains the standalone tests and all English documentation. The engine is
+built from the pinned official source in a separate checkout. Existing fork
+branches retain their own content; no separate GitHub repository is required.
+The German-and-English distribution remains available through the
+[previous verified handover](https://github.com/Easton97-Jens/ModSecurity/blob/becb17e4c12679369983e664eda97eb49e0f0ff1/doc/json-pr-extension/prepared-repositories/README.md).
+
+```sh
+git clone --single-branch --no-tags --branch test/json-yajl-english-only-20261015 https://github.com/Easton97-Jens/ModSecurity.git modsecurity-json-tests-en
+cd modsecurity-json-tests-en
+```
 
 ## Original reference and scope
 

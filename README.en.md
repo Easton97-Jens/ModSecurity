@@ -1,6 +1,13 @@
 # ModSecurity: JSON tests and complete documentation
 
-This standalone test repository exercises the actual YAJL processing in official ModSecurity v3. It contains the complete previous baseline, additional tests inspired by the jsonbench PRs and both ModSecurity comments, and **the complete explanatory documentation in English**. This English repository contains only English explanatory documents. The separate German repository contains both language versions; the executable tests are identical.
+This English-only branch in [Easton97-Jens/ModSecurity](https://github.com/Easton97-Jens/ModSecurity/tree/test/json-yajl-english-only-20261015) contains the complete JSON behavior tests and English documentation. It includes the previous baseline, additional tests inspired by the jsonbench PRs and both ModSecurity comments, and the complete historical reports in English. Build the pinned official ModSecurity engine in a separate checkout using the commands below.
+
+Clone this branch into a new directory:
+
+```sh
+git clone --single-branch --no-tags --branch test/json-yajl-english-only-20261015 https://github.com/Easton97-Jens/ModSecurity.git modsecurity-json-tests-en
+cd modsecurity-json-tests-en
+```
 
 Start with the [new results and reproduction guide](doc/json-pr-extension/README.en.md), the [coverage matrix](doc/json-pr-extension/matrix.en.md), or [How ModSecurity processes a JSON request](doc/en/json-yajl-code-analysis.md). The complete historical reports and original project README are included in English.
 
