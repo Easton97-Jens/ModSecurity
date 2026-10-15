@@ -65,7 +65,7 @@ def cases():
     add('D-object-array','{"a":[1,2],"b":3}',[p('a.array_0','1'),p('a.array_1','2'),p('b','3')])
     add('D-array-object','[{"a":1},{"b":2}]',[pair('json.array_0.a','1'),pair('json.array_1.b','2')])
     add('D-multidim','[[1,2],[3],4]',[pair('json.array_0.array_0','1'),pair('json.array_0.array_1','2'),pair('json.array_1.array_0','3'),pair('json.array_2','4')])
-    add('D-empty-slots','[{},1,[],2,{},[],3]',[pair('json.array_1','1'),pair('json.array_3','2'),pair('json.array_6','3')])
+    add('D-empty-slots','[{},1,[],2,{},[],3,{},[]]',[pair('json.array_1','1'),pair('json.array_3','2'),pair('json.array_6','3')])
     add('D-mixed','{"a":[{},1,[],2,{"b":[true,false]}],"z":null}',[p('a.array_1','1'),p('a.array_3','2'),p('a.array_4.b.array_0','true'),p('a.array_4.b.array_1','false'),p('z','')])
     add('D-walkthrough','{"items":[["A","B"],"C"],"tail":"D"}',[p('items.array_0.array_0','A'),p('items.array_0.array_1','B'),p('items.array_1','C'),p('tail','D')])
     add('D-tail','{"a":[[{},1],2],"b":{"c":3},"z":4}',[p('a.array_0.array_1','1'),p('a.array_1','2'),p('b.c','3'),p('z','4')])
