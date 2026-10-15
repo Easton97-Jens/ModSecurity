@@ -258,6 +258,88 @@
 			),
 		),
 	),
-}
+},
 
+# YAJL baseline: exact rule-visible bytes and callback limit propagation.
+{
+    type => "rule",
+    comment => "json YAJL baseline - number text remains 1E+02",
+    conf => qq(
+        SecRuleEngine On
+        SecRequestBodyAccess On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
 
+        SecAction "id:209910,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON"
+        SecRule ARGS:n "\@streq 1E+02" "id:209901,phase:2,t:none,deny,status:403,log"
+    ),
+    match_log => { debug => [ qr/JSON parser initialization/s, 1 ] },
+    match_response => { status => qr/^403$/ },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [ "Content-Type" => "application/json" ],
+        q({"n":1E+02}),
+    ),
+},
+{
+    type => "rule",
+    comment => "json YAJL baseline - duplicate key occurrences remain visible",
+    conf => qq(
+        SecRuleEngine On
+        SecRequestBodyAccess On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+
+        SecAction "id:209911,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON"
+        SecRule &ARGS "\@eq 2" "id:209902,phase:2,t:none,deny,status:403,log,chain"
+        SecRule ARGS:a "\@streq 2" "t:none"
+    ),
+    match_log => { debug => [ qr/JSON parser initialization/s, 1 ] },
+    match_response => { status => qr/^403$/ },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [ "Content-Type" => "application/json" ],
+        q({"a":1,"a":2}),
+    ),
+},
+{
+    type => "rule",
+    comment => "json YAJL baseline - boolean callback propagates argument limit",
+    conf => qq(
+        SecRuleEngine On
+        SecRequestBodyAccess On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+        SecArgumentsLimit 1
+        SecAction "id:209912,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON"
+        SecRule REQBODY_ERROR "\@eq 1" "id:209903,phase:2,t:none,deny,status:403,log,chain"
+        SecRule &ARGS "\@eq 1" "t:none"
+    ),
+    match_log => { debug => [ qr/JSON parser initialization/s, 1 ] },
+    match_response => { status => qr/^403$/ },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [ "Content-Type" => "application/json" ],
+        q({"a":1,"b":false}),
+    ),
+},
+{
+    type => "rule",
+    comment => "json YAJL baseline - escaped NUL value is binary safe",
+    conf => qq(
+        SecRuleEngine On
+        SecRequestBodyAccess On
+        SecDebugLog $ENV{DEBUG_LOG}
+        SecDebugLogLevel 9
+
+        SecAction "id:209913,phase:1,t:none,pass,nolog,ctl:requestBodyProcessor=JSON"
+        SecRule ARGS:x "\@streq 610062" "id:209904,phase:2,t:none,t:hexEncode,deny,status:403,log"
+    ),
+    match_log => { debug => [ qr/JSON parser initialization/s, 1 ] },
+    match_response => { status => qr/^403$/ },
+    request => new HTTP::Request(
+        POST => "http://$ENV{SERVER_NAME}:$ENV{SERVER_PORT}/test.txt",
+        [ "Content-Type" => "application/json" ],
+        q({"x":"a\u0000b"}),
+    ),
+},

@@ -1,0 +1,6283 @@
+{
+  "counts": {
+    "PASS": 145,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "cases": [
+    {
+      "id": "CANARY-json-enabled",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 20,
+      "body_hex": "7b2263616e617279223a22656e61626c6564227d",
+      "body_sha256": "96b3f7e009c3820ecab8a70468484540187a6981fad6c6f8b4f92eb7e1d426a0",
+      "expected_args": [
+        {
+          "name_hex": "63616e617279",
+          "value_hex": "656e61626c6564"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "63616e617279",
+          "value_hex": "656e61626c6564"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "A-no-body",
+      "status": "PASS",
+      "failures": [],
+      "body_length": null,
+      "body_hex": null,
+      "body_sha256": null,
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": false,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "A-zero-bytes",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 0,
+      "body_hex": "",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "A-whitespace",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 4,
+      "body_hex": "20090d0a",
+      "body_sha256": "bb403f616bb62f0c473c42534601e3d8fe24fa61add49f51f4cdba8bd585ce29",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": false,
+      "http_expected": 500,
+      "http_actual": 500,
+      "args": [],
+      "error": [],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "A-object",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "7b7d",
+      "body_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "A-array",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "5b5d",
+      "body_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "A-empty-string",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "2222",
+      "body_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-empty",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 12,
+      "body_hex": "7b22223a2276616c7565227d",
+      "body_sha256": "c50c9e7f8403b32e90b6567d2463473da748798a661338a748495f925a73cfa5",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "76616c7565"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "76616c7565"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-nested-empty",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 21,
+      "body_hex": "7b2261223a7b22223a2276227d2c22223a227a227d",
+      "body_sha256": "5bb4a49afe48234932c05d138f94794f21975c05047979ff69303ba76262e046",
+      "expected_args": [
+        {
+          "name_hex": "612e",
+          "value_hex": "76"
+        },
+        {
+          "name_hex": "",
+          "value_hex": "7a"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e",
+          "value_hex": "76"
+        },
+        {
+          "name_hex": "",
+          "value_hex": "7a"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-empty-siblings",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 15,
+      "body_hex": "7b22223a2278222c22223a2279227d",
+      "body_sha256": "c880107cbb231da28820bebd29723acf91cd8935bdab4cdf9ef543604c936fbf",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "",
+          "value_hex": "79"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "",
+          "value_hex": "79"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-dot-flat",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b22612e62223a317d",
+      "body_sha256": "6e28a28bd896cc6e38f12571fce63a4cb149b98a32247e41fa01e41c8bef2a04",
+      "expected_args": [
+        {
+          "name_hex": "612e62",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e62",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-dot-nested",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 13,
+      "body_hex": "7b2261223a7b2262223a317d7d",
+      "body_sha256": "815ce69073bf37a71afee34156192e1d9921dfc365dc653a02516902c3a5e2e7",
+      "expected_args": [
+        {
+          "name_hex": "612e62",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e62",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-backslash-unicode",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 24,
+      "body_hex": "7b22615c5c62223a2278222c22c3b6223a22f09f92a9227d",
+      "body_sha256": "64529dfe7d562f125c9c9d439e0c877e14154e99e972591998a81581f855fb60",
+      "expected_args": [
+        {
+          "name_hex": "615c62",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "c3b6",
+          "value_hex": "f09f92a9"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "615c62",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "c3b6",
+          "value_hex": "f09f92a9"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "B-nul-key",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 16,
+      "body_hex": "7b22615c753030303062223a2278227d",
+      "body_sha256": "dc1a87e3132ff40b09e9d4e6ac660ce5e308ee6393b1add5c88ac17ff0fcbea6",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-string",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "2268656c6c6f22",
+      "body_sha256": "5aa762ae383fbb727af3c7a36d4940a5b8c40a989452d2304fc958ff3f354e7a",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "68656c6c6f"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "68656c6c6f"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-string-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "20092268656c6c6f220d0a",
+      "body_sha256": "31f4513910bf121c85b9e643eb9d0beb6513835cdeed29f11e5eb155d5783760",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "68656c6c6f"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "68656c6c6f"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-empty",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "2222",
+      "body_sha256": "12ae32cb1ec02d01eda3581b127c1fee3b0dc53572ed6baf239721a03d82e126",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-empty-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 6,
+      "body_hex": "200922220d0a",
+      "body_sha256": "ae03c4aa46c3a5bcfe9f2879679cb21c634b30cd3a92d612fedc5109b08bece7",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-int",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "3235",
+      "body_sha256": "b7a56873cd771f2c446d369b649430b65a756ba278ff97ec81bb6f55b2e73569",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "3235"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "3235"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-int-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 6,
+      "body_hex": "200932350d0a",
+      "body_sha256": "174305e2868b0515e92de08712a57cedef6c559a0d2b0bbc140d02b147e0c6a6",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "3235"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "3235"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-decimal",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 6,
+      "body_hex": "312e32333030",
+      "body_sha256": "8410f0402d0a3a770db9851714606f9803cb7833f20fc2f94dc8f2ef96d1be84",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "312e32333030"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "312e32333030"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-decimal-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "2009312e323330300d0a",
+      "body_sha256": "2a56ecc23f3bc331e4d18e1eba2fabc96101e1f4d807397b230d8820f5b5114b",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "312e32333030"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "312e32333030"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-true",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 4,
+      "body_hex": "74727565",
+      "body_sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "74727565"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "74727565"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-true-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "2009747275650d0a",
+      "body_sha256": "3fa8f58c36bddc89d3a803ddab04454f8bfdaa7abcd28c7ebaff4090316041e0",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "74727565"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "74727565"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-false",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 5,
+      "body_hex": "66616c7365",
+      "body_sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "66616c7365"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "66616c7365"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-false-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "200966616c73650d0a",
+      "body_sha256": "eaf755a5292d22011a2871321ba2d5a59ef3bde7f739593db016601f7b47c9ca",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "66616c7365"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "66616c7365"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-null",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 4,
+      "body_hex": "6e756c6c",
+      "body_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "C-null-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "20096e756c6c0d0a",
+      "body_sha256": "50193521ed45c356177589c939e920c279ee8bd58bcc3c1f37a5d35ba4e708be",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": ""
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "D-root-array",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 5,
+      "body_hex": "5b312c325d",
+      "body_sha256": "49a64717d5d4cb19952e6eac2946415cf6879adacf9908e7d872332d32c6e684",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "D-object-array",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "7b2261223a5b312c325d2c227a223a337d",
+      "body_sha256": "192e94050a16b1990c656f91dd545745bd7d55eabce094b2de0fd43133b7cdaa",
+      "expected_args": [
+        {
+          "name_hex": "612e61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "612e61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "7a",
+          "value_hex": "33"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "612e61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "7a",
+          "value_hex": "33"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "D-objects",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "5b7b2278223a317d2c7b2278223a327d5d",
+      "body_sha256": "33e09bfbb74384796e37a25d972b0c7731f1e00f81cd9ff2a1b243486052d3c7",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e61727261792e78",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e61727261792e78",
+          "value_hex": "32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e61727261792e78",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e61727261792e78",
+          "value_hex": "32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "D-multidimensional",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "5b5b312c325d2c5b335d5d",
+      "body_sha256": "2ce1506f23766b649ef41e6bdfe0fdbe4f0511b691fae88138226d089ed82a4b",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "33"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "33"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "D-mixed-empty",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 41,
+      "body_hex": "7b2261223a5b7b7d2c312c5b5d2c322c7b2262223a5b335d7d2c342c7b7d2c5b5d5d2c227a223a357d",
+      "body_sha256": "1b50d221955cf965a769d5a84cc653fa0a93c3f1ce6e0f0133dff1e8f447c392",
+      "expected_args": [
+        {
+          "name_hex": "612e61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "612e61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "612e612e622e62",
+          "value_hex": "33"
+        },
+        {
+          "name_hex": "612e61",
+          "value_hex": "34"
+        },
+        {
+          "name_hex": "7a",
+          "value_hex": "35"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "612e61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "612e612e622e62",
+          "value_hex": "33"
+        },
+        {
+          "name_hex": "612e61",
+          "value_hex": "34"
+        },
+        {
+          "name_hex": "7a",
+          "value_hex": "35"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-object-2",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 13,
+      "body_hex": "7b2261223a7b2261223a317d7d",
+      "body_sha256": "8ff02e51492298394eb8d285b3873e3660c41e58c6de5b51ad6871b003688ec2",
+      "expected_args": [
+        {
+          "name_hex": "612e61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-array-2",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 5,
+      "body_hex": "5b5b315d5d",
+      "body_sha256": "043f347c2cdc0d8ce70c38775d24e556c0290acf6d0c87a3a52aa85471cb8d02",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-mixed-2",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "7b2261223a5b5b315d5d7d",
+      "body_sha256": "daf0c3e5e2173f7c74b5a2aa3a7a6bed1ad50b2d2a29857fbf3e7a4e59a70b3d",
+      "expected_args": [
+        {
+          "name_hex": "612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-object-3",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 19,
+      "body_hex": "7b2261223a7b2261223a7b2261223a317d7d7d",
+      "body_sha256": "0d386f53413e5c91c9f82c20cfdaa1f563d3878676ec8508f7bc001bcabd536a",
+      "expected_args": [
+        {
+          "name_hex": "612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-array-3",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "5b5b5b315d5d5d",
+      "body_sha256": "ae973b0501aa804743d67badc7de3645e565b60a1aa115316bb493a205c13843",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-mixed-3",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 13,
+      "body_hex": "7b2261223a5b5b5b315d5d5d7d",
+      "body_sha256": "a7b962ffc433a199f46e6a144fedf8e92b2bb4db068808004a45717bab8ca5de",
+      "expected_args": [
+        {
+          "name_hex": "612e612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-object-4",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 25,
+      "body_hex": "7b2261223a7b2261223a7b2261223a7b2261223a317d7d7d7d",
+      "body_sha256": "e7c545f2b188e2d7f9d924219880e008b07164cdacd043d2f5e88acc593e0212",
+      "expected_args": [
+        {
+          "name_hex": "612e612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e612e612e61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-array-4",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "5b5b5b5b315d5d5d5d",
+      "body_sha256": "b6bb89c1950785438bc131b5a5e8eddcf7cf7057d39f295b23fca052d768a50c",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-mixed-4",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 15,
+      "body_hex": "7b2261223a5b5b5b5b315d5d5d5d7d",
+      "body_sha256": "fb7c644fce3a7f30adc41f9a2c36bb31c7c5ce39ff7411779f4ef271fe921d0d",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-object-over",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 31,
+      "body_hex": "7b2261223a7b2262223a7b2263223a7b2264223a7b2265223a317d7d7d7d7d",
+      "body_sha256": "2908f1617b1a6274cf5e566f145c6fa02f5fd013de5669839e980c5cef0c6aa5",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-partial",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 22,
+      "body_hex": "7b226f6b223a312c2261223a5b5b5b5b325d5d5d5d7d",
+      "body_sha256": "675972b9fa4ebfb97c53169a9e10e8f5a695800d94032dfc19b89af16931448a",
+      "expected_args": [
+        {
+          "name_hex": "6f6b",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6f6b",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-limit-one-object",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-limit-one-array",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 5,
+      "body_hex": "5b5b315d5d",
+      "body_sha256": "043f347c2cdc0d8ce70c38775d24e556c0290acf6d0c87a3a52aa85471cb8d02",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-object-2",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "7b226b30223a2273222c226b31223a327d",
+      "body_sha256": "ea95fd94fe4239fb7cdcc04a02fb12a1b0b8f82a6eea8693a1106b900e73418c",
+      "expected_args": [
+        {
+          "name_hex": "6b30",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "6b31",
+          "value_hex": "32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6b30",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "6b31",
+          "value_hex": "32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-array-2",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "5b2273222c325d",
+      "body_sha256": "2a96b74e0112de8e59791c025e8b3b945a96fac52ff70ecc35a926a64079d6e9",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-object-3",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 27,
+      "body_hex": "7b226b30223a2273222c226b31223a322c226b32223a747275657d",
+      "body_sha256": "9ba6cc3310c15496b48cc66df2f958a7915aefc7c3c68720ad0df2d6efb94333",
+      "expected_args": [
+        {
+          "name_hex": "6b30",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "6b31",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "6b32",
+          "value_hex": "74727565"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6b30",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "6b31",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "6b32",
+          "value_hex": "74727565"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-array-3",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 12,
+      "body_hex": "5b2273222c322c747275655d",
+      "body_sha256": "8e56118ba17892800b96df5ac42807e6e893e6e9c875537a5820b1d988f0db11",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "74727565"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "74727565"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-object-4",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 37,
+      "body_hex": "7b226b30223a2273222c226b31223a322c226b32223a747275652c226b33223a6e756c6c7d",
+      "body_sha256": "43289ac9fa5737a184005a65f8f69980fb67dec4b23d1cfa10d5de77e0f4d9bf",
+      "expected_args": [
+        {
+          "name_hex": "6b30",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "6b31",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "6b32",
+          "value_hex": "74727565"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6b30",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "6b31",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "6b32",
+          "value_hex": "74727565"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-array-4",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "5b2273222c322c747275652c6e756c6c5d",
+      "body_sha256": "0f20d05d3a8d3a58b8fcc320c9c48aaf99b3dff73db6b4da0b4e47caf3c60efc",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "74727565"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "73"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "74727565"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-callback-false",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "7b2261223a312c2262223a66616c73657d",
+      "body_sha256": "dc55090895fbe592549eef02603b64365c7dc7300f571b76aa9620f1a068eb91",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-callback-true",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 16,
+      "body_hex": "7b2261223a312c2262223a747275657d",
+      "body_sha256": "d918e8d1a9eb1f54b583326cad9950c771474b5c8ac1072bb0f2a0ad148d6de5",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-callback-null",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 16,
+      "body_hex": "7b2261223a312c2262223a6e756c6c7d",
+      "body_sha256": "46e0ff59f6164548317489fbea1133a48f7a83c325c3535e44559c9619afb76b",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-callback-x",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 15,
+      "body_hex": "7b2261223a312c2262223a2278227d",
+      "body_sha256": "ecf9e98ec0641e23113ff3ce8bdc78d0ddd249886517fd4a7f68cc83d4e65667",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-callback-4",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 13,
+      "body_hex": "7b2261223a312c2262223a347d",
+      "body_sha256": "b117417cd324619ced7fea07f32dab6e10d313e9961d438324b6fd4128910620",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-empty-containers",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 21,
+      "body_hex": "7b2261223a7b7d2c2262223a5b5d2c2263223a317d",
+      "body_sha256": "eca0da663a4e251f83b13dda3f32af1c729f12390be5a29d940dc7e6a3944573",
+      "expected_args": [
+        {
+          "name_hex": "63",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "63",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-duplicates",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 25,
+      "body_hex": "7b2261223a312c2261223a322c2261223a332c2261223a347d",
+      "body_sha256": "07db46ddaa754942a2a404248d87d14eaa51abaad1d843e2d5ec614676213685",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "33"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "33"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-query-json",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 13,
+      "body_hex": "7b226a223a312c226b223a327d",
+      "body_sha256": "aa2bce01fbbc36980eec9b7f631e35e13ad6701a47a143df93c35d4f33c4f34e",
+      "expected_args": [
+        {
+          "name_hex": "71",
+          "value_hex": "76"
+        },
+        {
+          "name_hex": "6a",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "71",
+          "value_hex": "76"
+        },
+        {
+          "name_hex": "6a",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-query-at",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b226a223a317d",
+      "body_sha256": "2f9a7bd16d6361e0768578c7d88e64e0d2c3a78f670487dd7f193ec1a62d290d",
+      "expected_args": [
+        {
+          "name_hex": "71",
+          "value_hex": "76"
+        },
+        {
+          "name_hex": "6a",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "71",
+          "value_hex": "76"
+        },
+        {
+          "name_hex": "6a",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-utf8",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 37,
+      "body_hex": "7b22c2a2223a22c2a2222c22e282ac223a22e282ac222c22f09f92a9223a22f09f92a9227d",
+      "body_sha256": "7adba08eb06c03c2a2e99caa36f8843a8aa83ced2b5f949a4cea091ec3875908",
+      "expected_args": [
+        {
+          "name_hex": "c2a2",
+          "value_hex": "c2a2"
+        },
+        {
+          "name_hex": "e282ac",
+          "value_hex": "e282ac"
+        },
+        {
+          "name_hex": "f09f92a9",
+          "value_hex": "f09f92a9"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "c2a2",
+          "value_hex": "c2a2"
+        },
+        {
+          "name_hex": "e282ac",
+          "value_hex": "e282ac"
+        },
+        {
+          "name_hex": "f09f92a9",
+          "value_hex": "f09f92a9"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-escapes",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 49,
+      "body_hex": "7b225c7530306132223a225c7532306163222c225c75643833645c7564636139223a225c75643833645c7564636139227d",
+      "body_sha256": "02146ccb0d1bc23280304f53f4c7ebd854bdb5ade50b081eea24b5fc54c04b68",
+      "expected_args": [
+        {
+          "name_hex": "c2a2",
+          "value_hex": "e282ac"
+        },
+        {
+          "name_hex": "f09f92a9",
+          "value_hex": "f09f92a9"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "c2a2",
+          "value_hex": "e282ac"
+        },
+        {
+          "name_hex": "f09f92a9",
+          "value_hex": "f09f92a9"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-control-escapes",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 24,
+      "body_hex": "7b2278223a225c625c665c6e5c725c745c5c5c225c2f227d",
+      "body_sha256": "062c38ef9090fcde9bcabe5c46e13c01c38660a860e2cdfccb44b0c3a48ff1b3",
+      "expected_args": [
+        {
+          "name_hex": "78",
+          "value_hex": "080c0a0d095c222f"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "78",
+          "value_hex": "080c0a0d095c222f"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-nul-value",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 16,
+      "body_hex": "7b2278223a22615c753030303062227d",
+      "body_sha256": "6b21b82b52ccdb0f0ee86e0ee0d87407c673060a30c683c13db1c18e446bda05",
+      "expected_args": [
+        {
+          "name_hex": "78",
+          "value_hex": "610062"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "78",
+          "value_hex": "610062"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-value-continuation",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2278223a2280227d",
+      "body_sha256": "d140d1067913cdca3d35bec6f4fe2e8741be770d81a3eb3c749b490c5bd0aa9b",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-key-continuation",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2280223a2278227d",
+      "body_sha256": "aa8b2555eeca54b77f23b0829a1b0bfd57fc5b82fa890e76b340194556d04e90",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-value-overlong",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "7b2278223a22c0af227d",
+      "body_sha256": "37b3f35930ea17bfe075c5666f4cf91f3f0eb13b6b34853870daf30c161b7932",
+      "expected_args": [
+        {
+          "name_hex": "78",
+          "value_hex": "c0af"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "78",
+          "value_hex": "c0af"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-key-overlong",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "7b22c0af223a2278227d",
+      "body_sha256": "8444325a59a037286d2d5073a47e49257f2d13792aff312978a0e8b4ec851cf0",
+      "expected_args": [
+        {
+          "name_hex": "c0af",
+          "value_hex": "78"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "c0af",
+          "value_hex": "78"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-value-truncated",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "7b2278223a22e282227d",
+      "body_sha256": "69f43f523899bf8c6bb65fae15474e11209215dadbf870cc1fa23df0d1c56d36",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-key-truncated",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "7b22e282223a2278227d",
+      "body_sha256": "e88a3b7d44b2207221fdfad9b993b201952b3d301ebdb313d840352442624054",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-value-range",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 12,
+      "body_hex": "7b2278223a22f4908080227d",
+      "body_sha256": "a397cb45ecddae3182b5954a3ef3d30fc1e9f7055c709ce950f96b4e7a0f9fc6",
+      "expected_args": [
+        {
+          "name_hex": "78",
+          "value_hex": "f4908080"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "78",
+          "value_hex": "f4908080"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-key-range",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 12,
+      "body_hex": "7b22f4908080223a2278227d",
+      "body_sha256": "c96b5f832cbe72b70b62507df3b390e32fbb860f6c06526ba5e5f7761c5c80c3",
+      "expected_args": [
+        {
+          "name_hex": "f4908080",
+          "value_hex": "78"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "f4908080",
+          "value_hex": "78"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-escape",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "7b2278223a225c71227d",
+      "body_sha256": "675c0628e8f62f7573e87f2853bf0cdce87f4dec64f1d763bfbf7fa74787d499",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-short-u",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 13,
+      "body_hex": "7b2278223a225c75313233227d",
+      "body_sha256": "cca012d75459921cc484cf91599b4ed5fb8fbae6f2b6ba681f5e8ff494e40eb8",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-bad-u",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 14,
+      "body_hex": "7b2278223a225c755a5a5a5a227d",
+      "body_sha256": "3bcb13bfbeeabf32c2a3d1346d8dbf383cfb0e335155723db907088a018e6b5d",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-invalid-raw-control",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2278223a2201227d",
+      "body_sha256": "c038d83bdc1c2a5d3c752ce765c20c1c43e98435ecd3dadafbf504e41a8509d1",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-high-surrogate",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 14,
+      "body_hex": "7b2278223a225c7564383030227d",
+      "body_sha256": "7f3c6b6b4a88409efe4d2fba1cb3cf2b79b682fe4387678cba2e6b9645b58221",
+      "expected_args": [
+        {
+          "name_hex": "78",
+          "value_hex": "3f"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "78",
+          "value_hex": "3f"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "G-low-surrogate",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 14,
+      "body_hex": "7b2278223a225c7564633030227d",
+      "body_sha256": "d89680df38c82470ec066373c076cf7bad36215c60bb8faaad67658af7aa366f",
+      "expected_args": [
+        {
+          "name_hex": "78",
+          "value_hex": "edb080"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "78",
+          "value_hex": "edb080"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-00",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b226e223a307d",
+      "body_sha256": "f3013f933b9fb80ab6d995e7ad9da36f683837ba1d81e950c943d40111eac2f0",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "30"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "30"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-01",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b226e223a2d307d",
+      "body_sha256": "d54829e5b2d6e184fe2005d0b3ee73c1931163e1c1fd461a7449c9f7255ea2d2",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d30"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d30"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-02",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b226e223a317d",
+      "body_sha256": "2bfd14f43d17fc7cea24e0917a8879b4b2f880b8baeec1b9d90fbaad655e71bd",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-03",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b226e223a2d317d",
+      "body_sha256": "0c31e9341837b3869856e8ea000cdc2668e68a8bd0f291d61c3d7ea52bbcff96",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-04",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 26,
+      "body_hex": "7b226e223a2d393232333337323033363835343737353830387d",
+      "body_sha256": "bef2d002efa1e5cb6c97e2738e7f311f87d3bbb75dd3a860d55052aa0128e978",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d39323233333732303336383534373735383038"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d39323233333732303336383534373735383038"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-05",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 25,
+      "body_hex": "7b226e223a393232333337323033363835343737353830377d",
+      "body_sha256": "faf5d00c8f17856eac0c8cae6eae118ca936a9ae1af9de80da15dcc33e844a9d",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39323233333732303336383534373735383037"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39323233333732303336383534373735383037"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-06",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 26,
+      "body_hex": "7b226e223a2d393232333337323033363835343737353830397d",
+      "body_sha256": "fab955fb54defa78ccc17cd6d720fd75b81555fd2cf12a32116f1ca00beac150",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d39323233333732303336383534373735383039"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "2d39323233333732303336383534373735383039"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-07",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 25,
+      "body_hex": "7b226e223a393232333337323033363835343737353830387d",
+      "body_sha256": "55182d699cf108822ffa0002d7db122b601bc7a12ddb993ffec1509b63ff85aa",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39323233333732303336383534373735383038"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39323233333732303336383534373735383038"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-08",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 26,
+      "body_hex": "7b226e223a31383434363734343037333730393535313631357d",
+      "body_sha256": "71aad85172d3c45bb3f3379466473927538d2759522c5446febca32fba09c17f",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "3138343436373434303733373039353531363135"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "3138343436373434303733373039353531363135"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-09",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 26,
+      "body_hex": "7b226e223a31383434363734343037333730393535313631367d",
+      "body_sha256": "5171b3f02739553257cde342c54398ac7f809898b9fbce52c1b40f7ff07c5d22",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "3138343436373434303733373039353531363136"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "3138343436373434303733373039353531363136"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-10",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 22,
+      "body_hex": "7b226e223a393030373139393235343734303939317d",
+      "body_sha256": "e1da48c6a6089f06ecb4e0a2259e658e3786b2420f52baccdf929ec6460d7b41",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39303037313939323534373430393931"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39303037313939323534373430393931"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-11",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 22,
+      "body_hex": "7b226e223a393030373139393235343734303939327d",
+      "body_sha256": "66c87d9cb3014e05a11baa97df62282d89d425f22ee15816577c84534e2ef1bb",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39303037313939323534373430393932"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39303037313939323534373430393932"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-12",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 22,
+      "body_hex": "7b226e223a393030373139393235343734303939337d",
+      "body_sha256": "4ac8309cc76123ef6c5325ef925fc873e9b5856ec4f844ef1462f9303960378a",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39303037313939323534373430393933"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "39303037313939323534373430393933"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-13",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b226e223a312e307d",
+      "body_sha256": "3b6b06ecd1c968c8e738e0f11c4bb361fca80a9a694de22fe66a05286afbd081",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "312e30"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "312e30"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-14",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 12,
+      "body_hex": "7b226e223a312e323330307d",
+      "body_sha256": "8debae3e829f8de93f0872595432376e0fd2da1df60c917ae5cebb1288b42303",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "312e32333030"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "312e32333030"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-15",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b226e223a3165327d",
+      "body_sha256": "477bbdd93b24d7ebe5b110b7bd76f53e82c2831cd361d557779cbf3f1da9c522",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "316532"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "316532"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-16",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "7b226e223a31452b30327d",
+      "body_sha256": "b43fa301519b4124f3f3b8fa038c406e161fe8ad1f456eaf7339a85bfd885e17",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31452b3032"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31452b3032"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-17",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 10,
+      "body_hex": "7b226e223a31652d327d",
+      "body_sha256": "c3d755f5b5bac954d7e3c2f74468c41e0322a60fce45b71b5e3e92aaa210ad1f",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31652d32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31652d32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-18",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "7b226e223a31653430307d",
+      "body_sha256": "99450423054b8646b3dc4c0bc12384edb68977ec153e96189686618fafdc584c",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "3165343030"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "3165343030"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-19",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 12,
+      "body_hex": "7b226e223a31652d3430307d",
+      "body_sha256": "538e564ed8f2afd124c3989a53b0ff0b9b9cff48659eb69383a88db394a0f1bd",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31652d343030"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "31652d343030"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-number-20",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 102,
+      "body_hex": "7b226e223a3939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939397d",
+      "body_sha256": "a9eff8f5cf50db3a2add86d8d06207549baf8807217913241433b0b2ab030db5",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939393939"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-invalid-00",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b226e223a30317d",
+      "body_sha256": "2c96e2271e216ac28cc070125973a5937945870b6bd8d09c2fcd96c7b2ce1cde",
+      "expected_args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "30"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6e",
+          "value_hex": "30"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-invalid-01",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b226e223a2b317d",
+      "body_sha256": "33935ebfbcd63c74c19be63b10bcbd04f8cc77ec283a1a407df25f7687d0b644",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-invalid-02",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b226e223a312e7d",
+      "body_sha256": "c04711e93bd3887aa82d8f2f849e1660c839fd1e12966659217361a1ef14165a",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-invalid-03",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b226e223a31657d",
+      "body_sha256": "41254d851e1db9e4d45eae1631d636994efb9d12fe23b18cecf2fe15feb98ac5",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-invalid-04",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b226e223a4e614e7d",
+      "body_sha256": "df38c4379aa2b6d4a7151668f11c6cdf75dc52f52588502956377adddf9e1a26",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "H-invalid-05",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 14,
+      "body_hex": "7b226e223a496e66696e6974797d",
+      "body_sha256": "118b2cab78badb9e6239321a230c158b3f31bd401885e17dfedbf341a04d99ef",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "I-same",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "7b2261223a2278222c2261223a2278227d",
+      "body_sha256": "5a0c66fd711c1922719af8a9ceae4c73955d817deeb77a7540e6f841997d7598",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "I-different",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 17,
+      "body_hex": "7b2261223a2278222c2261223a2279227d",
+      "body_sha256": "689c0e761085c83c304888be3f0be5ffbfc87672ea851acce1ddf2a255d3bc3b",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "79"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "78"
+        },
+        {
+          "name_hex": "61",
+          "value_hex": "79"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "I-empty",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "7b22223a312c22223a327d",
+      "body_sha256": "46dfd2aaa48a98f3ca77b7bc985515961bf075b8fe5df0e7f2dceebcea87b554",
+      "expected_args": [
+        {
+          "name_hex": "",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "",
+          "value_hex": "32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "",
+          "value_hex": "32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "I-nested",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 31,
+      "body_hex": "7b2278223a7b2261223a312c2261223a327d2c2279223a7b2261223a337d7d",
+      "body_sha256": "05ec3ecedbfe097f52564c3237b6c59b76aa6d0089b063215072f224d8575adb",
+      "expected_args": [
+        {
+          "name_hex": "782e61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "782e61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "792e61",
+          "value_hex": "33"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "782e61",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "782e61",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "792e61",
+          "value_hex": "33"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "I-collision",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 21,
+      "body_hex": "7b22612e62223a312c2261223a7b2262223a327d7d",
+      "body_sha256": "b481627ca15355fbd22bc347bbb3d45a29025539c88e0194fc1f3c93aa9303af",
+      "expected_args": [
+        {
+          "name_hex": "612e62",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "612e62",
+          "value_hex": "32"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "612e62",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "612e62",
+          "value_hex": "32"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-follow-ws",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 11,
+      "body_hex": "7b2261223a317d20090d0a",
+      "body_sha256": "773415f804920380326df7e46a0d82007df64bf00614b4b744765f2853d9d2da",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-garbage",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b2261223a317d78",
+      "body_sha256": "e3de6add675ec69cc38526eb2dd586a2f9ce66fe7e14616a9dee6180b131b7d3",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-documents",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 14,
+      "body_hex": "7b2261223a317d7b2262223a327d",
+      "body_sha256": "dad3c0d0a4f2e21f5ca84ada2e897b9246b8a01aff36a0909a7ed0dd5d9774e6",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-truncated-object",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 6,
+      "body_hex": "7b2261223a31",
+      "body_sha256": "8b0f0d75aabe01bbfba9341752c2cf7626f154e676aa791427b31aebfabc2592",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": false,
+      "http_expected": 500,
+      "http_actual": 500,
+      "args": [],
+      "error": [],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-truncated-array",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 3,
+      "body_hex": "5b312c",
+      "body_sha256": "b2d3da6f524e2498194717d153a5621e2618d7643c1b23dbbcb2ebe52fa7933e",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": false,
+      "http_expected": 500,
+      "http_actual": 500,
+      "args": [],
+      "error": [],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-truncated-string",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2278223a22616263",
+      "body_sha256": "48ee716df8eb40688c9bd8f9a58f0e55bd584d33bd9459c2bb427340f3aa2c85",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": false,
+      "http_expected": 500,
+      "http_actual": 500,
+      "args": [],
+      "error": [],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-truncated-number",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "3165",
+      "body_sha256": "a8196a36f4d736a540dff9a8a00387111ff0133f9848f4e149118092ac712426",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": false,
+      "http_expected": 500,
+      "http_actual": 500,
+      "args": [],
+      "error": [],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "J-truncated-literal",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 3,
+      "body_hex": "747275",
+      "body_sha256": "e2de3f751ecb78216c447144c8c1f4bf9e0645c32b72a02d3ad1d1c48eec2fe7",
+      "expected_args": [],
+      "expected_error": 1,
+      "phase2_expected": false,
+      "http_expected": 500,
+      "http_actual": 500,
+      "args": [],
+      "error": [],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-access-off",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": false,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-no-selection",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": false,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-type-plain",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-type-suffix",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-type-charset",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-after-error",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-long",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2311,
+      "body_hex": "7b226b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b223a227676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676227d",
+      "body_sha256": "55ebefbb1b74715321bfd64c4f6dcb93b9555d8cca55a5cdc3446faf17fa8acd",
+      "expected_args": [
+        {
+          "name_hex": "6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b6b",
+          "value_hex": "7676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676767676"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": true
+    },
+    {
+      "id": "K-large",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 915,
+      "body_hex": "5b302c312c322c332c342c352c362c372c382c392c31302c31312c31322c31332c31342c31352c31362c31372c31382c31392c32302c32312c32322c32332c32342c32352c32362c32372c32382c32392c33302c33312c33322c33332c33342c33352c33362c33372c33382c33392c34302c34312c34322c34332c34342c34352c34362c34372c34382c34392c35302c35312c35322c35332c35342c35352c35362c35372c35382c35392c36302c36312c36322c36332c36342c36352c36362c36372c36382c36392c37302c37312c37322c37332c37342c37352c37362c37372c37382c37392c38302c38312c38322c38332c38342c38352c38362c38372c38382c38392c39302c39312c39322c39332c39342c39352c39362c39372c39382c39392c3130302c3130312c3130322c3130332c3130342c3130352c3130362c3130372c3130382c3130392c3131302c3131312c3131322c3131332c3131342c3131352c3131362c3131372c3131382c3131392c3132302c3132312c3132322c3132332c3132342c3132352c3132362c3132372c3132382c3132392c3133302c3133312c3133322c3133332c3133342c3133352c3133362c3133372c3133382c3133392c3134302c3134312c3134322c3134332c3134342c3134352c3134362c3134372c3134382c3134392c3135302c3135312c3135322c3135332c3135342c3135352c3135362c3135372c3135382c3135392c3136302c3136312c3136322c3136332c3136342c3136352c3136362c3136372c3136382c3136392c3137302c3137312c3137322c3137332c3137342c3137352c3137362c3137372c3137382c3137392c3138302c3138312c3138322c3138332c3138342c3138352c3138362c3138372c3138382c3138392c3139302c3139312c3139322c3139332c3139342c3139352c3139362c3139372c3139382c3139392c3230302c3230312c3230322c3230332c3230342c3230352c3230362c3230372c3230382c3230392c3231302c3231312c3231322c3231332c3231342c3231352c3231362c3231372c3231382c3231392c3232302c3232312c3232322c3232332c3232342c3232352c3232362c3232372c3232382c3232392c3233302c3233312c3233322c3233332c3233342c3233352c3233362c3233372c3233382c3233392c3234302c3234312c3234322c3234332c3234342c3234352c3234362c3234372c3234382c3234392c3235302c3235312c3235322c3235332c3235342c3235355d",
+      "body_sha256": "be66c2867e103fa00c88539675e5cd95f52ec5e38d9038e6d3710539f6c0aec1",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "30"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "33"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "34"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "35"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "36"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "37"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "38"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "39"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3130"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3131"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3132"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3133"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3134"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3135"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3136"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3137"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3138"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3139"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3230"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3231"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3232"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3233"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3234"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3235"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3236"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3237"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3238"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3239"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3330"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3331"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3332"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3333"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3334"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3335"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3336"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3337"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3338"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3339"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3430"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3431"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3432"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3433"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3434"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3435"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3436"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3437"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3438"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3439"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3530"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3531"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3532"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3533"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3534"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3535"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3536"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3537"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3538"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3539"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3630"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3631"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3632"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3633"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3634"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3635"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3636"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3637"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3638"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3639"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3730"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3731"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3732"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3733"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3734"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3735"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3736"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3737"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3738"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3739"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3830"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3831"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3832"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3833"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3834"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3835"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3836"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3837"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3838"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3839"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3930"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3931"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3932"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3933"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3934"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3935"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3936"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3937"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3938"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3939"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313030"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313031"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313032"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313033"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313034"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313035"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313036"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313037"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313038"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313039"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313130"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313131"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313132"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313133"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313134"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313135"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313136"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313137"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313138"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313139"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313230"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313231"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313232"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313233"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313234"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313235"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313236"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313237"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313238"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313239"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313330"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313331"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313332"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313333"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313334"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313335"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313336"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313337"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313338"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313339"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313430"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313431"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313432"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313433"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313434"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313435"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313436"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313437"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313438"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313439"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313530"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313531"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313532"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313533"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313534"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313535"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313536"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313537"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313538"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313539"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313630"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313631"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313632"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313633"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313634"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313635"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313636"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313637"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313638"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313639"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313730"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313731"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313732"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313733"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313734"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313735"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313736"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313737"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313738"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313739"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313830"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313831"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313832"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313833"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313834"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313835"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313836"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313837"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313838"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313839"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313930"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313931"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313932"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313933"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313934"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313935"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313936"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313937"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313938"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313939"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323030"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323031"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323032"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323033"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323034"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323035"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323036"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323037"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323038"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323039"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323130"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323131"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323132"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323133"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323134"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323135"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323136"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323137"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323138"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323139"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323230"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323231"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323232"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323233"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323234"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323235"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323236"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323237"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323238"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323239"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323330"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323331"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323332"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323333"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323334"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323335"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323336"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323337"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323338"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323339"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323430"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323431"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323432"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323433"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323434"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323435"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323436"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323437"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323438"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323439"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323530"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323531"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323532"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323533"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323534"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323535"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "30"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "31"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "32"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "33"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "34"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "35"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "36"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "37"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "38"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "39"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3130"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3131"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3132"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3133"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3134"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3135"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3136"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3137"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3138"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3139"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3230"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3231"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3232"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3233"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3234"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3235"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3236"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3237"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3238"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3239"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3330"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3331"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3332"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3333"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3334"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3335"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3336"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3337"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3338"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3339"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3430"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3431"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3432"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3433"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3434"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3435"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3436"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3437"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3438"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3439"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3530"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3531"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3532"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3533"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3534"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3535"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3536"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3537"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3538"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3539"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3630"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3631"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3632"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3633"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3634"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3635"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3636"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3637"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3638"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3639"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3730"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3731"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3732"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3733"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3734"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3735"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3736"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3737"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3738"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3739"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3830"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3831"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3832"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3833"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3834"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3835"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3836"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3837"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3838"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3839"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3930"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3931"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3932"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3933"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3934"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3935"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3936"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3937"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3938"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "3939"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313030"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313031"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313032"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313033"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313034"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313035"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313036"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313037"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313038"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313039"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313130"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313131"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313132"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313133"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313134"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313135"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313136"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313137"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313138"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313139"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313230"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313231"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313232"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313233"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313234"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313235"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313236"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313237"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313238"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313239"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313330"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313331"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313332"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313333"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313334"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313335"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313336"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313337"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313338"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313339"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313430"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313431"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313432"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313433"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313434"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313435"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313436"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313437"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313438"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313439"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313530"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313531"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313532"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313533"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313534"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313535"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313536"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313537"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313538"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313539"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313630"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313631"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313632"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313633"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313634"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313635"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313636"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313637"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313638"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313639"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313730"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313731"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313732"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313733"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313734"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313735"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313736"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313737"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313738"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313739"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313830"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313831"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313832"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313833"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313834"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313835"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313836"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313837"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313838"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313839"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313930"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313931"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313932"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313933"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313934"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313935"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313936"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313937"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313938"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "313939"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323030"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323031"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323032"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323033"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323034"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323035"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323036"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323037"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323038"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323039"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323130"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323131"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323132"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323133"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323134"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323135"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323136"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323137"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323138"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323139"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323230"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323231"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323232"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323233"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323234"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323235"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323236"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323237"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323238"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323239"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323330"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323331"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323332"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323333"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323334"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323335"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323336"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323337"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323338"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323339"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323430"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323431"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323432"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323433"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323434"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323435"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323436"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323437"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323438"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323439"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323530"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323531"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323532"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323533"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323534"
+        },
+        {
+          "name_hex": "61727261792e6172726179",
+          "value_hex": "323535"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-audit",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 23,
+      "body_hex": "7b2271223a225c225c5c5c6ec2a2e282acf09f92a9227d",
+      "body_sha256": "9a2b49b6d5c73253947a1416f2ceb31f5f45ef3365696fad9e6a5d418ded8415",
+      "expected_args": [
+        {
+          "name_hex": "71",
+          "value_hex": "225c0ac2a2e282acf09f92a9"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "71",
+          "value_hex": "225c0ac2a2e282acf09f92a9"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "D-walkthrough",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 36,
+      "body_hex": "7b226974656d73223a5b5b2241222c2242225d2c2243225d2c227461696c223a2244227d",
+      "body_sha256": "a9682a7f17c7f215b4e4592ac72dedf1191ec03aa7b424d1a3068bd5c9d05a25",
+      "expected_args": [
+        {
+          "name_hex": "6974656d732e6974656d732e6974656d73",
+          "value_hex": "41"
+        },
+        {
+          "name_hex": "6974656d732e6974656d732e6974656d73",
+          "value_hex": "42"
+        },
+        {
+          "name_hex": "6974656d732e6974656d73",
+          "value_hex": "43"
+        },
+        {
+          "name_hex": "7461696c",
+          "value_hex": "44"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "6974656d732e6974656d732e6974656d73",
+          "value_hex": "41"
+        },
+        {
+          "name_hex": "6974656d732e6974656d732e6974656d73",
+          "value_hex": "42"
+        },
+        {
+          "name_hex": "6974656d732e6974656d73",
+          "value_hex": "43"
+        },
+        {
+          "name_hex": "7461696c",
+          "value_hex": "44"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-On-Reject-7",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-On-Reject-8",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b2261223a317d20",
+      "body_sha256": "e76a443e8bc10145c8e0c0a855e89b3720b75277fff801aba27a797999712bdd",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-On-Reject-9",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2261223a317d2020",
+      "body_sha256": "97c5e6afa14d79e2bf11b53855c627276bd77c614ea67886ec9da326c0e8b384",
+      "expected_args": [],
+      "expected_error": 0,
+      "phase2_expected": false,
+      "http_expected": 413,
+      "http_actual": 413,
+      "args": [],
+      "error": [],
+      "parser_invoked": false,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-On-ProcessPartial-7",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-On-ProcessPartial-8",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b2261223a317d20",
+      "body_sha256": "e76a443e8bc10145c8e0c0a855e89b3720b75277fff801aba27a797999712bdd",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-On-ProcessPartial-9",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2261223a317d2020",
+      "body_sha256": "97c5e6afa14d79e2bf11b53855c627276bd77c614ea67886ec9da326c0e8b384",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-DetectionOnly-Reject-7",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-DetectionOnly-Reject-8",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b2261223a317d20",
+      "body_sha256": "e76a443e8bc10145c8e0c0a855e89b3720b75277fff801aba27a797999712bdd",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-DetectionOnly-Reject-9",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2261223a317d2020",
+      "body_sha256": "97c5e6afa14d79e2bf11b53855c627276bd77c614ea67886ec9da326c0e8b384",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-DetectionOnly-ProcessPartial-7",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 7,
+      "body_hex": "7b2261223a317d",
+      "body_sha256": "015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-DetectionOnly-ProcessPartial-8",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b2261223a317d20",
+      "body_sha256": "e76a443e8bc10145c8e0c0a855e89b3720b75277fff801aba27a797999712bdd",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-body-DetectionOnly-ProcessPartial-9",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 9,
+      "body_hex": "7b2261223a317d2020",
+      "body_sha256": "97c5e6afa14d79e2bf11b53855c627276bd77c614ea67886ec9da326c0e8b384",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "E-default-depth-64",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 129,
+      "body_hex": "5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b5b315d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d",
+      "body_sha256": "36127fd491fb6253bca865d070b1c735abaf9d9b4d8a225ea3392e9c36ad193a",
+      "expected_args": [
+        {
+          "name_hex": "61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e61727261792e6172726179",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-error-deny",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 8,
+      "body_hex": "7b2261223a317d78",
+      "body_sha256": "e3de6add675ec69cc38526eb2dd586a2f9ce66fe7e14616a9dee6180b131b7d3",
+      "expected_args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "expected_error": 1,
+      "phase2_expected": true,
+      "http_expected": 403,
+      "http_actual": 403,
+      "args": [
+        {
+          "name_hex": "61",
+          "value_hex": "31"
+        }
+      ],
+      "error": [
+        "1"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "K-intro-object",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 60,
+      "body_hex": "7b2275736572223a22416461222c22656e61626c6564223a747275652c22636f756e74223a312e323330302c226f7074696f6e616c223a6e756c6c7d",
+      "body_sha256": "e7a6f5a66d6b34305e8693bab38f105c552d35bba5ff6ad64392493355e6f6e3",
+      "expected_args": [
+        {
+          "name_hex": "75736572",
+          "value_hex": "416461"
+        },
+        {
+          "name_hex": "656e61626c6564",
+          "value_hex": "74727565"
+        },
+        {
+          "name_hex": "636f756e74",
+          "value_hex": "312e32333030"
+        },
+        {
+          "name_hex": "6f7074696f6e616c",
+          "value_hex": ""
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "75736572",
+          "value_hex": "416461"
+        },
+        {
+          "name_hex": "656e61626c6564",
+          "value_hex": "74727565"
+        },
+        {
+          "name_hex": "636f756e74",
+          "value_hex": "312e32333030"
+        },
+        {
+          "name_hex": "6f7074696f6e616c",
+          "value_hex": ""
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    },
+    {
+      "id": "F-query-below",
+      "status": "PASS",
+      "failures": [],
+      "body_length": 2,
+      "body_hex": "7b7d",
+      "body_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "expected_args": [
+        {
+          "name_hex": "71",
+          "value_hex": "76"
+        }
+      ],
+      "expected_error": 0,
+      "phase2_expected": true,
+      "http_expected": 200,
+      "http_actual": 200,
+      "args": [
+        {
+          "name_hex": "71",
+          "value_hex": "76"
+        }
+      ],
+      "error": [
+        "0"
+      ],
+      "parser_invoked": true,
+      "exact_value_rule_matched": null
+    }
+  ]
+}

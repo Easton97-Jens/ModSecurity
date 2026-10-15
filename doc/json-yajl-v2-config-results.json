@@ -1,0 +1,109 @@
+{
+  "counts": {
+    "PASS": 14,
+    "FAIL": 0,
+    "SKIP": 0,
+    "BLOCKED": 0,
+    "XFAIL": 0
+  },
+  "cases": [
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit-1",
+      "expected_accepted": true,
+      "exit": 0,
+      "status": "PASS",
+      "diagnostic": "Syntax OK"
+    },
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit-3",
+      "expected_accepted": true,
+      "exit": 0,
+      "status": "PASS",
+      "diagnostic": "Syntax OK"
+    },
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit-0",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecRequestBodyJsonDepthLimit-0.conf:\nModSecurity: Invalid value for SecRequestBodyJsonDepthLimit: 0"
+    },
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit--1",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecRequestBodyJsonDepthLimit--1.conf:\nModSecurity: Invalid value for SecRequestBodyJsonDepthLimit: -1"
+    },
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit-invalid",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecRequestBodyJsonDepthLimit-invalid.conf:\nModSecurity: Invalid value for SecRequestBodyJsonDepthLimit: invalid"
+    },
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit-3trailing",
+      "expected_accepted": true,
+      "exit": 0,
+      "status": "PASS",
+      "diagnostic": "Syntax OK"
+    },
+    {
+      "id": "CFG-SecRequestBodyJsonDepthLimit-9223372036854775807",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecRequestBodyJsonDepthLimit-9223372036854775807.conf:\nModSecurity: Invalid value for SecRequestBodyJsonDepthLimit: 9223372036854775807"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit-1",
+      "expected_accepted": true,
+      "exit": 0,
+      "status": "PASS",
+      "diagnostic": "Syntax OK"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit-3",
+      "expected_accepted": true,
+      "exit": 0,
+      "status": "PASS",
+      "diagnostic": "Syntax OK"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit-0",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecArgumentsLimit-0.conf:\nModSecurity: Invalid value for SecArgumentsLimit: 0"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit--1",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecArgumentsLimit--1.conf:\nModSecurity: Invalid value for SecArgumentsLimit: -1"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit-invalid",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecArgumentsLimit-invalid.conf:\nModSecurity: Invalid value for SecArgumentsLimit: invalid"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit-3trailing",
+      "expected_accepted": true,
+      "exit": 0,
+      "status": "PASS",
+      "diagnostic": "Syntax OK"
+    },
+    {
+      "id": "CFG-SecArgumentsLimit-9223372036854775807",
+      "expected_accepted": false,
+      "exit": 1,
+      "status": "PASS",
+      "diagnostic": "AH00526: Syntax error on line 27 of /workspace/work/json-yajl-baseline/root-verification/v2-config/SecArgumentsLimit-9223372036854775807.conf:\nModSecurity: Invalid value for SecArgumentsLimit: 9223372036854775807"
+    }
+  ]
+}
