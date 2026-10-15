@@ -42,6 +42,9 @@ int main() {
     try {
         const std::string mode=line(), rulesText=unhex(line()), firstBody=unhex(line());
         const std::string uri=unhex(line()), contentType=unhex(line()), chunkLine=line();
+        // Optional seventh line only for the new sequence mode. Legacy inputs
+        // remain six lines; both bodies share one engine and one RulesSet.
+        const std::string secondBody=(mode=="sequence")?unhex(line()):"{\"ok\":[1,2]}";
         modsecurity::ModSecurity engine;
         std::cout<<"VERSION\t"<<hex(engine.whoAmI())<<"\n";
 #ifndef WITH_YAJL
@@ -71,8 +74,8 @@ int main() {
         std::cout<<"CONFIG\t"<<(loaded>=0)<<"\n";
         if(loaded<0) { value("CONFIG_ERROR",rules.getParserError());return 0; }
         // Two sequential transactions can deliberately share the engine/rules.
-        for (int repeat=0;repeat<((mode=="repeat" || mode=="isolation")?2:1);++repeat) {
-            const std::string body=(mode=="isolation" && repeat==1)?"{\"ok\":[1,2]}":firstBody;
+        for (int repeat=0;repeat<((mode=="repeat" || mode=="isolation" || mode=="sequence")?2:1);++repeat) {
+            const std::string body=((mode=="isolation" || mode=="sequence") && repeat==1)?secondBody:firstBody;
             modsecurity::Transaction tx(&engine,&rules,nullptr);
             tx.processConnection("127.0.0.1",12345,"127.0.0.1",80);
             tx.processURI(uri.c_str(),"POST","1.1");

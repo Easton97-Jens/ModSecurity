@@ -27,6 +27,8 @@ EXTRA_DIST = \
 	json-baseline/*.cc \
 	json-baseline/*.py \
 	json-baseline/*.sh \
+	json-baseline/tools/*.py \
+	json-baseline/repository-template/.github/workflows/*.yml \
 	json-baseline/results/*.json
 
 
