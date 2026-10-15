@@ -6,14 +6,16 @@ This extension adds independently implemented tests inspired by
 [fzipi's comment](https://github.com/owasp-modsecurity/ModSecurity/issues/3308#issuecomment-6166461842)
 and [airween's comment](https://github.com/owasp-modsecurity/ModSecurity/issues/3308#issuecomment-6142615388).
 The tests exercise ModSecurity itself. YAJL and production code are unchanged.
-[Deutsche Fassung](README.de.md).
+[German version](README.de.md).
 
 The two standalone repositories, provisionally named
 `ModSecurity-JSON-Tests-DE` and `ModSecurity-JSON-Tests-EN`, are prepared as local
 deliverables. **Neither new GitHub repository has been created or published.**
-Each prepared repository contains the same tests and the complete German and
-English documentation; its entry page selects the main language. This is
-separate from any publication of the task branch in the existing ModSecurity fork.
+Both prepared repositories contain the same executable tests. The German
+repository contains the complete historical and new documentation in German and
+English; the English repository contains **only the complete English versions**.
+This is separate from any publication of the task branch in the existing
+ModSecurity fork.
 
 ## Original reference and scope
 
@@ -163,9 +165,11 @@ acceptance by an external HTTP server.
 
 ## Complete documentation in both languages
 
-Both prepared repositories include the following complete documents. Translations
-preserve all original sections, tables, code/source references, counts and caveats;
-the archived baseline is not silently rewritten with extension results.
+The German repository includes both columns of the following complete document
+index. The English repository includes only the English column, with an
+English-only index and no links to omitted German files. Translations preserve
+all original sections, tables, code/source references, counts and caveats; the
+archived baseline is not silently rewritten with extension results.
 
 | Document | German | English |
 |---|---|---|
@@ -223,9 +227,9 @@ git clone ModSecurity-JSON-Tests-EN.bundle ModSecurity-JSON-Tests-EN
 git -C ModSecurity-JSON-Tests-EN bundle verify ../ModSecurity-JSON-Tests-EN.bundle
 ```
 
-Use the DE filenames for the German entry variant. The export manifest lists
-both local Git SHAs, every file hash and the verified equality of all content
-except the primary README. `export_repositories.py` requires the full original
+Use the DE filenames for the bilingual German repository. The export manifest
+lists both local Git SHAs, every file hash, identical executable test files and
+the distinct documentation language profiles. `export_repositories.py` requires the full original
 fork history and is a packaging helper, not the standalone build entry point.
 The optional `patches/native-regressions.patch` targets the fixed official base
 and carries native JSON cases plus the test distribution list. Copy the entire

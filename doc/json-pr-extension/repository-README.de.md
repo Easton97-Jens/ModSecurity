@@ -2,7 +2,7 @@
 
 [English](README.en.md) · [Deutsche Fassung](README.de.md)
 
-Dieses eigenständige Test-Repository prüft die tatsächliche YAJL-Verarbeitung des offiziellen ModSecurity v3. Es enthält die vollständige vorherige Bestandsaufnahme, neue Tests aus den jsonbench-PRs und beiden ModSecurity-Kommentaren sowie **alle erklärenden Dokumente auf Deutsch und Englisch**. Beide Sprach-Repositories haben dieselben Tests und Dokumente; nur die Einstiegssprache unterscheidet sich.
+Dieses eigenständige Test-Repository prüft die tatsächliche YAJL-Verarbeitung des offiziellen ModSecurity v3. Es enthält die vollständige vorherige Bestandsaufnahme, neue Tests aus den jsonbench-PRs und beiden ModSecurity-Kommentaren sowie **alle erklärenden Dokumente auf Deutsch und Englisch**. Das deutsche Repository enthält beide Sprachfassungen; das separate englische Repository enthält ausschließlich die vollständige englische Dokumentation. Die ausführbaren Tests sind in beiden identisch.
 
 Beginne mit der [neuen Ergebnisübersicht und Reproduktionsanleitung](doc/json-pr-extension/README.de.md), der [Testmatrix](doc/json-pr-extension/matrix.de.md) oder [So verarbeitet ModSecurity einen JSON-Request](doc/json-yajl-code-analysis.md). Die [vollständige englische Dokumentation](doc/json-pr-extension/README.en.md#complete-documentation-in-both-languages) ist ebenfalls enthalten.
 

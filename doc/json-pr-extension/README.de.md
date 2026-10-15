@@ -1,6 +1,6 @@
 # Zusätzliche v3-JSON-Tests aus den PRs und der ModSecurity-Diskussion
 
-Diese Übergabe erweitert die YAJL-Bestandsaufnahme um eigenständige ModSecurity-Tests. Beide vorbereiteten Repositories enthalten dieselben Tests und **die vollständige bisherige Dokumentation auf Deutsch und Englisch**. Nur die Einstiegssprache ihrer Haupt-README unterscheidet sich. YAJL, der Parser und alle übrigen Produktionsdateien bleiben unverändert.
+Diese Übergabe erweitert die YAJL-Bestandsaufnahme um eigenständige ModSecurity-Tests. Beide vorbereiteten Repositories enthalten dieselben ausführbaren Tests. **Das deutsche Repository enthält die vollständige bisherige und neue Dokumentation auf Deutsch und Englisch; das englische Repository enthält ausschließlich deren vollständige englische Fassungen.** YAJL, der Parser und alle übrigen Produktionsdateien bleiben unverändert.
 
 ## Vollständige Dokumentation
 
@@ -79,7 +79,7 @@ Jeder Lauf schreibt `summary.json`, Einzelberichte und getrennte stdout/stderr-D
 
 ## Übergabe und Veröffentlichung
 
-Die neuen GitHub-Repositories sind **vorbereitet**, nicht automatisch angelegt. Für `ModSecurity-JSON-Tests-DE` und `ModSecurity-JSON-Tests-EN` gibt es jeweils einen vollständigen lokalen Git-Stand, ein ZIP und ein geprüftes Git-Bundle. Die Pakete enthalten beide Sprachen; die Haupt-README startet jeweils mit Deutsch beziehungsweise Englisch. Code und Dokumentationsdateien sind ansonsten identisch. Die Archiv-/Bundle-Hashes stehen bei den Paketen im Exportmanifest.
+Die neuen GitHub-Repositories sind **vorbereitet**, nicht automatisch angelegt. Für `ModSecurity-JSON-Tests-DE` und `ModSecurity-JSON-Tests-EN` gibt es jeweils einen vollständigen lokalen Git-Stand, ein ZIP und ein geprüftes Git-Bundle. Das DE-Paket enthält die vollständige Dokumentation in beiden Sprachen und eine deutsche Haupt-README. Das EN-Paket enthält ausschließlich die vollständigen englischen Dokumentationsfassungen und eine englische Haupt-README. Die ausführbaren Tests sind identisch; die Dokumentationsprofile unterscheiden sich bewusst. Die Archiv-/Bundle-Hashes stehen bei den Paketen im Exportmanifest.
 
 Die ausdrückliche bisherige Push-Freigabe gilt für neue Aufgabenbranches im vorhandenen ModSecurity-Fork. Deshalb werden die geprüften Quelländerungen und Übergabepakete dort veröffentlicht; das Anlegen neuer GitHub-Repositories ist ein gesonderter Schritt. Der Abschlussbericht nennt den tatsächlich zurückgelesenen Fork-SHA und funktionierende Links. Weder bestehende Fork-Branches noch das offizielle Repository werden verändert.
 
@@ -95,7 +95,7 @@ git -C ModSecurity-JSON-Tests-DE bundle verify ../ModSecurity-JSON-Tests-DE.bund
 
 Für EN entsprechend den Dateinamen ersetzen. Nur ein neues Zielverzeichnis verwenden.
 Das Exportmanifest verzeichnet beide Git-SHAs, alle Datei-Hashes und die überprüfte
-Inhaltsgleichheit bis auf die Haupt-README. `export_repositories.py` ist ein Helfer
+Identität der Testdateien sowie die jeweils enthaltenen Sprachfassungen. `export_repositories.py` ist ein Helfer
 für den vollständigen Fork mit dessen Historie; im eigenständigen Test-Repository
 werden nur `prepare_source.py`, `build.py` und `run_all.py` benötigt. Der optionale
 Patch `patches/native-regressions.patch` gilt gegen den festen Originalcommit und

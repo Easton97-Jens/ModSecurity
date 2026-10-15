@@ -29,7 +29,7 @@ A passing characterization test means: **This is how this original version behav
 
 ## Existing work and provenance
 
-The unchanged initial clone `/workspace/ModSecurity` remained on its existing branch `work` at `48e561b2ba44d35eec799176608720129c678777`. It was clean at the start; existing ignored build artifacts and the `/workspace/modsecurity-env` environment were not overwritten. No existing local branches were checked out, reset, stashed, merged or rebased. The task branches were created with `git worktree add --no-track -b ... <vollständiger Original-SHA>` (the placeholder means the full original SHA).
+The unchanged initial clone `/workspace/ModSecurity` remained on its existing branch `work` at `48e561b2ba44d35eec799176608720129c678777`. It was clean at the start; existing ignored build artifacts and the `/workspace/modsecurity-env` environment were not overwritten. No existing local branches were checked out, reset, stashed, merged or rebased. The task branches were created with `git worktree add --no-track -b ... <FULL-ORIGINAL-SHA>` (the placeholder means the full original SHA).
 
 `origin` is the fork and `upstream` is the official original. The latter was only read. The manifest contains the complete previous fork reference inventory. Direct comparisons show:
 
@@ -66,7 +66,7 @@ git -c fetch.recurseSubmodules=false fetch --no-tags upstream \
   refs/heads/v2/master:refs/remotes/upstream/v2/master \
   refs/heads/v3/master:refs/remotes/upstream/v3/master
 # Then use the task SHA verified in the handover report:
-git switch --detach <VERIFIZIERTE-AUFGABEN-SHA>
+git switch --detach <VERIFIED-TASK-SHA>
 git diff --stat <ORIGINAL-SHA> HEAD
 ```
 

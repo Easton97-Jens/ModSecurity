@@ -1,37 +1,37 @@
 {
   "schema": 1,
-  "created_utc": "2026-10-15T14:40:11.714871+00:00",
+  "created_utc": "2026-10-15T15:00:29.105657+00:00",
   "baseline_fork_commit": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
   "remote_publication": "not-created; prepared local repositories only",
   "repositories": {
     "ModSecurity-JSON-Tests-DE": {
-      "local_path": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE",
+      "local_path": "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE",
       "branch": "main",
-      "commit": "8e033cddd78d0d8484355831f9d5ff00fcd218e5",
+      "commit": "f84b9f701effcc3fb2710fba72682a705f73c35c",
       "primary_language": "DE",
-      "file_count": 57,
+      "file_count": 58,
       "files_sha256": {
         ".github/workflows/json-tests.yml": "8a57583aa65578c96b5fbd414cb3eb6d5ba52e337495e44c5996e5201c1bbf0d",
         ".gitignore": "862263fa1f46c20f0d1e4dac5ffcc75abd55c08211b2c3864c5f8764b9d87793",
         "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-        "README.de.md": "03915ff8e5bd1f8e20499e260c6f9c6fc007632d13dd1802de0500fbed1c7e1c",
-        "README.en.md": "58c34fdccc791c1f43c1f1747a69b068d99994b81b33ee9a998fed38c655251a",
-        "README.md": "03915ff8e5bd1f8e20499e260c6f9c6fc007632d13dd1802de0500fbed1c7e1c",
+        "README.de.md": "9dba5f138d7c8be5af896db1d93992cd40ec3da8d5da33c235bf9ed59e3cd00d",
+        "README.en.md": "2673d8c1502cc80da08be52a3886655f928d499635fb68b564a5239233aeffdf",
+        "README.md": "9dba5f138d7c8be5af896db1d93992cd40ec3da8d5da33c235bf9ed59e3cd00d",
         "doc/.empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "doc/JSON-YAJL-BASELINE.md": "a1b6eaac8a83c39ad5c436a77f4d06f6e7a62f80eab9b862657d78b45a82131d",
         "doc/Makefile.am": "c8ae65604541185eeccc250acaf19dfe2a56fa41f594cf7f2683216df2a562f9",
         "doc/doxygen.cfg": "82bc941a7f832098f26e5f4f5fc974f39b9a790c5ce04f78f3a6cfe5a04555a5",
-        "doc/en/JSON-YAJL-BASELINE.md": "68f8bde09f9cb205355fe718638a90f7a6f39f2ee24d8068206ed04744b71d2a",
+        "doc/en/JSON-YAJL-BASELINE.md": "eefe37aeeab290ccdc16cd6c5d84f043af72b98fc77ce74fb3c7ce33cc195194",
         "doc/en/json-yajl-baseline-v3.md": "c657b5fbbae67272371612e1d50174b598bff54e757ac0c5f0b5934f272c04d0",
         "doc/en/json-yajl-code-analysis.md": "4b4ababff0e5978bbf082339d371693699cb54e16a9e1e7ff3349ee0ba71d9d5",
-        "doc/json-pr-extension/README.de.md": "509e9c0105e3bf834c4c446ae5b38da209d2ca341d576d5f8ac42187b8befc84",
-        "doc/json-pr-extension/README.en.md": "b38cbdcbeacaf8ee346edbd51880595c7c17d82ad8bcf9b5a32b55a3fd2713b1",
+        "doc/json-pr-extension/README.de.md": "6a1639f3edc54ed1b8e38c6fbaf49ffab7c516cf7721c8c2545ae307b0d22ccc",
+        "doc/json-pr-extension/README.en.md": "af403d32db039384c6b65772663745038bb31676b9d24a3ce008be227158e648",
         "doc/json-pr-extension/catalog.json": "44fb817809bcf47c40d999aab630124655d649174fcee18f45d97c091e624067",
         "doc/json-pr-extension/matrix.de.md": "9f406e01d2dd6940e9d8233c48b36dea6365d910bbd2b7ca0ce548772c71bb70",
         "doc/json-pr-extension/matrix.en.md": "813e1d78454144ce67c6185757bc628ab299f5a09b17b99c38be4e8b7c8e8c5a",
-        "doc/json-pr-extension/provenance.json": "96229c1dde68bbcd7018f1019a28f43e1ad97422cfde5511c89f73435e44b686",
-        "doc/json-pr-extension/repository-README.de.md": "03915ff8e5bd1f8e20499e260c6f9c6fc007632d13dd1802de0500fbed1c7e1c",
-        "doc/json-pr-extension/repository-README.en.md": "58c34fdccc791c1f43c1f1747a69b068d99994b81b33ee9a998fed38c655251a",
+        "doc/json-pr-extension/provenance.json": "f19b88a601330c57e9718339e3fe6e5bd4af583a691a5a918908310a242341d6",
+        "doc/json-pr-extension/repository-README.de.md": "9dba5f138d7c8be5af896db1d93992cd40ec3da8d5da33c235bf9ed59e3cd00d",
+        "doc/json-pr-extension/repository-README.en.md": "2673d8c1502cc80da08be52a3886655f928d499635fb68b564a5239233aeffdf",
         "doc/json-pr-extension/results-summary.json": "f374956799c929477275260c0c036645b79d62a13372469c44556fc45d24dc79",
         "doc/json-yajl-baseline-v3.md": "19c14589096dc49247c3771972e5fc1027accfaf552c1b4ab3b563771b16a0d7",
         "doc/json-yajl-code-analysis.md": "54213f8f834dffd21379ab7b114047a951be6fb2d193f10fbd3833934c48cdce",
@@ -64,50 +64,65 @@
         "test/json-baseline/run_extended_audit.py": "e68d2349391e562f93a71d07bf93f9895c77e6091efdc3f5143ace608cc3be59",
         "test/json-baseline/run_requirements.py": "206bcea375d6004654e903ec7ee4f1300567d6088dfefa3a539be65690cc1523",
         "test/json-baseline/tools/build.py": "08486a7eb1ed1711a2c390b26199cdaaac13cbc1666f4d79e72c1ca232d8ba88",
-        "test/json-baseline/tools/export_repositories.py": "6920a33e08546a728024788b647c9078b3302a3a5af785ecf16d323c0fff3adf",
+        "test/json-baseline/tools/english_export.py": "0c977078f9e378cd5a62912d832f116b3a96e98977a51a73a263cdf1dd57826d",
+        "test/json-baseline/tools/export_repositories.py": "32a8d791ec49c6f4fd99ac2db29690b07570905db4180c38f75809ad72dfa494",
         "test/json-baseline/tools/prepare_source.py": "f70de410aa139adfad80391c9fe350cc197e78d41e568878b3a15c205f1f954e",
         "test/json-baseline/tools/run_all.py": "b2503ab2f8ad16c409b68bf29b1d737465d667cdc6b3b35ea8f304fe38f96729",
         "test/test-cases/regression/request-body-parser-json.json": "bc5442777635f993b28e8d26f9bfdacc00ef464409a4ac24e39359d8d69924d2"
       },
       "remote": null,
-      "both_languages_complete": true,
+      "documentation_languages": [
+        "de",
+        "en"
+      ],
+      "localization": {
+        "documentation_languages": [
+          "de",
+          "en"
+        ],
+        "baseline_documents_retained_byte_identical": [
+          "doc/.empty",
+          "doc/JSON-YAJL-BASELINE.md",
+          "doc/Makefile.am",
+          "doc/doxygen.cfg",
+          "doc/json-yajl-baseline-v3.md",
+          "doc/json-yajl-code-analysis.md",
+          "doc/json-yajl-provenance.json",
+          "doc/ms-doxygen-logo.png"
+        ]
+      },
       "default_bundle_clone_verified": true
     },
     "ModSecurity-JSON-Tests-EN": {
-      "local_path": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN",
+      "local_path": "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN",
       "branch": "main",
-      "commit": "2ae50a74475510445bfa9ed316af0befdb755b02",
+      "commit": "55dff1f618fc4e67828d64e909a8cb690b79ac31",
       "primary_language": "EN",
-      "file_count": 57,
+      "file_count": 51,
       "files_sha256": {
         ".github/workflows/json-tests.yml": "8a57583aa65578c96b5fbd414cb3eb6d5ba52e337495e44c5996e5201c1bbf0d",
         ".gitignore": "862263fa1f46c20f0d1e4dac5ffcc75abd55c08211b2c3864c5f8764b9d87793",
         "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
-        "README.de.md": "03915ff8e5bd1f8e20499e260c6f9c6fc007632d13dd1802de0500fbed1c7e1c",
-        "README.en.md": "58c34fdccc791c1f43c1f1747a69b068d99994b81b33ee9a998fed38c655251a",
-        "README.md": "58c34fdccc791c1f43c1f1747a69b068d99994b81b33ee9a998fed38c655251a",
+        "README.en.md": "2673d8c1502cc80da08be52a3886655f928d499635fb68b564a5239233aeffdf",
+        "README.md": "2673d8c1502cc80da08be52a3886655f928d499635fb68b564a5239233aeffdf",
         "doc/.empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "doc/JSON-YAJL-BASELINE.md": "a1b6eaac8a83c39ad5c436a77f4d06f6e7a62f80eab9b862657d78b45a82131d",
+        "doc/JSON-YAJL-BASELINE.md": "0a916c3be065f1e083cc5794b0a8f44402552cd2d25c03112e735034ef3496c3",
         "doc/Makefile.am": "c8ae65604541185eeccc250acaf19dfe2a56fa41f594cf7f2683216df2a562f9",
         "doc/doxygen.cfg": "82bc941a7f832098f26e5f4f5fc974f39b9a790c5ce04f78f3a6cfe5a04555a5",
-        "doc/en/JSON-YAJL-BASELINE.md": "68f8bde09f9cb205355fe718638a90f7a6f39f2ee24d8068206ed04744b71d2a",
+        "doc/en/JSON-YAJL-BASELINE.md": "eefe37aeeab290ccdc16cd6c5d84f043af72b98fc77ce74fb3c7ce33cc195194",
         "doc/en/json-yajl-baseline-v3.md": "c657b5fbbae67272371612e1d50174b598bff54e757ac0c5f0b5934f272c04d0",
         "doc/en/json-yajl-code-analysis.md": "4b4ababff0e5978bbf082339d371693699cb54e16a9e1e7ff3349ee0ba71d9d5",
-        "doc/json-pr-extension/README.de.md": "509e9c0105e3bf834c4c446ae5b38da209d2ca341d576d5f8ac42187b8befc84",
-        "doc/json-pr-extension/README.en.md": "b38cbdcbeacaf8ee346edbd51880595c7c17d82ad8bcf9b5a32b55a3fd2713b1",
+        "doc/json-pr-extension/README.en.md": "d5b0c4e4d40a9215d7e71045e4a4612762e90cddfd12ec296881c885c7c5daa7",
         "doc/json-pr-extension/catalog.json": "44fb817809bcf47c40d999aab630124655d649174fcee18f45d97c091e624067",
-        "doc/json-pr-extension/matrix.de.md": "9f406e01d2dd6940e9d8233c48b36dea6365d910bbd2b7ca0ce548772c71bb70",
-        "doc/json-pr-extension/matrix.en.md": "813e1d78454144ce67c6185757bc628ab299f5a09b17b99c38be4e8b7c8e8c5a",
-        "doc/json-pr-extension/provenance.json": "96229c1dde68bbcd7018f1019a28f43e1ad97422cfde5511c89f73435e44b686",
-        "doc/json-pr-extension/repository-README.de.md": "03915ff8e5bd1f8e20499e260c6f9c6fc007632d13dd1802de0500fbed1c7e1c",
-        "doc/json-pr-extension/repository-README.en.md": "58c34fdccc791c1f43c1f1747a69b068d99994b81b33ee9a998fed38c655251a",
+        "doc/json-pr-extension/matrix.en.md": "926b6571ad89f7470ea6619a3c8e9e82def0026175b29f8e4fa461bdecba5f5a",
+        "doc/json-pr-extension/provenance.json": "f19b88a601330c57e9718339e3fe6e5bd4af583a691a5a918908310a242341d6",
+        "doc/json-pr-extension/repository-README.en.md": "a980229ca85a0790037561da106f4d413cfa7a66400740a2ec1654f401492ed7",
         "doc/json-pr-extension/results-summary.json": "f374956799c929477275260c0c036645b79d62a13372469c44556fc45d24dc79",
-        "doc/json-yajl-baseline-v3.md": "19c14589096dc49247c3771972e5fc1027accfaf552c1b4ab3b563771b16a0d7",
-        "doc/json-yajl-code-analysis.md": "54213f8f834dffd21379ab7b114047a951be6fb2d193f10fbd3833934c48cdce",
-        "doc/json-yajl-provenance.json": "8a9152ec5f3219a0ff89feb928ab03eb5e7f67e14e44ac82c1b6fb59be2f481d",
+        "doc/json-yajl-baseline-v3.md": "2dd1ba173c63adb4d55d324247392d23e20d451c69aaa5b72f5b2a8ae1f92ded",
+        "doc/json-yajl-code-analysis.md": "4b4ababff0e5978bbf082339d371693699cb54e16a9e1e7ff3349ee0ba71d9d5",
+        "doc/json-yajl-provenance.json": "82d0c0df400d73b0d437884a6a22c9fda614eb20a0971fe2677e9ca7e01038b4",
         "doc/ms-doxygen-logo.png": "c93985e749025a1cace2213c2798a47187c2ef594cbfba5d02605018c91c8cb5",
         "doc/reference/Makefile.am": "c8ae65604541185eeccc250acaf19dfe2a56fa41f594cf7f2683216df2a562f9",
-        "doc/reference/de/ModSecurity-README.md": "aa921648b5f66ca15e5693b8c27a497796efa9618d199c37d5ba418d4327c188",
         "doc/reference/doxygen.cfg": "82bc941a7f832098f26e5f4f5fc974f39b9a790c5ce04f78f3a6cfe5a04555a5",
         "doc/reference/en/ModSecurity-README.md": "45887431ef65646fbba77d39a7ca64d5d4d20be19aa96653ba1671a5ce06eae5",
         "doc/reference/ms-doxygen-logo.png": "c93985e749025a1cace2213c2798a47187c2ef594cbfba5d02605018c91c8cb5",
@@ -133,44 +148,144 @@
         "test/json-baseline/run_extended_audit.py": "e68d2349391e562f93a71d07bf93f9895c77e6091efdc3f5143ace608cc3be59",
         "test/json-baseline/run_requirements.py": "206bcea375d6004654e903ec7ee4f1300567d6088dfefa3a539be65690cc1523",
         "test/json-baseline/tools/build.py": "08486a7eb1ed1711a2c390b26199cdaaac13cbc1666f4d79e72c1ca232d8ba88",
-        "test/json-baseline/tools/export_repositories.py": "6920a33e08546a728024788b647c9078b3302a3a5af785ecf16d323c0fff3adf",
         "test/json-baseline/tools/prepare_source.py": "f70de410aa139adfad80391c9fe350cc197e78d41e568878b3a15c205f1f954e",
         "test/json-baseline/tools/run_all.py": "b2503ab2f8ad16c409b68bf29b1d737465d667cdc6b3b35ea8f304fe38f96729",
         "test/test-cases/regression/request-body-parser-json.json": "bc5442777635f993b28e8d26f9bfdacc00ef464409a4ac24e39359d8d69924d2"
       },
       "remote": null,
-      "both_languages_complete": true,
+      "documentation_languages": [
+        "en"
+      ],
+      "localization": {
+        "schema": 1,
+        "language": "English only",
+        "canonical_source_modified": false,
+        "translated_documents": [
+          {
+            "path": "doc/JSON-YAJL-BASELINE.md",
+            "full_translation_source": "doc/en/JSON-YAJL-BASELINE.md",
+            "translation_source_sha256": "eefe37aeeab290ccdc16cd6c5d84f043af72b98fc77ce74fb3c7ce33cc195194",
+            "source_original_url": "https://github.com/Easton97-Jens/ModSecurity/blob/2bfb2180d8c0fa35ae7a3f2665e999600607d896/doc/JSON-YAJL-BASELINE.md",
+            "note": "Complete existing English translation; only local links and human-readable command placeholders adapted for the export."
+          },
+          {
+            "path": "doc/json-yajl-baseline-v3.md",
+            "full_translation_source": "doc/en/json-yajl-baseline-v3.md",
+            "translation_source_sha256": "c657b5fbbae67272371612e1d50174b598bff54e757ac0c5f0b5934f272c04d0",
+            "source_original_url": "https://github.com/Easton97-Jens/ModSecurity/blob/2bfb2180d8c0fa35ae7a3f2665e999600607d896/doc/json-yajl-baseline-v3.md",
+            "note": "Complete existing English translation; only local links and human-readable command placeholders adapted for the export."
+          },
+          {
+            "path": "doc/json-yajl-code-analysis.md",
+            "full_translation_source": "doc/en/json-yajl-code-analysis.md",
+            "translation_source_sha256": "4b4ababff0e5978bbf082339d371693699cb54e16a9e1e7ff3349ee0ba71d9d5",
+            "source_original_url": "https://github.com/Easton97-Jens/ModSecurity/blob/2bfb2180d8c0fa35ae7a3f2665e999600607d896/doc/json-yajl-code-analysis.md",
+            "note": "Complete existing English translation; only local links and human-readable command placeholders adapted for the export."
+          }
+        ],
+        "removed_paths": [
+          "README.de.md",
+          "doc/json-pr-extension/README.de.md",
+          "doc/json-pr-extension/matrix.de.md",
+          "doc/json-pr-extension/repository-README.de.md",
+          "doc/reference/de/ModSecurity-README.md",
+          "test/json-baseline/tools/english_export.py",
+          "test/json-baseline/tools/export_repositories.py"
+        ],
+        "historical_provenance": {
+          "source_commit": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
+          "source_url": "https://github.com/Easton97-Jens/ModSecurity/blob/2bfb2180d8c0fa35ae7a3f2665e999600607d896/doc/json-yajl-provenance.json",
+          "original_sha256": "8a9152ec5f3219a0ff89feb928ab03eb5e7f67e14e44ac82c1b6fb59be2f481d",
+          "human_prose_translations": [],
+          "note": "The original manifest human-readable prose is already English. All historical SHAs, references, paths, fixtures and observations are preserved, including literal branch names in other languages."
+        },
+        "runtime_files_verified_identical": 24
+      },
       "default_bundle_clone_verified": true
     }
   },
   "artifacts": {
     "ModSecurity-JSON-Tests-DE.zip": {
-      "sha256": "7b6e769c3870afd50306ae16d2cd4ae21a5a0283c32e11fc7eb36d75661ff5ee",
-      "bytes": 369290,
-      "repository_commit": "8e033cddd78d0d8484355831f9d5ff00fcd218e5"
+      "sha256": "a83c708dd5764e14e202d324cc10fc7c30b499e4f4ad0a9a94c727b9ff766471",
+      "bytes": 374466,
+      "repository_commit": "f84b9f701effcc3fb2710fba72682a705f73c35c"
     },
     "ModSecurity-JSON-Tests-DE.bundle": {
-      "sha256": "900d25c2b461710d75bd6106cb148f5affc2270182d763682c0a0a7485483362",
-      "bytes": 291745,
-      "repository_commit": "8e033cddd78d0d8484355831f9d5ff00fcd218e5"
+      "sha256": "b6964bafa7847c07195ee528adc2dcea3b76fb8be4ce1f6200871711213d5dbd",
+      "bytes": 296920,
+      "repository_commit": "f84b9f701effcc3fb2710fba72682a705f73c35c"
     },
     "ModSecurity-JSON-Tests-EN.zip": {
-      "sha256": "456b8fe5c9628ee1b43bdb0f1193ba6451b2326ea9c812c92eb691a8bcedf0b9",
-      "bytes": 369153,
-      "repository_commit": "2ae50a74475510445bfa9ed316af0befdb755b02"
+      "sha256": "10254e7a57cbb7b14a5a912f00a01d6f1f5c8f70ceafa262e195b02fd1b6d3b5",
+      "bytes": 334349,
+      "repository_commit": "55dff1f618fc4e67828d64e909a8cb690b79ac31"
     },
     "ModSecurity-JSON-Tests-EN.bundle": {
-      "sha256": "65885036e13f11182ab83cded35ea64da99c2a7b7589e84f85847719a9714879",
-      "bytes": 291748,
-      "repository_commit": "2ae50a74475510445bfa9ed316af0befdb755b02"
+      "sha256": "f2b303dd20f75912fd45eee120793445434c1d68ece4df669b68e7fcd595414c",
+      "bytes": 231443,
+      "repository_commit": "55dff1f618fc4e67828d64e909a8cb690b79ac31"
     }
   },
   "parity": {
-    "differing_files": [
-      "README.md"
+    "differing_common_files": [
+      "README.md",
+      "doc/JSON-YAJL-BASELINE.md",
+      "doc/json-pr-extension/README.en.md",
+      "doc/json-pr-extension/matrix.en.md",
+      "doc/json-pr-extension/repository-README.en.md",
+      "doc/json-yajl-baseline-v3.md",
+      "doc/json-yajl-code-analysis.md",
+      "doc/json-yajl-provenance.json"
     ],
-    "all_other_tracked_bytes_identical": true,
-    "baseline_documents_verified_against_commit": [
+    "only_bilingual_profile": [
+      "README.de.md",
+      "doc/json-pr-extension/README.de.md",
+      "doc/json-pr-extension/matrix.de.md",
+      "doc/json-pr-extension/repository-README.de.md",
+      "doc/reference/de/ModSecurity-README.md",
+      "test/json-baseline/tools/english_export.py",
+      "test/json-baseline/tools/export_repositories.py"
+    ],
+    "only_english_profile": [],
+    "executable_tests_fixtures_reports_workflows_identical": true,
+    "compared_test_files": [
+      ".github/workflows/json-tests.yml",
+      "patches/native-regressions.patch",
+      "test/json-baseline/audit_probe.cc",
+      "test/json-baseline/build-extended-audit.sh",
+      "test/json-baseline/build-probes.sh",
+      "test/json-baseline/extended_audit_probe.cc",
+      "test/json-baseline/pr_cases.py",
+      "test/json-baseline/probe.cc",
+      "test/json-baseline/repository-template/.github/workflows/json-tests.yml",
+      "test/json-baseline/results/extended-audit-results.json",
+      "test/json-baseline/results/extended-request-results.json",
+      "test/json-baseline/results/extended-sanitizer-results.json",
+      "test/json-baseline/results/requirements-results.json",
+      "test/json-baseline/results/v3-audit-results.json",
+      "test/json-baseline/results/v3-request-results.json",
+      "test/json-baseline/results/v3-sanitizer-results.json",
+      "test/json-baseline/results/v3-summary.json",
+      "test/json-baseline/run.py",
+      "test/json-baseline/run_audit.py",
+      "test/json-baseline/run_extended.py",
+      "test/json-baseline/run_extended_audit.py",
+      "test/json-baseline/run_requirements.py",
+      "test/json-baseline/tools/build.py",
+      "test/json-baseline/tools/prepare_source.py",
+      "test/json-baseline/tools/run_all.py",
+      "test/test-cases/regression/request-body-parser-json.json"
+    ],
+    "documentation_profiles": {
+      "DE": [
+        "de",
+        "en"
+      ],
+      "EN": [
+        "en"
+      ]
+    },
+    "baseline_documents_verified_in_source_against_commit": [
       "doc/.empty",
       "doc/JSON-YAJL-BASELINE.md",
       "doc/Makefile.am",

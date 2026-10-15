@@ -1,18 +1,105 @@
 {
-  "schema": 1,
-  "verified_utc": "2026-10-15T14:43:02.437197+00:00",
+  "schema": 2,
+  "verified_utc": "2026-10-15T15:02:37.639916+00:00",
+  "correction": "EN contains only English documentation; DE includes German and English. This supersedes the previous bilingual/bilingual export layout.",
+  "fork_base": "bc2dac43f75f22e79d9c5808245f6e6d5b158e5e",
+  "language_profiles": {
+    "EN": [
+      "en"
+    ],
+    "DE": [
+      "de",
+      "en"
+    ]
+  },
   "artifact_manifest": "export-manifest.json",
-  "publication": "New standalone GitHub repositories not created. Prepared Git commits are delivered as complete ZIPs/bundles on the authorized fork task branch; final verified fork SHA is in the handover.",
+  "standalone_github_repositories": "not created; complete local Git repositories delivered as bundles and ZIPs",
+  "parity": {
+    "differing_common_files": [
+      "README.md",
+      "doc/JSON-YAJL-BASELINE.md",
+      "doc/json-pr-extension/README.en.md",
+      "doc/json-pr-extension/matrix.en.md",
+      "doc/json-pr-extension/repository-README.en.md",
+      "doc/json-yajl-baseline-v3.md",
+      "doc/json-yajl-code-analysis.md",
+      "doc/json-yajl-provenance.json"
+    ],
+    "only_bilingual_profile": [
+      "README.de.md",
+      "doc/json-pr-extension/README.de.md",
+      "doc/json-pr-extension/matrix.de.md",
+      "doc/json-pr-extension/repository-README.de.md",
+      "doc/reference/de/ModSecurity-README.md",
+      "test/json-baseline/tools/english_export.py",
+      "test/json-baseline/tools/export_repositories.py"
+    ],
+    "only_english_profile": [],
+    "executable_tests_fixtures_reports_workflows_identical": true,
+    "compared_test_files": [
+      ".github/workflows/json-tests.yml",
+      "patches/native-regressions.patch",
+      "test/json-baseline/audit_probe.cc",
+      "test/json-baseline/build-extended-audit.sh",
+      "test/json-baseline/build-probes.sh",
+      "test/json-baseline/extended_audit_probe.cc",
+      "test/json-baseline/pr_cases.py",
+      "test/json-baseline/probe.cc",
+      "test/json-baseline/repository-template/.github/workflows/json-tests.yml",
+      "test/json-baseline/results/extended-audit-results.json",
+      "test/json-baseline/results/extended-request-results.json",
+      "test/json-baseline/results/extended-sanitizer-results.json",
+      "test/json-baseline/results/requirements-results.json",
+      "test/json-baseline/results/v3-audit-results.json",
+      "test/json-baseline/results/v3-request-results.json",
+      "test/json-baseline/results/v3-sanitizer-results.json",
+      "test/json-baseline/results/v3-summary.json",
+      "test/json-baseline/run.py",
+      "test/json-baseline/run_audit.py",
+      "test/json-baseline/run_extended.py",
+      "test/json-baseline/run_extended_audit.py",
+      "test/json-baseline/run_requirements.py",
+      "test/json-baseline/tools/build.py",
+      "test/json-baseline/tools/prepare_source.py",
+      "test/json-baseline/tools/run_all.py",
+      "test/test-cases/regression/request-body-parser-json.json"
+    ],
+    "documentation_profiles": {
+      "DE": [
+        "de",
+        "en"
+      ],
+      "EN": [
+        "en"
+      ]
+    },
+    "baseline_documents_verified_in_source_against_commit": [
+      "doc/.empty",
+      "doc/JSON-YAJL-BASELINE.md",
+      "doc/Makefile.am",
+      "doc/doxygen.cfg",
+      "doc/json-yajl-baseline-v3.md",
+      "doc/json-yajl-code-analysis.md",
+      "doc/json-yajl-provenance.json",
+      "doc/ms-doxygen-logo.png"
+    ]
+  },
   "repositories": {
     "DE": {
-      "commit": "8e033cddd78d0d8484355831f9d5ff00fcd218e5",
-      "path": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE",
+      "commit": "f84b9f701effcc3fb2710fba72682a705f73c35c",
+      "path": "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE",
+      "documentation_languages": [
+        "de",
+        "en"
+      ],
+      "file_count": 58,
       "git_status": "clean",
-      "summary": {
+      "history_commits": 1,
+      "functional_summary": {
         "schema": 1,
         "profile": "all",
         "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
-        "created_utc": "2026-10-15T14:40:36.239035+00:00",
+        "created_utc": "2026-10-15T15:00:45.745694+00:00",
         "counts": {
           "PASS": 405,
           "FAIL": 20,
@@ -35,11 +122,11 @@
             "stderr": "request-baseline.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline/run.py",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/json-baseline/run.py",
               "--probe",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/probe",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "--output",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-DE/request-baseline.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-DE/request-baseline.json",
               "--sensitivity"
             ],
             "exit": 0,
@@ -59,11 +146,11 @@
             "stderr": "request-expanded.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline/run_extended.py",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/json-baseline/run_extended.py",
               "--probe",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/probe",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "--output",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-DE/request-expanded.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-DE/request-expanded.json",
               "--sensitivity"
             ],
             "exit": 0,
@@ -83,10 +170,10 @@
             "stderr": "audit-baseline.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline/run_audit.py",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/audit-probe",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/json-baseline/run_audit.py",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/audit-probe",
               "--report",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-DE/audit-baseline.json"
+              "/workspace/work/json-yajl-pr-expansion/language-run-DE/audit-baseline.json"
             ],
             "exit": 0,
             "status": "PASS"
@@ -105,10 +192,10 @@
             "stderr": "audit-expanded-characterization.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline/run_extended_audit.py",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/extended-audit-probe",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/json-baseline/run_extended_audit.py",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
               "--report",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-DE/audit-expanded-characterization.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-DE/audit-expanded-characterization.json",
               "--suite",
               "characterization"
             ],
@@ -129,7 +216,7 @@
             "stderr": "native-json.stderr.log",
             "command": [
               "/workspace/work/json-yajl-baseline/v3/test/regression_tests",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/test-cases/regression/request-body-parser-json.json"
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/test-cases/regression/request-body-parser-json.json"
             ],
             "loader": {
               "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
@@ -152,11 +239,11 @@
             "stderr": "request-requirements.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline/run_requirements.py",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/json-baseline/run_requirements.py",
               "--probe",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/probe",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "--output",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-DE/request-requirements.json"
+              "/workspace/work/json-yajl-pr-expansion/language-run-DE/request-requirements.json"
             ],
             "exit": 1,
             "status": "FAIL"
@@ -175,10 +262,10 @@
             "stderr": "audit-requirements.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline/run_extended_audit.py",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/extended-audit-probe",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE/test/json-baseline/run_extended_audit.py",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
               "--report",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-DE/audit-requirements.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-DE/audit-requirements.json",
               "--suite",
               "requirements"
             ],
@@ -190,8 +277,8 @@
         "build_manifest": {
           "schema": 1,
           "status": "PASS",
-          "created_utc": "2026-10-15T14:40:32.935586+00:00",
-          "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE/test/json-baseline",
+          "created_utc": "2026-10-15T14:32:01.981907+00:00",
+          "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline",
           "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
           "source_root": "/workspace/work/json-yajl-baseline/v3",
           "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
@@ -237,7 +324,7 @@
           },
           "probes": {
             "probe": {
-              "path": "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/probe",
+              "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "sha256": "10fd166b0a69c3d1d5ec3cc628e8c40aa0954726e05965070af4e74276dd7dce",
               "source_file": "probe.cc",
               "source_sha256": "9000dcda7fdebbb672ff09547972fc48678e14224b89c929fbfa4f543f971636",
@@ -247,7 +334,7 @@
               }
             },
             "audit-probe": {
-              "path": "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/audit-probe",
+              "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/audit-probe",
               "sha256": "2a8724b8b01598092fcd6189170694b3c286d22e08fc62e74f9bf6225def3de8",
               "source_file": "audit_probe.cc",
               "source_sha256": "6ae5ee00f780da28b96071ed54868d6883e1dd3910be43358a13fccd6bf07a7c",
@@ -257,7 +344,7 @@
               }
             },
             "extended-audit-probe": {
-              "path": "/workspace/work/json-yajl-pr-expansion/export-final-probes-DE/extended-audit-probe",
+              "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
               "sha256": "10f9faa81c8f9e75938f9ff3f0f3305de295ad05eedc419babfa89869800975e",
               "source_file": "extended_audit_probe.cc",
               "source_sha256": "83fbeefad30a534ab1b44d6283160d760c1b32dc37ad655f15858ef2c313c08d",
@@ -320,31 +407,22 @@
         },
         "exit": 1
       },
-      "characterization_counts": {
-        "PASS": 399,
-        "FAIL": 0,
-        "SKIP": 0,
-        "BLOCKED": 0,
-        "XFAIL": 0
-      },
-      "requirements_counts": {
-        "PASS": 6,
-        "FAIL": 20,
-        "SKIP": 0,
-        "BLOCKED": 0,
-        "XFAIL": 0
-      },
-      "interpretation": "20 actual assertion failures remain ordinary FAIL/exit1; not infra errors or expected-failure masking. Two locale runs repeat same code, not doubled unique requirements."
+      "build_note": "Reused original-matching prebuilt probes; run_all rechecks CPP source hashes, source/submodule provenance, actual library resolution/hash, and activeJSON. Only documentation/packaging changed."
     },
     "EN": {
-      "commit": "2ae50a74475510445bfa9ed316af0befdb755b02",
-      "path": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN",
+      "commit": "55dff1f618fc4e67828d64e909a8cb690b79ac31",
+      "path": "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN",
+      "documentation_languages": [
+        "en"
+      ],
+      "file_count": 51,
       "git_status": "clean",
-      "summary": {
+      "history_commits": 1,
+      "functional_summary": {
         "schema": 1,
         "profile": "all",
         "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
-        "created_utc": "2026-10-15T14:40:31.802677+00:00",
+        "created_utc": "2026-10-15T15:00:45.318685+00:00",
         "counts": {
           "PASS": 405,
           "FAIL": 20,
@@ -367,11 +445,11 @@
             "stderr": "request-baseline.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline/run.py",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/json-baseline/run.py",
               "--probe",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/probe",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "--output",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/request-baseline.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-EN/request-baseline.json",
               "--sensitivity"
             ],
             "exit": 0,
@@ -391,11 +469,11 @@
             "stderr": "request-expanded.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline/run_extended.py",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/json-baseline/run_extended.py",
               "--probe",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/probe",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "--output",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/request-expanded.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-EN/request-expanded.json",
               "--sensitivity"
             ],
             "exit": 0,
@@ -415,10 +493,10 @@
             "stderr": "audit-baseline.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline/run_audit.py",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/audit-probe",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/json-baseline/run_audit.py",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/audit-probe",
               "--report",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/audit-baseline.json"
+              "/workspace/work/json-yajl-pr-expansion/language-run-EN/audit-baseline.json"
             ],
             "exit": 0,
             "status": "PASS"
@@ -437,10 +515,10 @@
             "stderr": "audit-expanded-characterization.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline/run_extended_audit.py",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/extended-audit-probe",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/json-baseline/run_extended_audit.py",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
               "--report",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/audit-expanded-characterization.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-EN/audit-expanded-characterization.json",
               "--suite",
               "characterization"
             ],
@@ -461,7 +539,7 @@
             "stderr": "native-json.stderr.log",
             "command": [
               "/workspace/work/json-yajl-baseline/v3/test/regression_tests",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/test-cases/regression/request-body-parser-json.json"
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/test-cases/regression/request-body-parser-json.json"
             ],
             "loader": {
               "resolved_path": "/workspace/work/json-yajl-baseline/v3/src/.libs/libmodsecurity.so.3.0.17",
@@ -484,11 +562,11 @@
             "stderr": "request-requirements.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline/run_requirements.py",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/json-baseline/run_requirements.py",
               "--probe",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/probe",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "--output",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/request-requirements.json"
+              "/workspace/work/json-yajl-pr-expansion/language-run-EN/request-requirements.json"
             ],
             "exit": 1,
             "status": "FAIL"
@@ -507,10 +585,10 @@
             "stderr": "audit-requirements.stderr.log",
             "command": [
               "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
-              "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline/run_extended_audit.py",
-              "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/extended-audit-probe",
+              "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN/test/json-baseline/run_extended_audit.py",
+              "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
               "--report",
-              "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/audit-requirements.json",
+              "/workspace/work/json-yajl-pr-expansion/language-run-EN/audit-requirements.json",
               "--suite",
               "requirements"
             ],
@@ -522,8 +600,8 @@
         "build_manifest": {
           "schema": 1,
           "status": "PASS",
-          "created_utc": "2026-10-15T14:40:28.698461+00:00",
-          "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN/test/json-baseline",
+          "created_utc": "2026-10-15T14:32:01.981907+00:00",
+          "probe_sources_root": "/workspace/work/json-yajl-pr-expansion/v3/test/json-baseline",
           "original_commit": "8271c9d3bc0abcbd1189f5414c196c336c959047",
           "source_root": "/workspace/work/json-yajl-baseline/v3",
           "source_head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896",
@@ -569,7 +647,7 @@
           },
           "probes": {
             "probe": {
-              "path": "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/probe",
+              "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/probe",
               "sha256": "10fd166b0a69c3d1d5ec3cc628e8c40aa0954726e05965070af4e74276dd7dce",
               "source_file": "probe.cc",
               "source_sha256": "9000dcda7fdebbb672ff09547972fc48678e14224b89c929fbfa4f543f971636",
@@ -579,7 +657,7 @@
               }
             },
             "audit-probe": {
-              "path": "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/audit-probe",
+              "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/audit-probe",
               "sha256": "2a8724b8b01598092fcd6189170694b3c286d22e08fc62e74f9bf6225def3de8",
               "source_file": "audit_probe.cc",
               "source_sha256": "6ae5ee00f780da28b96071ed54868d6883e1dd3910be43358a13fccd6bf07a7c",
@@ -589,7 +667,7 @@
               }
             },
             "extended-audit-probe": {
-              "path": "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/extended-audit-probe",
+              "path": "/workspace/work/json-yajl-pr-expansion/portable-probes-02/extended-audit-probe",
               "sha256": "10f9faa81c8f9e75938f9ff3f0f3305de295ad05eedc419babfa89869800975e",
               "source_file": "extended_audit_probe.cc",
               "source_sha256": "83fbeefad30a534ab1b44d6283160d760c1b32dc37ad655f15858ef2c313c08d",
@@ -652,52 +730,37 @@
         },
         "exit": 1
       },
-      "characterization_counts": {
-        "PASS": 399,
-        "FAIL": 0,
-        "SKIP": 0,
-        "BLOCKED": 0,
-        "XFAIL": 0
-      },
-      "requirements_counts": {
-        "PASS": 6,
-        "FAIL": 20,
-        "SKIP": 0,
-        "BLOCKED": 0,
-        "XFAIL": 0
-      },
-      "interpretation": "20 actual assertion failures remain ordinary FAIL/exit1; not infra errors or expected-failure masking. Two locale runs repeat same code, not doubled unique requirements."
+      "build_note": "Reused original-matching prebuilt probes; run_all rechecks CPP source hashes, source/submodule provenance, actual library resolution/hash, and activeJSON. Only documentation/packaging changed."
     }
   },
   "independent_integrity": {
     "DE": {
-      "commit": "8e033cddd78d0d8484355831f9d5ff00fcd218e5",
-      "file_count": 57,
-      "working_tree_clean": true,
-      "all_inventory_hashes_and_git_blobs_verified": true,
-      "baseline_documents_and_reports_unchanged": 12,
-      "zip_entries_bytes_and_hash_verified": true,
-      "bundle_hash_and_default_clone_verified": true,
-      "cloned_main_files_and_fsck_verified": true
+      "commit": "f84b9f701effcc3fb2710fba72682a705f73c35c",
+      "tracked_files": 58,
+      "clean": true,
+      "history_commits": 1,
+      "ZIP_and_bundle_hash_and_full_content_verified": true,
+      "default_bundle_clone_main_files_fsck_verified": true,
+      "old_reports_byte_identical": 4,
+      "all_original_doc_files_byte_identical": 8,
+      "no_German_files_or_old_German_blobs": "DE intentionally bilingual"
     },
     "EN": {
-      "commit": "2ae50a74475510445bfa9ed316af0befdb755b02",
-      "file_count": 57,
-      "working_tree_clean": true,
-      "all_inventory_hashes_and_git_blobs_verified": true,
-      "baseline_documents_and_reports_unchanged": 12,
-      "zip_entries_bytes_and_hash_verified": true,
-      "bundle_hash_and_default_clone_verified": true,
-      "cloned_main_files_and_fsck_verified": true
+      "commit": "55dff1f618fc4e67828d64e909a8cb690b79ac31",
+      "tracked_files": 51,
+      "clean": true,
+      "history_commits": 1,
+      "ZIP_and_bundle_hash_and_full_content_verified": true,
+      "default_bundle_clone_main_files_fsck_verified": true,
+      "old_reports_byte_identical": 4,
+      "all_original_doc_files_byte_identical": "German prose replaced by full English translations; English historical provenance gains origin annotation",
+      "no_German_files_or_old_German_blobs": true
     },
     "parity": {
-      "only_difference": [
-        "README.md"
-      ]
+      "runtime_fixtures_reports_workflows_patch_identical": true,
+      "compared_files": 26
     },
     "runtime_EN": {
-      "build": "PASS",
-      "build_manifest": "/workspace/work/json-yajl-pr-expansion/export-final-probes-EN/build-manifest.json",
       "profile": "all",
       "counts": {
         "PASS": 405,
@@ -707,104 +770,53 @@
         "XFAIL": 0
       },
       "exit": 1,
-      "summary": "/workspace/work/json-yajl-pr-expansion/export-final-run-EN/summary.json"
+      "summary": "/workspace/work/json-yajl-pr-expansion/language-run-EN/summary.json"
+    },
+    "hidden_content": {
+      "German_DE_document_paths_compared": [
+        "README.md",
+        "README.de.md",
+        "doc/JSON-YAJL-BASELINE.md",
+        "doc/json-yajl-baseline-v3.md",
+        "doc/json-yajl-code-analysis.md",
+        "doc/json-pr-extension/README.de.md",
+        "doc/json-pr-extension/matrix.de.md",
+        "doc/json-pr-extension/repository-README.de.md",
+        "doc/reference/de/ModSecurity-README.md"
+      ],
+      "unique_German_document_blobs_absent_from_EN_and_cloned_bundle": 7,
+      "EN_objects_all_reachable_from_single_English_commit": true,
+      "hidden_unreachable_objects": 0
     }
   },
+  "scope": "Documentation/localization/packaging only. Production source, YAJL, request fixtures and assertions unchanged. Normal fast-forward update only to the task branch created earlier in this assignment.",
+  "historical_verification_url": "https://github.com/Easton97-Jens/ModSecurity/blob/bc2dac43f75f22e79d9c5808245f6e6d5b158e5e/doc/json-pr-extension/prepared-repositories/verification.json",
+  "interpretation": "The repeated functional runs preserve 399 characterization PASS and 6PASS20FAIL requirements; genuine unmet requirements/policy proposals remain FAIL, exit1. Repeated locale executions do not double unique coverage.",
   "independent_links": {
-    "checked_local_links": 142,
-    "new_or_translated_document_issues": 0,
-    "inherited_archival_issues": [
+    "EN_documentation_language": "English only; all Markdown inspected and explicit German-navigation/placeholder patterns absent",
+    "checked_local_links": 79,
+    "new_or_translated_link_issues": 0,
+    "inherited_archival_link_issue": [
       [
         "doc/reference/en/ModSecurity-README.md",
         "#Git-submodules",
         "missing anchor"
       ]
     ],
-    "templates_skipped": "repository-README.*.md are intended for root; copied root READMEs checked",
-    "reference": "prepared-final EN, allbytesexceptprimaryREADMEidenticaltoDE"
-  },
-  "production_files": "Unchanged vs official8271c9d3; original baseline doc+4reports byte-identical.",
-  "limited_sanitizer": {
-    "counts": {
-      "PASS": 124,
-      "FAIL": 0,
-      "SKIP": 0,
-      "BLOCKED": 0,
-      "XFAIL": 0
-    },
-    "report": "../../../test/json-baseline/results/extended-sanitizer-results.json",
-    "scope": "helper+unchangedjson.cc only; no leak check/fullengine instrumentation"
-  },
-  "origin_identity": {
-    "full_name": "Easton97-Jens/ModSecurity",
-    "github_id": 1111635599,
-    "fork": true,
-    "parent": "owasp-modsecurity/ModSecurity",
-    "verified_by": "approved GitHub read connector; all effective origin push URLs checked"
-  },
-  "scope": "Only new test/json-yajl-pr-coverage-v3-20261015 is an authorized remote write target; no upstream writes, pre-existing branch writes, PRs, tags, or releases.",
-  "foreign_remote_movement_before_any_extension_push": [
-    {
-      "ref": "refs/heads/v3/master",
-      "initial": "48e561b2ba44d35eec799176608720129c678777",
-      "pre_push": "2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641",
-      "interpretation": "Observed external movement; this task has performed no pushes yet and does not write this ref."
-    }
-  ],
-  "preserved_worktrees": {
-    "/workspace/ModSecurity": {
-      "head": "48e561b2ba44d35eec799176608720129c678777",
-      "branch": "work"
-    },
-    "/workspace/work/json-yajl-baseline/v3": {
-      "head": "2bfb2180d8c0fa35ae7a3f2665e999600607d896"
-    },
-    "/workspace/work/json-yajl-baseline/v2": {
-      "head": "2739e0634ba688bc9cda9dad14eaf3ab1427e1c8"
-    }
-  },
-  "task_files": [
-    "doc/en/JSON-YAJL-BASELINE.md",
-    "doc/en/json-yajl-baseline-v3.md",
-    "doc/en/json-yajl-code-analysis.md",
-    "doc/json-pr-extension/README.de.md",
-    "doc/json-pr-extension/README.en.md",
-    "doc/json-pr-extension/catalog.json",
-    "doc/json-pr-extension/matrix.de.md",
-    "doc/json-pr-extension/matrix.en.md",
-    "doc/json-pr-extension/provenance.json",
-    "doc/json-pr-extension/repository-README.de.md",
-    "doc/json-pr-extension/repository-README.en.md",
-    "doc/json-pr-extension/results-summary.json",
-    "doc/reference/Makefile.am",
-    "doc/reference/de/ModSecurity-README.md",
-    "doc/reference/doxygen.cfg",
-    "doc/reference/en/ModSecurity-README.md",
-    "doc/reference/ms-doxygen-logo.png",
-    "test/Makefile.am",
-    "test/json-baseline/build-extended-audit.sh",
-    "test/json-baseline/extended_audit_probe.cc",
-    "test/json-baseline/pr_cases.py",
-    "test/json-baseline/probe.cc",
-    "test/json-baseline/repository-template/.github/workflows/json-tests.yml",
-    "test/json-baseline/results/extended-audit-results.json",
-    "test/json-baseline/results/extended-request-results.json",
-    "test/json-baseline/results/extended-sanitizer-results.json",
-    "test/json-baseline/results/requirements-results.json",
-    "test/json-baseline/run_extended.py",
-    "test/json-baseline/run_extended_audit.py",
-    "test/json-baseline/run_requirements.py",
-    "test/json-baseline/tools/build.py",
-    "test/json-baseline/tools/export_repositories.py",
-    "test/json-baseline/tools/prepare_source.py",
-    "test/json-baseline/tools/run_all.py",
-    "test/test-cases/regression/request-body-parser-json.json",
-    "doc/json-pr-extension/prepared-repositories/ModSecurity-JSON-Tests-DE.bundle",
-    "doc/json-pr-extension/prepared-repositories/ModSecurity-JSON-Tests-DE.zip",
-    "doc/json-pr-extension/prepared-repositories/ModSecurity-JSON-Tests-EN.bundle",
-    "doc/json-pr-extension/prepared-repositories/ModSecurity-JSON-Tests-EN.zip",
-    "doc/json-pr-extension/prepared-repositories/README.md",
-    "doc/json-pr-extension/prepared-repositories/export-manifest.json",
-    "doc/json-pr-extension/prepared-repositories/verification.json"
-  ]
+    "German_natural_language_JSON_values": 0,
+    "literal_historical_reference_exceptions": [
+      {
+        "file": "doc/json-yajl-provenance.json",
+        "path": "$.fork_refs_before[15].ref",
+        "text": "refs/heads/codex/erstelle-fachartikel-uber-fuzz-testing-und-sanitizer"
+      },
+      {
+        "file": "doc/json-pr-extension/provenance.json",
+        "path": "$.fork_refs_before_extension[15].ref",
+        "text": "refs/heads/codex/erstelle-fachartikel-uber-fuzz-testing-und-sanitizer"
+      }
+    ],
+    "test_Unicode_fixtures": "unchanged; runtime hash parity independently verified",
+    "embedded_old_archives": "none; one-commit bundle history contains no original German baseline document blobs"
+  }
 }

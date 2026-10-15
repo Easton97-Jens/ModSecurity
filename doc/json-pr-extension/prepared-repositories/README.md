@@ -1,25 +1,28 @@
 # Vorbereitete Repositories / Prepared repositories
 
-Beide Pakete enthalten die vollständige Dokumentation auf Deutsch **und** Englisch,
-dieselben Tests und festen Erwartungen sowie die bisherigen und neuen Berichte.
-Nur die Haupt-README startet mit einer anderen Sprache. Neue GitHub-Repositories
-wurden nicht angelegt; diese vollständigen lokalen Repository-Stände sind zur
-weiteren Veröffentlichung vorbereitet.
+Das EN-Paket enthält ausschließlich englische Dokumentation, einschließlich der
+vollständig übersetzten bisherigen Berichte. Das DE-Paket enthält Deutsch und
+Englisch. Beide enthalten dieselben ausführbaren Tests, festen Erwartungen und
+maschinenlesbaren Testergebnisse. Neue GitHub-Repositories wurden nicht angelegt;
+diese vollständigen lokalen Repository-Stände sind zur Veröffentlichung vorbereitet.
 
-Both packages contain the complete German **and** English documentation, identical
-tests and fixed expectations, and all prior and new reports. Only the primary
-README uses a different entry language. These are complete prepared local Git
-repositories; no new GitHub repositories have been created.
+The EN package contains English documentation only, including complete translations
+of the historical reports. The DE package contains German and English. Both contain
+identical executable tests, fixed expectations and machine-readable test results.
+These are complete prepared local Git repositories; no new GitHub repositories
+have been created.
 
-| Repository | ZIP | Git bundle | Local Git commit |
+| Repository / languages | ZIP | Git bundle | Local Git commit |
 |---|---|---|---|
-| ModSecurity-JSON-Tests-DE | [Download](ModSecurity-JSON-Tests-DE.zip) | [Bundle](ModSecurity-JSON-Tests-DE.bundle) | `8e033cddd78d0d8484355831f9d5ff00fcd218e5` |
-| ModSecurity-JSON-Tests-EN | [Download](ModSecurity-JSON-Tests-EN.zip) | [Bundle](ModSecurity-JSON-Tests-EN.bundle) | `2ae50a74475510445bfa9ed316af0befdb755b02` |
+| ModSecurity-JSON-Tests-DE / DE + EN | [Download](ModSecurity-JSON-Tests-DE.zip) | [Bundle](ModSecurity-JSON-Tests-DE.bundle) | `f84b9f701effcc3fb2710fba72682a705f73c35c` |
+| ModSecurity-JSON-Tests-EN / EN only | [Download](ModSecurity-JSON-Tests-EN.zip) | [Bundle](ModSecurity-JSON-Tests-EN.bundle) | `55dff1f618fc4e67828d64e909a8cb690b79ac31` |
 
 [Exportmanifest / Export manifest](export-manifest.json): vollständige Dateilisten,
 SHA-256 aller Dateien und Pakete, Inhaltsvergleich und Originalbezüge.
 [Prüfbericht / Verification](verification.json): frische Läufe aus beiden Paketen,
-Bundle-/ZIP-Prüfung und unveränderte bisherige Dokumentation.
+Bundle-/ZIP-Prüfung, Sprachprofile und unveränderte Testdaten. Im DE-Paket bleiben
+die bisherigen Originaldokumente erhalten; im EN-Paket stehen ihre vollständigen
+englischen Übersetzungen.
 
 Die eigenständigen Git-SHAs oben gehören zu den lokalen Test-Repositories, nicht
 zum offiziellen ModSecurity oder zum Fork-Aufgabenbranch. Dessen verifizierte

@@ -433,9 +433,19 @@
     "tool_guards": "Missing build manifest ->2 suite BLOCKED; existing destination/source output rejected unchanged; count mismatch and wrong library rejected."
   },
   "prepared_repositories": {
-    "DE": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-DE",
-    "EN": "/workspace/work/json-yajl-pr-expansion/prepared-final/ModSecurity-JSON-Tests-EN",
-    "contents": "Both full language versions and identical test code; only root README.md differs. No GitHub repositories created. Local Git SHAs and ZIP/bundle hashes live in separate export-manifest.json."
+    "DE": "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-DE",
+    "EN": "/workspace/work/json-yajl-pr-expansion/prepared-language-profiles/ModSecurity-JSON-Tests-EN",
+    "contents": "DE contains complete German and English documentation. EN contains complete English documentation only; translated historical documents replace German originals in this independent export. Executable tests/fixtures/reports are identical. No new GitHub repositories created. Local Git SHAs and ZIP/bundle hashes are in export-manifest.json.",
+    "documentation_languages": {
+      "DE": [
+        "de",
+        "en"
+      ],
+      "EN": [
+        "en"
+      ]
+    },
+    "history": "Both exports start fresh independent histories so English bundles contain no deleted German documents from earlier drafts."
   },
   "integration_patch": {
     "path_in_exports": "patches/native-regressions.patch",
@@ -577,5 +587,10 @@
   "packaging_verification": {
     "default_bundle_clone": "Exporter includes main and HEAD, then actually clones into a fresh directory and compares branch, commit and every tracked file hash. An initial main-only draft was corrected before publication.",
     "inherited_link_quirk": "Original English project README preserves an inherited #Git-submodules fragment with original case; current GitHub headings use lowercase anchors. Original archived content remains byte-identical except pinned file/image URLs; new/translated guide links verified."
+  },
+  "language_profile_correction": {
+    "request": "One English-only repository, one including German as well.",
+    "source_documents": "Canonical fork retains all German originals and English translations. Only the English export is localized; immutable source provenance is recorded.",
+    "tests": "No request fixture, assertion, production source or YAJL behavior changed."
   }
 }
