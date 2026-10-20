@@ -226,17 +226,21 @@ bool Rbl::evaluate(Transaction *t, RuleWithActions *rule,
         return false;
     }
 
-    // SonarCloud suggested to use the init-statement to declare "addr" inside the if statement.
-    // I think that's not good here, because we need that in the else block
-    const struct sockaddr *addr = info->ai_addr;  // NOSONAR
-    if (addr->sa_family == AF_INET) {  // NOSONAR
-        struct sockaddr_in sin{};  // initialize an empty struct; we don't need port info
-        memcpy(&sin.sin_addr, addr->sa_data + 2, sizeof(sin.sin_addr));
-        sin.sin_family = AF_INET;
-        furtherInfo(&sin, ipStr, t, m_provider);
+    bool foundIPv4 = false;
+    for (const struct addrinfo *ai = info; ai != NULL; ai = ai->ai_next) {
+        const struct sockaddr *addr = ai->ai_addr;
+        if (addr != NULL && addr->sa_family == AF_INET) {
+            struct sockaddr_in sin{};  // initialize an empty struct; we don't need port info
+            memcpy(&sin.sin_addr, addr->sa_data + 2, sizeof(sin.sin_addr));
+            sin.sin_family = AF_INET;
+            furtherInfo(&sin, ipStr, t, m_provider);
+            foundIPv4 = true;
+            break;
+        }
     }
-    else {
-        ms_dbg_a(t, 7,  "Unsupported address family: " + std::to_string(addr->sa_family));
+
+    if (!foundIPv4) {
+        ms_dbg_a(t, 7, "Unsupported address family in RBL result list.");
         freeaddrinfo(info);
         return false;
     }
