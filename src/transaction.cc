@@ -827,6 +827,7 @@ int Transaction::processRequestBody() {
     if (m_rules->m_secRequestBodyAccess == RulesSetProperties::FalseConfigBoolean) {
         if (m_requestBodyAccess != RulesSetProperties::TrueConfigBoolean) {
             ms_dbg(4, "Request body processing is disabled");
+            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         } else {
             ms_dbg(4, "Request body processing is disabled, but " \
@@ -838,6 +839,7 @@ int Transaction::processRequestBody() {
             ms_dbg(4, "Request body processing is enabled, but " \
                 "disabled to this transaction due to ctl:requestBodyAccess " \
                 "action");
+            this->m_rules->evaluate(modsecurity::RequestBodyPhase, this);
             return true;
         }
     }
