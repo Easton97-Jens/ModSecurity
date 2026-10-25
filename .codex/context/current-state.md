@@ -114,11 +114,19 @@ Dokumentationslektüre beweist keine Laufzeitintegration.
 
 ## Bereitstellungsstand
 
-Der deutsche Arbeitsbranch ist lokal als `codex/kontext-v3-de` angelegt.
-Beim Start der Übersetzung wurde `codex/kontext-v3` im Remote auf
+Die deutsche Variante ist im bestehenden öffentlichen Fork unter `codex/kontext-v3-de`
+hochgeladen. Der erste veröffentlichte Übersetzungs-Commit ist
+`b3db8941fada504caf3b88da9357da307c6c8132` mit Baum
+`8188488bd10cb5fa4e26e4f5a5740d52a2fd3ce8`. Dieser Baum stimmt exakt mit dem lokal
+geprüften Dateibaum überein. Der Branch wurde aus dem Remote abgerufen, sein Commit,
+Eltern-Commit und Baum wurden geprüft. Der GitHub-Vergleich bestätigte 98 geänderte
+Kontextdateien und keine zusätzlichen Produktänderungen. Die anschließende Aktualisierung
+dieses Arbeitsstands und des Backlogs hält diese beobachtete Bereitstellung fest.
+Für die deutsche Variante wurde kein Pull Request erstellt und kein Merge durchgeführt.
+
+Beim Start der Übersetzung wurde der englische Remote-Branch `codex/kontext-v3` auf
 `a35e8c3a1116a763f286f965f718f36d5f8876cc` bestätigt; der deutsche Remote-Branch
-war noch nicht vorhanden. Das Hochladen erfolgt nach der abschließenden Prüfung.
-Für diese Variante wird kein Pull Request erstellt.
+war noch nicht vorhanden. Die englische Fassung wurde bei der Bereitstellung nicht geändert.
 
 **Historie der englischen Fassung:** Die englische Anpassung wurde im bestehenden Fork
 mit [Entwurfs-PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) gegen
@@ -138,9 +146,8 @@ Arbeits-Commit dieser deutschen Variante. Der Head des englischen PR bezeichnet 
 
 ## Nächster konkreter Schritt
 
-Den abschließend geprüften deutschen Branch im bestehenden Fork hochladen und den Remote-Stand bestätigen.
-Danach können neue Chats `codex/kontext-v3-de` und den [Startprompt](prompts/start-new-chat.md)
-verwenden. Bei Wiederaufnahme immer den tatsächlichen Remote-Stand prüfen.
+Für den nächsten Chat `codex/kontext-v3-de` auswählen und den
+[Startprompt](prompts/start-new-chat.md) verwenden. Danach die konkrete nächste Aufgabe benennen. Bei Wiederaufnahme immer den tatsächlichen Remote-Stand prüfen.
 Andere Repositories und globale Nutzerkonfiguration wurden nicht geändert.
 Für eine spätere Produktaufgabe relevante Leitfäden und tatsächlichen Quellcode lesen,
 gewünschtes Verhalten und Umgebung bestimmen und angemessene Prüfungen auswählen.

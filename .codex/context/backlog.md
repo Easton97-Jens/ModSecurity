@@ -2,12 +2,11 @@
 
 Diese Liste hält tatsächlich verbleibende Arbeit fest. Sie behauptet weder einen
 bereits vorhandenen Repository-Fehler noch eine durchgeführte optionale Untersuchung.
-Die deutsche Variante wird im Branch `codex/kontext-v3-de` bereitgestellt;
+Die deutsche Variante ist im Branch `codex/kontext-v3-de` veröffentlicht;
 ein Pull Request dafür ist ausdrücklich nicht beauftragt.
 
 | Punkt | Aktueller Stand | Nächste konkrete Aktion |
 | --- | --- | --- |
-| Deutsche Kontextvariante bereitstellen | Übersetzung und lokale Prüfungen abgeschlossen | Ausschließlich `codex/kontext-v3-de` im bestehenden Fork hochladen und den Remote-Stand bestätigen |
 | Frühere englische Integration nach `v3/master` | Historisch über [Entwurfs-PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) vorbereitet; kein Merge in dieser Übersetzungsaufgabe | Nur bei einem späteren entsprechenden Auftrag aktuellen PR-Stand prüfen und gegebenenfalls integrieren |
 | Erste Produktcode-Aufgabe | Keine Verhaltensänderung in dieser Kontextaufgabe ausgewählt | Gewünschte Änderung benennen; relevante Implementierung und Tests untersuchen |
 | Tatsächliche Entwicklungs-Zielumgebung | Keine Nutzer-Deployment-/Build-Umgebung festgelegt | Für eine Build-Aufgabe Betriebssystem, Compiler und Abhängigkeiten bestimmen und festgehaltene Submodule initialisieren |
