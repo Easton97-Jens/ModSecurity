@@ -1,49 +1,49 @@
-# Shared procedure for an optional deep core review
+# Gemeinsamer Ablauf für eine optionale vertiefte Kernprüfung
 
-## Trigger and scope
+## Anlass und Umfang
 
-Use this procedure when the user requests a deep security review of the core library or selected components. The default assessment mode is analysis: source reading, scoped checks, and evidence. Product fixes, dependency changes, and external integration work follow the actual user request rather than being implied by this document.
+Nutze diesen Ablauf, wenn der Nutzer eine vertiefte Sicherheitsprüfung der Kernbibliothek oder ausgewählter Komponenten verlangt. Der standardmäßige Bewertungsmodus ist Analyse: Quellcode lesen, begrenzte Prüfungen und Nachweise. Produktkorrekturen, Änderungen an Abhängigkeiten und externe Integrationsarbeit richten sich nach dem tatsächlichen Nutzerauftrag und werden durch dieses Dokument nicht vorausgesetzt.
 
-Record the working commit, pinned upstream baseline, dirty state, selected [components](components/README.md), relevant build features, and excluded areas. Submodule gitlinks identify separate revisions; do not claim their contents were reviewed merely because the main repository records a pin.
+Halte Arbeitscommit, festgelegten Upstream-Ausgangsstand, vorhandene nicht committete Änderungen, ausgewählte [Komponenten](components/README.md), relevante Build-Funktionen und ausgeschlossene Bereiche fest. Submodul-Gitlinks bezeichnen getrennte Revisionen; behaupte nicht, ihre Inhalte seien geprüft worden, nur weil das Haupt-Repository einen Stand festhält.
 
-## Recommended sequence
+## Empfohlener Ablauf
 
-1. State the review question and intended invariant; identify caller-controlled input, assets, privileges, and trust boundaries.
-2. Read the public entry points, concrete implementation, callers, error paths, and relevant test definitions.
-3. Record applicable check modules and a bounded validation plan. Verify actual tooling and prerequisites before promising execution.
-4. Investigate candidate paths, including legitimate controls and the strongest counterevidence.
-5. Use the strongest suitable validation available within the task: focused existing tests, bounded temporary harnesses, or explicitly selected diagnostics.
-6. Reconcile candidate status, coverage, configuration variants, and unperformed checks. Keep proposed hardening separate from implemented or validated fixes.
-7. Record commands, results, limitations, task-owned artifacts, and final source changes; hand over the remaining concrete work.
+1. Benenne die Prüffrage und beabsichtigte Invariante; ermittle vom Aufrufer kontrollierte Eingaben, Schutzgüter, Berechtigungen und Vertrauensgrenzen.
+2. Lies öffentliche Einstiegspunkte, konkrete Implementierung, Aufrufer, Fehlerpfade und relevante Testdefinitionen.
+3. Halte anwendbare Prüfmodule und einen begrenzten Validierungsplan fest. Prüfe tatsächliche Werkzeuge und Voraussetzungen, bevor du Ausführung zusagst.
+4. Untersuche Kandidatenpfade einschließlich zulässiger Kontrollfälle und der stärksten Gegenbelege.
+5. Nutze die aussagekräftigste geeignete Validierung, die innerhalb der Aufgabe verfügbar ist: gezielte vorhandene Tests, begrenzte temporäre Testgerüste oder ausdrücklich ausgewählte Diagnosen.
+6. Gleiche Kandidatenstatus, Abdeckung, Konfigurationsvarianten und nicht ausgeführte Prüfungen ab. Halte vorgeschlagene Härtung von implementierten oder validierten Korrekturen getrennt.
+7. Halte Befehle, Ergebnisse, Grenzen, zur Aufgabe gehörende Artefakte und abschließende Quelländerungen fest; übergib die verbleibende konkrete Arbeit.
 
-## Candidate record
+## Kandidatenaufzeichnung
 
-| Field | Required meaning for a useful candidate |
+| Feld | Erforderliche Bedeutung für einen hilfreichen Kandidaten |
 | --- | --- |
-| Identity | Stable local ID, component, source revision, file, and symbol. |
-| Control | Who controls the input, with what privileges and preconditions? |
-| Path | Reachable entry point, relevant transformations, expected control, and sink. |
-| Consequence | Observable impact and its boundary; distinguish inference from execution. |
-| Counterevidence | Guards, configuration, unreachable branches, or caller contracts that may invalidate the hypothesis. |
-| Validation | Actual method, legitimate control, result, tool/configuration identity, and evidence location. |
-| Disposition | Candidate, validated, refuted, or unresolved, with reason and confidence. |
+| Identität | Stabile lokale Kennung, Komponente, Quellstand, Datei und Symbol. |
+| Kontrolle | Wer kontrolliert die Eingabe, mit welchen Berechtigungen und Voraussetzungen? |
+| Pfad | Erreichbarer Einstiegspunkt, relevante Transformationen, erwartete Kontrolle und Zielstelle. |
+| Folge | Beobachtbare Auswirkung und ihre Grenze; Schlussfolgerung von Ausführung unterscheiden. |
+| Gegenbelege | Schutzprüfungen, Konfiguration, unerreichbare Zweige oder Aufruferverträge, die die Hypothese entkräften können. |
+| Validierung | Tatsächliche Methode, zulässiger Kontrollfall, Ergebnis, Werkzeug- und Konfigurationsidentität sowie Nachweisort. |
+| Einstufung | Kandidat, validiert, widerlegt oder ungeklärt, mit Begründung und Vertrauen in die Einstufung. |
 
-Use [finding validation](checks/finding-validation.md). A scanner or AI result starts as a candidate. Deduplicate common root causes while preserving independently reachable instances that need separate validation or fixes.
+Nutze die [Befundvalidierung](checks/finding-validation.md). Ein Scanner- oder KI-Ergebnis beginnt als Kandidat. Fasse gemeinsame Grundursachen zusammen und erhalte dabei unabhängig erreichbare Vorkommen, die getrennte Validierung oder Korrekturen benötigen.
 
-## Library-specific questions
+## Bibliotheksspezifische Fragen
 
-- Are engine, ruleset, transaction, variable, and callback lifetimes compatible with the actual caller?
-- Do the bytes and lengths tested by rules correspond to the inputs supplied by that caller?
-- Which engine state, body-access setting, MIME selection, limit action, and optional processor apply?
-- Is a result a method return, rule match, intervention, callback, or persisted audit record?
-- Which shared backend, filesystem location, parser path, and dependency variant can the selected input reach?
+- Sind die Lebensdauern von Engine, Regelwerk, Transaktion, Variablen und Callbacks mit dem tatsächlichen Aufrufer vereinbar?
+- Entsprechen die von Regeln geprüften Bytes und Längen den von diesem Aufrufer gelieferten Eingaben?
+- Welcher Engine-Zustand, welche Körperzugriffseinstellung, MIME-Auswahl, Grenzwertaktion und welcher optionale Prozessor gelten?
+- Ist ein Ergebnis eine Methodenrückgabe, ein Regeltreffer, eine Intervention, ein Callback oder ein dauerhaft gespeicherter Audit-Datensatz?
+- Welches gemeinsame Backend, welcher Dateisystemort, Parser-Pfad und welche Abhängigkeitsvariante sind für die ausgewählte Eingabe erreichbar?
 
-These are review questions, not claims of defects. The [architecture](../architecture.md) and [C++ guide](../cpp-guide.md) provide source-linked entry points.
+Dies sind Prüffragen, keine Fehlerbehauptungen. Die [Architektur](../architecture.md) und der [C++-Leitfaden](../cpp-guide.md) bieten mit Quellen verknüpfte Einstiegspunkte.
 
-## Evidence and completion
+## Nachweise und Abschluss
 
-A compact report may contain the scope/inventory, coverage table, candidates, command log, limitations, and proposed next steps. Split files only when useful; do not create empty report collections or assume configured external storage variables exist.
+Ein knapper Bericht kann Umfang und Inventar, Abdeckungstabelle, Kandidaten, Befehlsprotokoll, Grenzen und vorgeschlagene nächste Schritte enthalten. Teile Dateien nur auf, wenn es hilfreich ist; erstelle keine leeren Berichtssammlungen und setze keine konfigurierten Variablen für externen Speicher voraus.
 
-Use actual task-owned output locations and document cleanup. Keep sensitive payloads and credentials out of versioned context. Missing tooling is a coverage gap, not proof of product failure or safety.
+Nutze tatsächliche, zur Aufgabe gehörende Ausgabeorte und dokumentiere die Bereinigung. Halte sensible Nutzdaten und Zugangsdaten aus versioniertem Kontext heraus. Fehlende Werkzeuge sind eine Abdeckungslücke, kein Beweis für Produktversagen oder Sicherheit.
 
-Complete means the declared review scope was reconciled; it does not mean every check passed or every possible issue was excluded. State explicitly that the assessment is not production approval.
+Vollständig bedeutet, dass der erklärte Prüfumfang abgeglichen wurde; es bedeutet nicht, dass jede Prüfung bestanden wurde oder jedes mögliche Problem ausgeschlossen ist. Benenne ausdrücklich, dass die Bewertung keine Produktionsfreigabe darstellt.

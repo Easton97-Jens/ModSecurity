@@ -1,72 +1,73 @@
-# Adaptation of the connector repository layout
+# Anpassung des Kontextaufbaus aus dem Connector-Repository
 
-## Requested template and inspected revision
+## Gewünschte Vorlage und untersuchter Stand
 
-The owner requested the `.codex` structure from
+Der Eigentümer wählte die `.codex`-Struktur von
 [`Easton97-Jens/ModSecurity-conector`](https://github.com/Easton97-Jens/ModSecurity-conector/tree/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex),
-branch `master`, inspected at commit
-`42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` on 2026-10-25.
-Its tracked `.codex` files, root `AGENTS.md`, `README.md`, `.gitignore`, and root
-build orchestration were examined for structure and repository-specific assumptions.
-The [reference inventory](../audit/template-source-index.tsv) records the selected
-Git objects. This is not a claim that all connector product source was audited.
+Branch `master`, untersucht am Commit `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3`
+am 25.10.2026. Die versionierten `.codex`-Dateien, `AGENTS.md`, `README.md`,
+`.gitignore` und die Build-Steuerung im Hauptverzeichnis wurden hinsichtlich Struktur
+und Repository-spezifischer Annahmen untersucht. Das
+[Referenzinventar](../audit/template-source-index.tsv) hält die ausgewählten Git-Objekte fest.
+Dies behauptet keine Prüfung des gesamten Produktcodes des Connectors.
 
-The template provides organization and workflow ideas only. Technical statements
-about libmodsecurity come from the official source revision in
-[upstream-lock.json](upstream-lock.json). The connector repository's policies,
-reports, and runtime claims are not evidence of core library behavior.
+Die Vorlage liefert ausschließlich Organisation und Ablaufideen. Technische Aussagen über
+libmodsecurity stammen aus dem offiziellen Quellstand in [upstream-lock.json](upstream-lock.json).
+Richtlinien, Berichte und Laufzeitaussagen des Connector-Repositorys belegen kein
+Verhalten der Kernbibliothek.
 
-## Mapping to this repository
+## Zuordnung zu diesem Repository
 
-| Connector template | ModSecurity adaptation |
+| Connector-Vorlage | ModSecurity-Anpassung |
 | --- | --- |
-| Concise root `AGENTS.md` | Reusable English agreement for any repository; core-specific rules are in `context/repository-context.md` |
-| `.codex/context/index.md` and `manifest.toml` | Routed technical guides, policy owners, profiles, and saved state |
-| Core operational policies | Same domains, adapted to Autotools, C++/C APIs, `test/`, and `v3/master` |
-| `context/profiles/` | Core-library, component, build/CI, response-phase, and evidence assessment workflows |
-| `context/security/checks/` | Focused review modules tied to library input, lifetime, rules, logging, and dependencies |
-| `context/security/connectors/` | `context/security/components/` for actual core areas |
-| `.codex/bin/` | Read-only structure, catalog-digest, and source-reference validators |
-| `.codex/audit/` | Complete pinned main-source inventory, template inventory, and dated session records |
-| Structure and inheritance manifests | Local routing and policy-digest catalog, without invented child repositories |
-| `.codex/inheritance-templates/` | Explicit opt-in reuse template and explanation; no active submodule inheritance |
-| Historical reports outside normal policy routing | Session/audit records separated from current state and policy owners |
+| Knappe `AGENTS.md` im Hauptverzeichnis | Wiederverwendbare Vereinbarung für beliebige Repositories, in diesem Branch auf Deutsch; Kernvorgaben stehen in `context/repository-context.md` |
+| `.codex/context/index.md` und `manifest.toml` | Zugeordnete technische Leitfäden, zuständige Richtlinien, Profile und gespeicherter Stand |
+| Zentrale Arbeitsrichtlinien | Dieselben Themengebiete, angepasst an Autotools, C++-/C-APIs, `test/` und `v3/master` |
+| `context/profiles/` | Prüfabläufe für Kernbibliothek, Komponenten, Build/CI, Antwortphase und Nachweise |
+| `context/security/checks/` | Gezielte Prüfmodule für Bibliothekseingaben, Lebensdauer, Regeln, Protokollierung und Abhängigkeiten |
+| `context/security/connectors/` | `context/security/components/` für tatsächliche Kernbereiche |
+| `.codex/bin/` | Nur lesende Prüfer für Struktur, Katalogprüfsummen und Quellverweise |
+| `.codex/audit/` | Vollständiges festgehaltenes Hauptquelleninventar, Vorlageninventar und datierte Sitzungsaufzeichnungen |
+| Struktur- und Vererbungsmanifeste | Lokale Dateizuordnung und Richtlinien-Prüfsummenkatalog ohne erfundene untergeordnete Repositories |
+| `.codex/inheritance-templates/` | Ausdrücklich wählbare Wiederverwendungsvorlage und Erklärung; keine aktive Vererbung an Submodule |
+| Historische Berichte außerhalb der normalen Richtlinienzuordnung | Sitzungs-/Prüfaufzeichnungen getrennt von aktuellem Stand und zuständigen Richtlinien |
 
-Detailed repository and C++ guides, source provenance, start/end prompts, and
-current-state/decision/backlog files supplement the template to meet the owner's
-request for reusable context across chats. All new content is English; the
-reference repository's English/German companion convention is not adopted.
-The root agreement is portable; the `.codex` context remains core-specific.
-The setup prescribes no chat language; each person chooses.
+Ausführliche Repository- und C++-Leitfäden, Quellenherkunft, Start-/Abschlussprompts sowie
+Dateien für aktuellen Stand, Entscheidungen und Backlog ergänzen die Vorlage, um den
+gewünschten wiederverwendbaren Kontext über Chats hinweg bereitzustellen. Die erste
+Anpassung war auf Englisch; eine verpflichtende englisch-deutsche Begleitdatei-Konvention
+des Referenzrepositorys wurde nicht übernommen. Auf späteren ausdrücklichen Auftrag
+liegt nun diese eigenständige deutsche Variante in `codex/kontext-v3-de` vor.
+Die Arbeitsvereinbarung ist portabel; der `.codex`-Kontext bleibt auf die Kernbibliothek
+zugeschnitten. Die Einrichtung schreibt keine Chatsprache vor; jede Person entscheidet selbst.
 
-## Repository-specific rules that were not copied
+## Nicht übernommene Repository-spezifische Regeln
 
-- Parent/Framework/MRTS topology, connector host/profile matrices, historical PR
-  states, and migration outcomes do not describe this core checkout.
-- Reference-machine paths, fixed storage roots, numeric limits, required global
-  skills, RTK wrappers, authentication wrappers, and service configurations are
-  not assumed to exist here.
-- SonarQube, runtime hosts, external test frameworks, and quality gates are
-  conditional tools or separate task scope, not asserted installations.
-- A reference policy's target behavior is not relabeled as implemented core
-  behavior. In particular, external host response commitment must not be inferred
-  from a library phase result.
-- The template's `3.2` policy version is not a ModSecurity release or a version of
-  this new local schema. The adapted manifests use their own schema version.
+- Übergeordnete/Framework-/MRTS-Topologien, Connector-Host-/Profilmatrizen, historische
+  PR-Stände und Migrationsergebnisse beschreiben diesen Kern-Checkout nicht.
+- Referenzmaschinen-Pfade, feste Speicherwurzeln, numerische Grenzen, erforderliche globale
+  Skills, RTK-Wrapper, Authentifizierungs-Wrapper und Dienstkonfigurationen werden hier nicht vorausgesetzt.
+- SonarQube, Laufzeithosts, externe Testframeworks und Qualitätsprüfungen sind bedingte
+  Werkzeuge oder gesonderter Aufgabenumfang, keine behaupteten Installationen.
+- Zielverhalten einer Referenzrichtlinie wird nicht als implementiertes Kernverhalten
+  umbenannt. Insbesondere darf aus einem Bibliotheks-Phasenergebnis nicht abgeleitet werden,
+  dass ein externer Host eine Antwort bereits verbindlich gesendet hat.
+- Die Richtlinienversion `3.2` der Vorlage ist weder eine ModSecurity-Version noch eine
+  Version dieses neuen lokalen Schemas. Die angepassten Manifeste haben eine eigene Schemaversion.
 
-The owner subsequently requested RTK guidance. The [RTK guide](rtk.md) adds
-conditional use based on RTK's own pinned source and official Codex documentation.
-It does not import the template's machine-specific wrappers or make installation
-mandatory. The reusable root agreement retains native-tool fallback.
+Der Eigentümer wünschte anschließend RTK-Hinweise. Der [RTK-Leitfaden](rtk.md) ergänzt
+bedingte Verwendung anhand der eigenen festgehaltenen RTK-Quellen und offizieller Codex-Dokumentation.
+Er übernimmt keine maschinenspezifischen Wrapper der Vorlage und schreibt keine Installation vor.
+Die wiederverwendbare Arbeitsvereinbarung erhält den Rückgriff auf native Werkzeuge.
 
-The four upstream submodule gitlinks remain unchanged. No policies are installed
-inside them. A future task must inspect and authorize its own repository boundary
-before adopting shared instructions there.
+Die vier Upstream-Gitlinks der Submodule bleiben unverändert. Darin werden keine
+Richtlinien installiert. Eine spätere Aufgabe muss ihre eigene Repository-Grenze untersuchen
+und freigeben, bevor dort gemeinsame Anweisungen übernommen werden.
 
-## Maintaining the adaptation
+## Pflege der Anpassung
 
-Use the local index as the routing authority for these added docs. Update the
-catalog after a deliberate policy edit and run the local validators. Do not
-periodically overwrite this adaptation from the connector repository: review
-relevant changes, record their source revision, and determine whether they apply
-to the core. User instructions and actual code remain authoritative.
+Nutze den lokalen Index als maßgebliche Zuordnung dieser ergänzten Dokumente.
+Aktualisiere nach einer bewussten Richtlinienänderung den Katalog und führe die lokalen
+Prüfprogramme aus. Überschreibe diese Anpassung nicht regelmäßig aus dem Connector-Repository:
+Prüfe relevante Änderungen, halte deren Quellrevision fest und entscheide, ob sie auf
+die Kernbibliothek anwendbar sind. Nutzeranweisungen und tatsächlicher Code bleiben maßgeblich.

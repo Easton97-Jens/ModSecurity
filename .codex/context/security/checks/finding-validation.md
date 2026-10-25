@@ -1,13 +1,13 @@
-# Candidate validation and impact questions
+# Fragen zur Kandidatenvalidierung und Auswirkung
 
-A suspicious pattern, advisory hit, scanner message, or AI suggestion begins as a candidate.
+Ein verdächtiges Muster, ein Treffer zu einem Sicherheitshinweis, eine Scannermeldung oder ein KI-Vorschlag beginnt als Kandidat.
 
-Before calling it a validated finding, establish the controlled input and privileges, reachable source path, intended invariant, missing/broken control, affected sink, observable consequence, relevant guards, and strongest counterevidence. Cite the exact revision, file, and symbol.
+Kläre vor der Bezeichnung als bestätigter Befund die kontrollierte Eingabe und Berechtigungen, den erreichbaren Quellpfad, die beabsichtigte Invariante, die fehlende beziehungsweise defekte Kontrolle, die betroffene Zielstelle, beobachtbare Folge, relevante Schutzprüfungen und stärkste Gegenbelege. Nenne genaue Revision, Datei und Symbol.
 
-Select a legitimate same-boundary control and a relevant alternative input or path when useful. Prefer existing focused cases or a bounded harness appropriate to the actual API. Do not change production code simply to make a hypothesis reproducible.
+Wähle einen zulässigen Kontrollfall an derselben Grenze und, soweit hilfreich, eine relevante alternative Eingabe oder einen alternativen Pfad. Bevorzuge vorhandene gezielte Fälle oder ein begrenztes Testgerüst, das zur tatsächlichen API passt. Ändere keinen Produktionscode allein, um eine Hypothese reproduzierbar zu machen.
 
-Distinguish source-supported reasoning from executed reproduction. If runtime validation was not performed or is inconclusive, state that limitation explicitly. A test definition is not a test result.
+Unterscheide quellcodegestützte Begründung von ausgeführter Reproduktion. Wurde die Laufzeitvalidierung nicht durchgeführt oder ist sie nicht eindeutig, benenne diese Grenze ausdrücklich. Eine Testdefinition ist kein Testergebnis.
 
-Deduplicate common root causes while preserving independently reachable instances whose reachability or correction differs. Identify external ownership boundaries without assuming permission to modify them.
+Fasse gemeinsame Grundursachen zusammen und erhalte dabei unabhängig erreichbare Vorkommen, deren Erreichbarkeit oder Korrektur sich unterscheidet. Benenne externe Zuständigkeitsgrenzen, ohne eine Änderungsfreigabe dafür anzunehmen.
 
-Use [evidence integrity](evidence-integrity.md) for result binding. These questions describe a method; they assert no existing vulnerability.
+Nutze die [Nachweisintegrität](evidence-integrity.md) für die Ergebniszuordnung. Diese Fragen beschreiben eine Methode; sie behaupten keine vorhandene Sicherheitslücke.

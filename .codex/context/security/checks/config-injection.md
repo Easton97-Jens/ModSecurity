@@ -1,13 +1,13 @@
-# Configuration, command, and path input questions
+# Fragen zu Konfigurations-, Befehls- und Pfadeingaben
 
-Trace the selected externally influenced value from its real source to parser, property, command, path, serialization, or build step. Identify who can set it; a rule author, CI contributor, and HTTP client do not automatically have the same authority.
+Verfolge den ausgewählten extern beeinflussten Wert von seiner tatsächlichen Quelle zu Parser, Eigenschaft, Befehl, Pfad, Serialisierung oder Build-Schritt. Ermittle, wer ihn setzen kann; Regelautor, CI-Mitwirkender und HTTP-Client haben nicht automatisch dieselben Befugnisse.
 
-- Does recognition lead to an implemented setting, an explicit error, or an empty compatibility action?
-- Where are quotes, escapes, newlines, control characters, option prefixes, substitutions, or path components interpreted?
-- Does validation cover the representation actually used at the sink?
-- Can environment or search-path fallback select a different binary, library, rule file, or output location?
-- Is shell evaluation involved at all, or does the API pass an argument vector?
+- Führt die Erkennung zu einer implementierten Einstellung, einem ausdrücklichen Fehler oder einer leeren Kompatibilitätsaktion?
+- Wo werden Anführungszeichen, Maskierungen, Zeilenumbrüche, Steuerzeichen, Optionspräfixe, Ersetzungen oder Pfadbestandteile interpretiert?
+- Deckt die Validierung die an der Zielstelle tatsächlich verwendete Darstellung ab?
+- Kann ein Rückgriff auf Umgebung oder Suchpfad eine andere Binärdatei, Bibliothek, Regeldatei oder einen anderen Ausgabeort auswählen?
+- Ist überhaupt eine Shell-Auswertung beteiligt, oder übergibt die API einen Argumentvektor?
 
-Use a bounded legitimate value and a focused negative value at the same boundary. Quoting alone is not evidence of the whole path's behavior. Record the actual parse/execute/write outcome and privilege assumptions.
+Nutze einen begrenzten zulässigen Wert und einen gezielten Negativwert an derselben Grenze. Anführungszeichen allein belegen nicht das Verhalten des gesamten Pfads. Halte das tatsächliche Parse-, Ausführungs- oder Schreibergebnis und die Berechtigungsannahmen fest.
 
-Entry points: [rules/parser](../components/rules-parser.md), [build/dependencies](../components/build-dependencies.md), and [known source discrepancies](../../fact-check.md).
+Einstiegspunkte: [Regeln und Parser](../components/rules-parser.md), [Build und Abhängigkeiten](../components/build-dependencies.md) und [bekannte Quellwidersprüche](../../fact-check.md).

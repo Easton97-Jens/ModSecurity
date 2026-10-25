@@ -1,14 +1,14 @@
-# Memory, ownership, and lifecycle questions
+# Fragen zu Speicher, Eigentümerschaft und Lebenszyklus
 
-Trace creation, storage, borrowing, ownership transfer, cleanup, and callback use for every object touched by the selected path. Read declarations, implementations, and actual callers together.
+Verfolge für jedes vom ausgewählten Pfad berührte Objekt Erzeugung, Speicherung, Ausleihen, Eigentumsübertragung, Freigabe und Callback-Nutzung. Lies Deklarationen, Implementierungen und tatsächliche Aufrufer gemeinsam.
 
-- Do engine/ruleset objects outlive transactions that borrow their pointers?
-- Are buffers valid for their explicit lengths or required null termination?
-- Is cleanup matched to allocation, including `new`/`delete`, `strdup`/`free`, smart pointers, and API cleanup helpers?
-- Can an error or early return skip cleanup, repeat it, or leave a retained reference to expired storage?
-- Does callback data remain valid during the call, and is a copy needed afterward?
-- Can an overflow, narrowing conversion, signedness change, or stale range alter an allocation or access?
+- Überdauern Engine- und Regelwerkobjekte die Transaktionen, die ihre Zeiger ausleihen?
+- Sind Puffer für ihre expliziten Längen beziehungsweise erforderliche Nullterminierung gültig?
+- Passt die Freigabe zur Allokation, einschließlich `new`/`delete`, `strdup`/`free`, intelligenter Zeiger und API-Freigabehilfen?
+- Kann ein Fehler oder eine vorzeitige Rückgabe die Freigabe auslassen, wiederholen oder einen aufbewahrten Verweis auf nicht mehr gültigen Speicher hinterlassen?
+- Bleiben Callback-Daten während des Aufrufs gültig, und wird danach eine Kopie benötigt?
+- Kann ein Überlauf, eine verengende Konvertierung, ein Wechsel zwischen vorzeichenbehafteten und vorzeichenlosen Typen oder ein veralteter Bereich eine Allokation oder einen Zugriff verändern?
 
-Do not infer ownership from `const` or a raw pointer type alone. Assess suspected effects under actual supported caller behavior and record the legitimate control.
+Leite Eigentümerschaft nicht allein aus `const` oder einem rohen Zeigertyp ab. Bewerte vermutete Auswirkungen unter tatsächlich unterstütztem Aufruferverhalten und halte den zulässigen Kontrollfall fest.
 
-Entry points: [API boundary](../components/api-boundary.md), [C++ guide](../../cpp-guide.md), and [failure/recovery](runtime-failure-recovery.md). Sanitizer use is optional and separately evidenced.
+Einstiegspunkte: [API-Grenze](../components/api-boundary.md), [C++-Leitfaden](../../cpp-guide.md) und [Fehler und Wiederherstellung](runtime-failure-recovery.md). Sanitizer-Nutzung ist optional und gesondert zu belegen.

@@ -1,20 +1,20 @@
-# Session completion prompt
+# Prompt zum Sitzungsabschluss
 
 ```text
-Prepare a handover for a new chat.
+Bereite eine Übergabe für einen neuen Chat vor.
 
-Review the actual diff and identify changed files.
-Update .codex/context/current-state.md with the current working state,
-checks actually executed and their results, and outstanding questions.
-Record durable new decisions in .codex/context/decisions.md and keep
-.codex/context/backlog.md limited to actual remaining work.
+Prüfe den tatsächlichen Diff und benenne die geänderten Dateien.
+Aktualisiere .codex/context/current-state.md mit dem aktuellen Arbeitsstand,
+den tatsächlich ausgeführten Prüfungen und ihren Ergebnissen sowie offenen Fragen.
+Halte dauerhafte neue Entscheidungen in .codex/context/decisions.md fest und
+beschränke .codex/context/backlog.md auf tatsächlich verbleibende Arbeit.
 
-If a detailed handover is useful, use .codex/context/handoff-template.md
-for a record under .codex/audit/sessions/. Cite source paths, symbols,
-and the verified commit. Write maintained context in English.
+Nutze bei Bedarf .codex/context/handoff-template.md für eine ausführliche
+Aufzeichnung unter .codex/audit/sessions/. Nenne Quellpfade, Symbole und
+den überprüften Commit. Schreibe den gepflegten Kontext dieser Variante auf Deutsch.
 
-Do not claim a check, publication, or save operation that you did not
-actually perform and verify. Keep unverified points visible.
-Identify the next concrete action and the first files to read for it.
-Run the appropriate final context consistency check.
+Behaupte keine Prüfung, Veröffentlichung oder Speicherung, die du nicht tatsächlich
+durchgeführt und überprüft hast. Halte ungeprüfte Punkte sichtbar.
+Benenne die nächste konkrete Aktion und die dafür zuerst zu lesenden Dateien.
+Führe die passende abschließende Konsistenzprüfung des Kontexts aus.
 ```

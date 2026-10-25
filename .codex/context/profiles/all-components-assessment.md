@@ -1,22 +1,22 @@
-# All-component coverage assessment
+# Bewertung der Abdeckung aller Komponenten
 
-## Trigger
+## Anlass
 
-Use when the user asks for coverage across the core library's main areas. This profile organizes the scope; it does not automatically request a deep security scan or every possible platform/feature combination.
+Nutze dieses Profil, wenn der Nutzer eine Abdeckung der Hauptbereiche der Kernbibliothek verlangt. Es ordnet den Umfang; es fordert nicht automatisch einen tiefgehenden Sicherheitsscan oder jede mögliche Plattform- und Funktionskombination an.
 
-Apply [bounded core-library assessment](core-library-assessment.md) to each selected row. Identify cross-component paths and justify any reuse of evidence.
+Wende die [begrenzte Bewertung der Kernbibliothek](core-library-assessment.md) auf jede ausgewählte Zeile an. Ermittle komponentenübergreifende Pfade und begründe jede Wiederverwendung von Nachweisen.
 
-| Component | Coverage question |
+| Komponente | Frage zur Abdeckung |
 | --- | --- |
-| [Engine](../security/components/engine.md) | Which phase/action and transaction-state behavior was examined? |
-| [Rules/parser](../security/components/rules-parser.md) | Which accepted/rejected settings and construction paths were examined? |
-| [Body processors](../security/components/body-processors.md) | Which format, limit, access, and error variants were examined? |
-| [Logging/storage](../security/components/logging-storage.md) | Which callback, audit, collection, and file paths were examined? |
-| [API boundary](../security/components/api-boundary.md) | Which C/C++ signatures, ownership, length, and cleanup contracts were examined? |
-| [Build/dependencies](../security/components/build-dependencies.md) | Which toolchain, optional features, provenance, and tests were examined? |
+| [Engine](../security/components/engine.md) | Welches Phasen-, Aktions- und Transaktionszustandsverhalten wurde untersucht? |
+| [Regeln und Parser](../security/components/rules-parser.md) | Welche akzeptierten beziehungsweise abgewiesenen Einstellungen und Erzeugungspfade wurden untersucht? |
+| [Verarbeitung der Nachrichtenkörper](../security/components/body-processors.md) | Welche Format-, Grenzwert-, Zugriffs- und Fehlervarianten wurden untersucht? |
+| [Protokollierung und Speicherung](../security/components/logging-storage.md) | Welche Callback-, Audit-, Kollektions- und Dateipfade wurden untersucht? |
+| [API-Grenze](../security/components/api-boundary.md) | Welche C-/C++-Signaturen und Verträge zu Eigentümerschaft, Längen und Freigabe wurden untersucht? |
+| [Build und Abhängigkeiten](../security/components/build-dependencies.md) | Welche Werkzeugkette, optionalen Funktionen, Herkunftsnachweise und Tests wurden untersucht? |
 
-For each row record source review, available tests, actual execution, configuration, findings/questions, and gaps separately. Listing six rows does not prove every file, function, input, or backend was covered.
+Halte je Zeile Quellcodeprüfung, verfügbare Tests, tatsächliche Ausführung, Konfiguration, Befunde beziehungsweise Fragen und Lücken getrennt fest. Sechs aufgeführte Zeilen beweisen keine Abdeckung jeder Datei, Funktion, Eingabe oder jedes Backends.
 
-Parallelize only independent work whose output paths and resources do not conflict. Do not create a connector/transport matrix for a core-only task.
+Parallelisiere nur unabhängige Arbeit, deren Ausgabepfade und Ressourcen nicht miteinander kollidieren. Erstelle für eine reine Kernaufgabe keine Connector- oder Transportmatrix.
 
-Report `not_run` and `blocked` with reasons; use `not_applicable` only for a technically excluded condition, not an inconvenient prerequisite.
+Berichte `not_run` und `blocked` mit Begründung; nutze `not_applicable` nur für eine technisch ausgeschlossene Bedingung, nicht für eine unbequeme Voraussetzung.

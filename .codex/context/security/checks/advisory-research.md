@@ -1,11 +1,11 @@
-# Optional advisory research
+# Optionale Recherche zu Sicherheitshinweisen
 
-Use only when dependency/advisory research is part of the selected assessment. Start from actual source revisions, dependency versions, build options, and platform information; do not infer installed versions from a README example.
+Nur verwenden, wenn die Recherche zu Abhängigkeiten oder Sicherheitshinweisen Teil der ausgewählten Bewertung ist. Gehe von tatsächlichen Quellständen, Abhängigkeitsversionen, Build-Optionen und Plattformangaben aus; leite installierte Versionen nicht aus einem README-Beispiel ab.
 
-Consult current official advisories or maintainer notices when network access and task scope permit. Record the source URL/date, advisory identifier, affected conditions, local revision, candidate reachable path, strongest counterevidence, and remaining validation work.
+Ziehe aktuelle offizielle Sicherheitshinweise oder Mitteilungen der Verantwortlichen heran, wenn Netzwerkzugriff und Aufgabenumfang dies erlauben. Halte Quellen-URL und Datum, Hinweiskennung, betroffene Bedingungen, lokalen Stand, möglicherweise erreichbaren Pfad, stärkste Gegenbelege und verbleibende Validierungsarbeit fest.
 
-Does the affected feature exist in this build? Is the relevant code reachable under this configuration? Is the proposed issue already fixed, disabled, or outside the selected component?
+Ist die betroffene Funktion in diesem Build vorhanden? Ist der relevante Code unter dieser Konfiguration erreichbar? Ist das vermutete Problem bereits behoben, deaktiviert oder außerhalb der ausgewählten Komponente?
 
-A version-range match is a lead, not proof of local impact. Do not invent identifiers, applicability, exploitability, or a clean bill of health when research was not performed.
+Eine Übereinstimmung mit einem Versionsbereich ist ein Hinweis, kein Beweis lokaler Auswirkungen. Erfinde keine Kennungen, Anwendbarkeit, Ausnutzbarkeit oder Unbedenklichkeitsbescheinigung, wenn die Recherche nicht durchgeführt wurde.
 
-Entry points: [build/dependencies](../components/build-dependencies.md), [supply-chain questions](supply-chain.md), and [finding validation](finding-validation.md).
+Einstiegspunkte: [Build und Abhängigkeiten](../components/build-dependencies.md), [Fragen zur Lieferkette](supply-chain.md) und [Befundvalidierung](finding-validation.md).

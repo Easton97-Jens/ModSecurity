@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Check the added documentation against its pinned upstream Git objects.
+"""Die ergänzte Dokumentation gegen ihre festgehaltenen Upstream-Git-Objekte prüfen.
 
-This project-local helper reads files and invokes read-only Git commands. It
-does not fetch, build, install, modify source, or establish semantic correctness.
-Python standard library only; Git must be available on PATH.
+Dieses projektlokale Hilfsprogramm liest Dateien und ruft nur lesende Git-Befehle auf.
+Es lädt nichts herunter, baut und installiert nichts, ändert keinen Quellcode und
+belegt keine inhaltliche Richtigkeit. Nur Python-Standardbibliothek; Git muss im PATH verfügbar sein.
 """
 
 import argparse
@@ -45,7 +45,7 @@ def context_path(path):
 
 
 def markdown_prose(content):
-    """Exclude fenced examples from Markdown-link syntax checks."""
+    """Eingezäunte Beispiele von Syntaxprüfungen für Markdown-Links ausschließen."""
     lines = []
     fence = None
     for line in content.splitlines(keepends=True):
@@ -71,25 +71,25 @@ def main():
     parser.add_argument(
         "--strict-source",
         action="store_true",
-        help="Fail when the worktree differs from upstream outside context files.",
+        help="Bei Abweichungen des Arbeitsbaums von Upstream außerhalb der Kontextdateien fehlschlagen.",
     )
     args = parser.parse_args()
     errors = []
     lock = json.loads((ROOT / ".codex/context/upstream-lock.json").read_text("utf-8"))
     if lock.get("schema_version") != 1:
-        raise ValueError("Unknown schema_version in upstream-lock.json")
+        raise ValueError("Unbekannte schema_version in upstream-lock.json")
     base = lock["upstream"]["commit"]
     expected_tree = lock["upstream"]["tree"]
     if not HEX40.fullmatch(base) or not HEX40.fullmatch(expected_tree):
-        raise ValueError("Commit and tree must be full Git object IDs")
+        raise ValueError("Commit und Baum müssen vollständige Git-Objekt-IDs sein")
     root_from_git = Path(git("rev-parse", "--show-toplevel").decode().strip()).resolve()
     if root_from_git != ROOT:
-        raise ValueError("Documentation is not in the expected Git repository root")
+        raise ValueError("Die Dokumentation liegt nicht im erwarteten Git-Hauptverzeichnis")
     actual_tree = git("rev-parse", base + "^{tree}").decode().strip()
     if actual_tree != expected_tree:
-        errors.append("The baseline commit tree differs from upstream-lock.json")
+        errors.append("Der Baum des Basis-Commits weicht von upstream-lock.json ab")
     git("merge-base", "--is-ancestor", base, "HEAD")
-    print("OK: Baseline commit is available and an ancestor of HEAD: " + base)
+    print("OK: Der Basis-Commit ist verfügbar und ein Vorfahr von HEAD: " + base)
 
     entries = {}
     directories = {""}
@@ -104,17 +104,17 @@ def main():
         directories.update(str(p) for p in Path(path).parents if str(p) != ".")
     actual_index = (ROOT / ".codex/audit/source-index.tsv").read_text("utf-8")
     if actual_index != "".join(index_lines):
-        errors.append("source-index.tsv does not match the pinned Git tree")
+        errors.append("source-index.tsv stimmt nicht mit dem festgehaltenen Git-Baum überein")
     if lock["tracked_entry_count"] != len(entries):
-        errors.append("tracked_entry_count does not match the Git tree")
+        errors.append("tracked_entry_count stimmt nicht mit dem Git-Baum überein")
     blobs = sum(kind == "blob" for _, kind, _ in entries.values())
     if lock["tracked_blob_count"] != blobs:
-        errors.append("tracked_blob_count does not match the Git tree")
+        errors.append("tracked_blob_count stimmt nicht mit dem Git-Baum überein")
     gitlinks = {p: oid for p, (mode, _, oid) in entries.items() if mode == "160000"}
     locked_gitlinks = {item["path"]: item["commit"] for item in lock["submodules"]}
     if gitlinks != locked_gitlinks:
-        errors.append("Submodule commits do not match the Git tree")
-    print(f"INFO: Source inventory: {len(entries)} entries, {blobs} blobs, {len(gitlinks)} gitlinks")
+        errors.append("Submodul-Commits stimmen nicht mit dem Git-Baum überein")
+    print(f"INFO: Quelleninventar: {len(entries)} Einträge, {blobs} Blobs, {len(gitlinks)} Gitlinks")
 
     docs = [ROOT / "AGENTS.md", ROOT / "CODEX_START.md"]
     docs.extend(sorted((ROOT / ".codex").rglob("*.md")))
@@ -131,12 +131,12 @@ def main():
         content = document.read_text("utf-8")
         prose, unclosed_fence = markdown_prose(content)
         if unclosed_fence:
-            errors.append(f"{name}: unclosed Markdown code fence")
+            errors.append(f"{name}: nicht geschlossener Markdown-Codeblock")
         definitions = dict(REFERENCE_DEF.findall(prose))
         normalized_definitions = {key.casefold() for key in definitions}
         for ref in REFERENCE_USE.findall(prose):
             if ref.casefold() not in normalized_definitions:
-                errors.append(f"{name}: Markdown reference [{ref}] is not defined")
+                errors.append(f"{name}: Markdown-Referenz [{ref}] ist nicht definiert")
         links = INLINE_LINK.findall(prose) + list(definitions.values())
         for target in links:
             target = target.strip("<>")
@@ -148,24 +148,24 @@ def main():
             try:
                 resolved.relative_to(ROOT)
             except ValueError:
-                errors.append(f"{name}: local link leaves the repository: {target}")
+                errors.append(f"{name}: lokaler Link verlässt das Repository: {target}")
                 continue
             if not resolved.exists():
-                errors.append(f"{name}: local link target is missing: {target}")
+                errors.append(f"{name}: lokales Linkziel fehlt: {target}")
 
         for url in SOURCE_URL.findall(content):
             parsed = urlsplit(url)
             parts = parsed.path.strip("/").split("/", 4)
             if len(parts) < 4:
-                errors.append(f"{name}: incomplete source link: {url}")
+                errors.append(f"{name}: unvollständiger Quellverweis: {url}")
                 continue
             kind, commit = parts[2:4]
             source_path = unquote(parts[4]) if len(parts) == 5 else ""
             if not HEX40.fullmatch(commit):
-                errors.append(f"{name}: source link does not use a full commit ID: {url}")
+                errors.append(f"{name}: Quellverweis verwendet keine vollständige Commit-ID: {url}")
                 continue
             if commit != base and not historical:
-                errors.append(f"{name}: source link does not use the pinned commit: {url}")
+                errors.append(f"{name}: Quellverweis verwendet nicht den festgehaltenen Commit: {url}")
                 continue
             if url in unique_source_urls:
                 continue
@@ -195,17 +195,17 @@ def main():
             entry = source_entries.get(source_path)
             if kind == "tree":
                 if source_path not in source_directories and source_path not in source_gitlinks:
-                    errors.append(f"{name}: source directory is missing at {commit}: {source_path}")
+                    errors.append(f"{name}: Quellverzeichnis fehlt an {commit}: {source_path}")
                 if parsed.fragment:
-                    errors.append(f"{name}: directory link has an unchecked fragment: {url}")
+                    errors.append(f"{name}: Verzeichnislink enthält ein ungeprüftes Fragment: {url}")
                 continue
             if entry is None or entry[1] != "blob":
-                errors.append(f"{name}: source file is missing at {commit}: {source_path}")
+                errors.append(f"{name}: Quelldatei fehlt an {commit}: {source_path}")
                 continue
             if parsed.fragment:
                 match = LINE_FRAGMENT.fullmatch(parsed.fragment)
                 if not match:
-                    errors.append(f"{name}: source fragment is not a line range: {url}")
+                    errors.append(f"{name}: Quellfragment ist kein Zeilenbereich: {url}")
                     continue
                 start = int(match.group(1))
                 end = int(match.group(2) or match.group(1))
@@ -214,32 +214,32 @@ def main():
                 line_count = len(content_cache[entry[2]].splitlines())
                 if start > end or end > line_count:
                     errors.append(
-                        f"{name}: range {start}..{end} exceeds "
-                        f"{source_path} ({line_count} lines)"
+                        f"{name}: Bereich {start}..{end} überschreitet "
+                        f"{source_path} ({line_count} Zeilen)"
                     )
 
-    print(f"INFO: {len(docs)} Markdown files, {local_count} local link targets")
-    print(f"INFO: {len(unique_source_urls)} unique commit-pinned ModSecurity source links")
+    print(f"INFO: {len(docs)} Markdown-Dateien, {local_count} lokale Linkziele")
+    print(f"INFO: {len(unique_source_urls)} eindeutige, an einen Commit gebundene ModSecurity-Quellverweise")
     changed = git("diff", "--no-ext-diff", "--no-textconv", "--name-only", "-z", base, "--").decode().split("\0")
     untracked = git("ls-files", "--others", "--exclude-standard", "-z").decode().split("\0")
     deviations = sorted({path for path in changed + untracked if path and not context_path(path)})
     if deviations:
-        print("DIFFERENCES: Files outside the context additions:")
+        print("ABWEICHUNGEN: Dateien außerhalb der Kontextergänzungen:")
         for path in deviations:
             print("  " + path)
-        print("The technical guides describe the baseline; recheck affected claims.")
+        print("Die technischen Leitfäden beschreiben die Grundlage; prüfe betroffene Aussagen erneut.")
         if args.strict_source:
-            errors.append("--strict-source: source differences found")
+            errors.append("--strict-source: Quellabweichungen gefunden")
     else:
-        print("OK: No source differences outside AGENTS.md, CODEX_START.md and .codex/")
+        print("OK: Keine Quellabweichungen außerhalb von AGENTS.md, CODEX_START.md und .codex/")
 
     for error in errors:
-        print("ERROR: " + error, file=sys.stderr)
+        print("FEHLER: " + error, file=sys.stderr)
     if errors:
-        print(f"RESULT: {len(errors)} consistency errors", file=sys.stderr)
+        print(f"ERGEBNIS: {len(errors)} Konsistenzfehler", file=sys.stderr)
         return 1
-    print("RESULT: Documentation consistency check passed.")
-    print("LIMIT: No semantic guarantee, external website check, or C++ build/test execution.")
+    print("ERGEBNIS: Konsistenzprüfung der Dokumentation erfolgreich.")
+    print("GRENZE: Keine inhaltliche Garantie, Prüfung externer Websites oder Ausführung von C++-Builds/-Tests.")
     return 0
 
 
@@ -247,6 +247,6 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except (OSError, RuntimeError, ValueError, KeyError, TypeError) as exc:
-        print("ERROR: " + str(exc), file=sys.stderr)
-        print("Check the checkout and upstream-lock.json; no objects are fetched automatically.", file=sys.stderr)
+        print("FEHLER: " + str(exc), file=sys.stderr)
+        print("Prüfe den Checkout und upstream-lock.json; es werden keine Objekte automatisch heruntergeladen.", file=sys.stderr)
         sys.exit(2)

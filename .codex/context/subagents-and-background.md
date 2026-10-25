@@ -1,78 +1,79 @@
-# Subagents and background work
+# Teilagenten und Hintergrundarbeit
 
-## Responsibility and scope
+## Verantwortung und Umfang
 
-This working policy applies when the active environment provides subagents
-or background execution. It does not assume that either capability is available.
-The coordinating agent remains responsible for task scope, evidence, integration,
-validation, delivery decisions, and the final report.
+Diese Arbeitsrichtlinie gilt, wenn die aktive Umgebung Teilagenten oder
+Hintergrundausführung bereitstellt. Sie setzt keine dieser Fähigkeiten voraus.
+Der koordinierende Agent bleibt für Aufgabenumfang, Nachweise, Zusammenführung,
+Prüfung, Bereitstellungsentscheidungen und den Abschlussbericht verantwortlich.
 
-Delegate independent, bounded work when it improves speed or review quality
-enough to justify coordination. Read-only source investigation and independent
-review are useful candidates. A helper receives no greater authority than the
-main task, and delegation does not transfer a material user decision to an agent.
+Delegiere unabhängige, begrenzte Arbeit, wenn der Gewinn an Geschwindigkeit oder Prüfqualität
+den Koordinationsaufwand rechtfertigt. Rein lesende Quellcodeuntersuchungen und unabhängige
+Reviews eignen sich dafür. Ein Helfer erhält keine weitergehenden Befugnisse als die Hauptaufgabe,
+und Delegation überträgt keine wesentliche Nutzerentscheidung auf einen Agenten.
 
-## Define assignments
+## Aufträge festlegen
 
-Each assignment should identify:
+Jeder Auftrag soll Folgendes benennen:
 
-- The repository root and relevant source revision.
-- The concrete question or deliverable and completion criteria.
-- Read-only mode or the exact files the agent may edit.
-- Relevant existing instructions and source/evidence requirements.
-- Temporary output ownership, if temporary files are necessary.
-- Prohibited actions, including any task-specific limits on builds, network
-  use, dependency changes, commits, pushes, or external messages.
+- Repository-Wurzel und relevanten Quellstand.
+- Konkrete Frage oder Ergebnis sowie Abschlusskriterien.
+- Rein lesenden Modus oder die genauen Dateien, die der Agent bearbeiten darf.
+- Relevante vorhandene Anweisungen und Anforderungen an Quellen und Nachweise.
+- Zuständigkeit für temporäre Ausgaben, falls temporäre Dateien notwendig sind.
+- Verbotene Handlungen, einschließlich aufgabenspezifischer Grenzen für Builds,
+  Netzwerknutzung, Änderungen an Abhängigkeiten, Commits, Pushes oder externe Nachrichten.
 
-Give parallel writers disjoint files. Assign a single integrator for shared
-indexes, manifests, state records, and final consistency checks. Do not overwrite
-another agent's changes or revert unrelated edits to make a local result simpler.
+Weise parallel Schreibenden überschneidungsfreie Dateien zu. Bestimme eine einzige zuständige
+Person oder Instanz für die Zusammenführung gemeinsamer Indizes, Manifeste, Zustandsaufzeichnungen
+und abschließender Konsistenzprüfungen. Überschreibe keine Änderungen anderer Agenten und mache
+keine sachfremden Änderungen rückgängig, um ein lokales Ergebnis zu vereinfachen.
 
-## Core and submodule boundaries
+## Grenzen der Kernbibliothek und Submodule
 
-The declared submodules are `others/libinjection`, `others/mbedtls`,
-`test/test-cases/secrules-language-tests`, and `bindings/python`.
-A delegated investigation of one of these paths must distinguish its repository
-and pinned revision from the core repository. Reading a dependency does not
-authorize changes to it or to the core gitlink.
-Source: [submodule declarations][submodules].
+Die deklarierten Submodule sind `others/libinjection`, `others/mbedtls`,
+`test/test-cases/secrules-language-tests` und `bindings/python`.
+Eine delegierte Untersuchung eines dieser Pfade muss dessen Repository und festgelegten Stand
+vom Kern-Repository unterscheiden. Das Lesen einer Abhängigkeit erlaubt weder Änderungen
+an ihr noch am Gitlink im Kern-Repository.
+Quelle: [Submoduldeklarationen][submodules].
 
-There is no Framework/MRTS assignment model introduced by this policy. Use the
-actual core boundaries and the relevant dependency's instructions when its
-source is within task scope. The technical guides
-[cpp-guide.md](cpp-guide.md), [build-and-test.md](build-and-test.md), and
-[configuration-and-rules.md](configuration-and-rules.md) provide reading routes.
+Diese Richtlinie führt kein Framework/MRTS-Auftragsmodell ein. Nutze die tatsächlichen Grenzen
+der Kernbibliothek und die Anweisungen der betreffenden Abhängigkeit, wenn ihr Quellcode
+zum Aufgabenumfang gehört. Die technischen Leitfäden
+[C++-Leitfaden](cpp-guide.md), [Build und Tests](build-and-test.md) und
+[Konfiguration und Regeln](configuration-and-rules.md) bieten Lesewege.
 
-## Background commands
+## Hintergrundbefehle
 
-Before starting a long-running task, record its purpose, working directory,
-process/session reference, relevant output location, expected duration or
-timeout, and completion/cancellation condition. Use the environment's supported
-process control; do not detach a process in a way that loses its status or owner.
+Halte vor dem Start einer länger laufenden Aufgabe Zweck, Arbeitsverzeichnis,
+Prozess- oder Sitzungsreferenz, relevanten Ausgabeort, erwartete Dauer oder Zeitlimit
+und Abschluss- beziehungsweise Abbruchbedingung fest. Nutze die von der Umgebung unterstützte
+Prozesssteuerung; entkopple keinen Prozess so, dass sein Status oder seine Zuständigkeit verloren geht.
 
-Check [resources-and-storage.md](resources-and-storage.md) for capacity and
-output isolation. Concurrent builds or tests must not reconfigure the same
-checkout, overwrite shared logs/fixtures, or compete for a runtime port or
-mutable service state. Read-only searches can usually be handled independently
-without creating a background service.
+Prüfe [Ressourcen und Speicher](resources-and-storage.md) hinsichtlich Kapazität und
+getrennter Ausgaben. Parallele Builds oder Tests dürfen nicht denselben Checkout neu konfigurieren,
+gemeinsame Protokolle oder Testdaten überschreiben oder um einen Laufzeitport oder veränderlichen
+Dienstzustand konkurrieren. Rein lesende Suchen lassen sich gewöhnlich unabhängig ausführen,
+ohne einen Hintergrunddienst einzurichten.
 
-Monitor progress and collect the terminal exit status. Stop or adjust work
-that exceeds its scope, conflicts with another writer, grows unexpectedly, or
-cannot be observed. Keep the user informed during sustained work.
+Beobachte den Fortschritt und erfasse den endgültigen Exit-Status. Stoppe oder passe Arbeit an,
+die ihren Umfang überschreitet, mit einem anderen Schreibenden kollidiert, unerwartet wächst
+oder sich nicht beobachten lässt. Halte den Nutzer während längerer Arbeit auf dem Laufenden.
 
-## Integration and completion
+## Zusammenführung und Abschluss
 
-Inspect each helper's result and supporting evidence. A summary from another
-agent is not by itself proof that a source claim or test result is correct;
-verify material findings against the affected files or recorded execution.
+Prüfe jedes Helferergebnis und die dazugehörigen Nachweise. Eine Zusammenfassung eines anderen
+Agenten beweist für sich genommen nicht die Richtigkeit einer Quellcodeaussage oder eines
+Testergebnisses; überprüfe wesentliche Befunde anhand der betroffenen Dateien oder aufgezeichneten Ausführung.
 
-Before reporting completion, collect required results, finish or stop task-owned
-helpers and commands, and confirm no unintended process remains. Retain any
-necessary handover evidence and remove only eligible task-owned temporary
-files through [cleanup-and-restoration.md](cleanup-and-restoration.md).
+Hole vor der Abschlussmeldung die erforderlichen Ergebnisse ein, beende oder stoppe zur Aufgabe
+gehörende Helfer und Befehle und bestätige, dass kein unbeabsichtigter Prozess verbleibt.
+Bewahre notwendige Übergabenachweise auf und entferne nur dafür vorgesehene, zur Aufgabe
+gehörende temporäre Dateien gemäß [Bereinigung und Wiederherstellung](cleanup-and-restoration.md).
 
-A separately authorized durable service or monitoring task must have an
-explicit owner and lifecycle; it must not be left behind as an undocumented
-side effect of ordinary repository work.
+Ein gesondert freigegebener dauerhafter Dienst oder Überwachungsauftrag benötigt eine ausdrückliche
+Zuständigkeit und einen Lebenszyklus; er darf nicht als undokumentierte Nebenwirkung gewöhnlicher
+Repository-Arbeit zurückbleiben.
 
 [submodules]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitmodules#L1-L12

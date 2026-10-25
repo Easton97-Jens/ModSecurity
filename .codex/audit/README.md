@@ -1,18 +1,18 @@
-# Source inventory and historical evidence
+# Quelleninventar und historische Nachweise
 
-This directory holds reproducible inventories and dated handovers. These are
-historical records, not automatically loaded operational policies.
+Dieses Verzeichnis enthält reproduzierbare Inventare und datierte Übergaben.
+Dies sind historische Aufzeichnungen, keine automatisch geladenen Arbeitsrichtlinien.
 
-| Entry | Scope |
+| Eintrag | Umfang |
 | --- | --- |
-| [source-index.tsv](source-index.tsv) | Every entry in the pinned upstream main-repository Git tree: mode, object type, object ID, path |
-| [template-source-index.tsv](template-source-index.tsv) | Selected connector-template files and their Git object IDs at the recorded reference revision |
-| [sessions/README.md](sessions/README.md) | Dated session records and their evidence requirements |
+| [source-index.tsv](source-index.tsv) | Jeder Eintrag im festgehaltenen Git-Baum des Upstream-Hauptrepositorys: Modus, Objekttyp, Objekt-ID, Pfad |
+| [template-source-index.tsv](template-source-index.tsv) | Ausgewählte Dateien der Connector-Vorlage und ihre Git-Objekt-IDs am festgehaltenen Referenzstand |
+| [sessions/README.md](sessions/README.md) | Datierte Sitzungsaufzeichnungen und Anforderungen an deren Nachweise |
 
-A gitlink records a dependency commit, not its internal contents. An inventory is
-not a claim of exhaustive review. Keep large build output, private HTTP traffic,
-credentials, and raw scanner data out of versioned context. Record the command,
-revision, relevant result, and limits in a concise handover instead.
+Ein Gitlink hält den Commit einer Abhängigkeit fest, nicht deren interne Inhalte.
+Ein Inventar behauptet keine vollständige Prüfung. Halte umfangreiche Build-Ausgaben,
+privaten HTTP-Verkehr, Zugangsdaten und rohe Scanner-Daten aus dem versionierten Kontext heraus.
+Halte stattdessen Befehl, Revision, relevantes Ergebnis und Grenzen in einer knappen Übergabe fest.
 
-Current instructions are in [context/index.md](../context/index.md); source
-provenance is in [context/provenance.md](../context/provenance.md).
+Aktuelle Anweisungen stehen in [context/index.md](../context/index.md); die Quellenherkunft
+steht in [context/provenance.md](../context/provenance.md).

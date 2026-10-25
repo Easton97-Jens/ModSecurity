@@ -1,73 +1,75 @@
-# Architecture and repository boundaries
+# Architektur und Repository-Grenzen
 
-This policy assigns work to the correct source and evidence boundary. It is a
-working convention for this fork. Read [project-context.md](project-context.md),
-[architecture.md](architecture.md), and [repository-map.md](repository-map.md)
-for the source-backed technical explanation.
+Diese Richtlinie ordnet Arbeit der richtigen Quell- und Nachweisgrenze zu. Sie ist
+eine Arbeitskonvention für diesen Fork. Lies [project-context.md](project-context.md),
+[architecture.md](architecture.md) und [repository-map.md](repository-map.md)
+für die durch Quellen belegte technische Erklärung.
 
-## Repository identity
+## Identität des Repositorys
 
-The working repository is `Easton97-Jens/ModSecurity`. Its context branch is
-`codex/kontext-v3`, with integration targeting the fork's `v3/master`.
-The official source is `owasp-modsecurity/ModSecurity`, branch `v3/master`.
-Use [upstream-lock.json](upstream-lock.json) for the documented source revision
-and [current-state.md](current-state.md) for the observed working state.
-Read the actual branch and commit before acting; branch names are moving refs.
+Das Arbeitsrepository ist `Easton97-Jens/ModSecurity`. Sein deutschsprachiger Kontextbranch ist
+`codex/kontext-v3-de`, auf Grundlage des englischen Kontextbranchs `codex/kontext-v3`.
+Der Auftrag für diese Variante umfasst Übersetzung und Hochladen des Branchs, ohne Pull Request oder Merge.
+Die offizielle Quelle ist `owasp-modsecurity/ModSecurity`, Branch `v3/master`.
+Verwende [upstream-lock.json](upstream-lock.json) für den dokumentierten Quellstand
+und [current-state.md](current-state.md) für den beobachteten Arbeitsstand.
+Prüfe vor einer Aktion den tatsächlichen Branch und Commit; Branchnamen sind veränderliche Referenzen.
 
-The core library consumes HTTP data supplied by an application or connector
-and evaluates configured rules. Web-server connectors are separate projects.
-The upstream [overview](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md)
-and the [Transaction interface](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h)
-establish that boundary. Do not attribute a connector's host hooks, transport
-handling, or deployment behavior to this library without inspecting the
-separately identified connector revision.
+Die Kernbibliothek verarbeitet HTTP-Daten, die eine Anwendung oder ein Connector
+bereitstellt, und wertet konfigurierte Regeln aus. Webserver-Connectors sind separate Projekte.
+Die [Upstream-Übersicht](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md)
+und die [Transaction-Schnittstelle](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h)
+belegen diese Grenze. Schreibe Host-Hooks, Transportverarbeitung oder
+Bereitstellungsverhalten eines Connectors nicht dieser Bibliothek zu, ohne den
+separat identifizierten Quellstand des Connectors zu untersuchen.
 
-## Work ownership
+## Zuständigkeit für die Arbeit
 
-| Area | What belongs here | Boundary to preserve |
+| Bereich | Was hierher gehört | Zu wahrende Grenze |
 | --- | --- | --- |
-| `headers/modsecurity/` and corresponding `src/` definitions | Core types, C++ and C interfaces, library behavior | Inspect declarations, definitions, and callers together; an installed header does not promise ABI stability |
-| `src/parser/` | Rule-language scanner, grammar, parser driver, and generated parser files | Distinguish `.ll`/`.yy` inputs from generated output |
-| Other `src/` areas | Rule evaluation, actions, transformations, operators, variables, body processing, collections, logs, and utilities | Follow the affected implementation and build conditions instead of inferring support from a filename |
-| `configure.ac`, `Makefile.am`, component build files, and `build/` | Compiler/dependency detection and platform build definitions | Build instructions depend on the actual platform and configured features |
-| `test/` | Main-repository tests, test programs, and their data | Keep the separately pinned test-corpus submodule distinct |
-| `examples/` and `tools/` | Library examples and supporting utilities | An example or tool result establishes only its demonstrated behavior |
-| `AGENTS.md`, `CODEX_START.md`, and `.codex/` | Assistant instructions, technical explanations, workflows, and saved context | These are local additions, not upstream runtime features |
+| `headers/modsecurity/` und zugehörige Definitionen in `src/` | Kerntypen, C++- und C-Schnittstellen, Bibliotheksverhalten | Deklarationen, Definitionen und Aufrufer zusammen untersuchen; ein installierter Header verspricht keine ABI-Stabilität |
+| `src/parser/` | Scanner der Regelsprache, Grammatik, Parser-Driver und erzeugte Parserdateien | `.ll`-/`.yy`-Eingaben von erzeugten Ausgaben unterscheiden |
+| Andere Bereiche von `src/` | Regelauswertung, Aktionen, Transformationen, Operatoren, Variablen, Body-Verarbeitung, Collections, Logs und Hilfsfunktionen | Der betroffenen Implementierung und den Build-Bedingungen folgen, statt Unterstützung aus einem Dateinamen abzuleiten |
+| `configure.ac`, `Makefile.am`, Build-Dateien der Komponenten und `build/` | Compiler-/Abhängigkeitserkennung und plattformbezogene Build-Definitionen | Build-Anweisungen hängen von der tatsächlichen Plattform und den konfigurierten Funktionen ab |
+| `test/` | Tests, Testprogramme und deren Daten im Hauptrepository | Das separat festgelegte Submodul des Testkorpus getrennt halten |
+| `examples/` und `tools/` | Bibliotheksbeispiele und unterstützende Werkzeuge | Ein Beispiel oder Werkzeugergebnis belegt nur sein gezeigtes Verhalten |
+| `AGENTS.md`, `CODEX_START.md` und `.codex/` | Assistentenanweisungen, technische Erklärungen, Arbeitsabläufe und gespeicherter Kontext | Dies sind lokale Ergänzungen, keine Laufzeitfunktionen von Upstream |
 
-The source mappings and installed-header list are recorded in
+Die Quellzuordnungen und die Liste der installierten Header stehen in
 [src/Makefile.am](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/Makefile.am).
-The complete directory inventory and further evidence are in the
-[repository map](repository-map.md).
+Das vollständige Verzeichnisinventar und weitere Belege stehen in der
+[Repository-Übersicht](repository-map.md).
 
-## Submodules and external projects
+## Submodule und externe Projekte
 
-The main source records four direct submodule paths:
-`bindings/python`, `others/libinjection`, `others/mbedtls`, and
-`test/test-cases/secrules-language-tests`. The registrations are in
+Der Hauptquellstand verzeichnet vier direkte Submodulpfade:
+`bindings/python`, `others/libinjection`, `others/mbedtls` und
+`test/test-cases/secrules-language-tests`. Die Einträge stehen in
 [.gitmodules](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitmodules);
-their actual commit pins are recorded in [provenance.md](provenance.md).
+ihre tatsächlich festgelegten Commits sind in [provenance.md](provenance.md) dokumentiert.
 
-Treat submodule source and Git history as read-only unless the user's task
-includes changes there. Reading relevant pinned source or initializing pinned
-dependencies for an authorized build does not authorize editing that source,
-advancing its branch, or changing the main repository's gitlink. Avoid
-`git submodule update --remote` as routine setup. If a fix belongs inside a
-submodule, establish the required scope before modifying it and keep its
-evidence and delivery state separate.
+Behandle Submodulquellen und deren Git-Historie als schreibgeschützt, sofern die
+Nutzeraufgabe dort keine Änderungen umfasst. Das Lesen relevanter festgelegter Quellen
+oder das Initialisieren festgelegter Abhängigkeiten für einen autorisierten Build erlaubt weder
+das Bearbeiten dieser Quellen noch das Fortschreiben ihres Branchs oder die Änderung
+des Gitlinks im Hauptrepository. Vermeide `git submodule update --remote` bei der gewöhnlichen Einrichtung.
+Wenn eine Korrektur in ein Submodul gehört, kläre vor der Änderung den erforderlichen Umfang
+und halte dessen Belege und Veröffentlichungsstand
+getrennt.
 
-External connectors, independently supplied rulesets such as the Core Rule Set,
-and ModSecurity v2 are separate investigation scopes. Record their revisions
-when they are relevant. A core-library change does not establish their
-compatibility, runtime behavior, or test outcome.
+Externe Connectors, unabhängig bereitgestellte Rulesets wie das Core Rule Set
+und ModSecurity v2 sind getrennte Untersuchungsbereiche. Halte ihre Quellstände fest,
+wenn sie relevant sind. Eine Änderung der Kernbibliothek belegt weder deren
+Kompatibilität noch Laufzeitverhalten oder Testergebnisse.
 
-## Evidence boundary
+## Nachweisgrenze
 
-Distinguish source reading, build success, test definitions, executed tests,
-and connector integration results. None automatically establishes the others.
-Keep findings tied to the source revision, build options, dependencies, input,
-and environment actually inspected or exercised.
+Unterscheide das Lesen von Quellen, erfolgreiche Builds, Testdefinitionen,
+ausgeführte Tests und Ergebnisse der Connector-Integration. Keines davon belegt automatisch die anderen.
+Binde Befunde an Quellstand, Build-Optionen, Abhängigkeiten, Eingaben
+und Umgebung, die tatsächlich untersucht oder ausgeführt wurden.
 
-For a cross-boundary symptom, start with the observable input and the relevant
-core calls. A focused library reproduction may locate the fault more precisely;
-failure to reproduce in the core alone is not proof that an external component
-is defective. Record that uncertainty under [findings-policy.md](findings-policy.md).
+Beginne bei einem bereichsübergreifenden Symptom mit der beobachtbaren Eingabe und den relevanten
+Kernaufrufen. Eine gezielte Reproduktion auf Bibliotheksebene kann den Fehler genauer eingrenzen;
+wenn er sich allein im Kern nicht reproduzieren lässt, ist das kein Beweis für einen Defekt
+einer externen Komponente. Halte diese Unsicherheit gemäß [findings-policy.md](findings-policy.md) fest.

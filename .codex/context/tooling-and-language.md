@@ -1,74 +1,84 @@
-# Tooling and language
+# Werkzeuge und Sprache
 
-## Scope
+## Geltungsbereich
 
-This is a working policy for this core repository. It selects appropriate tools
-and checks; [command-execution-policy.md](command-execution-policy.md) governs
-their execution. The cited source describes the pinned upstream revision, while
-the instructions below define how this working repository should be maintained.
+Dies ist eine Arbeitsrichtlinie für dieses Core-Repository. Sie legt die Wahl
+geeigneter Werkzeuge und Prüfungen fest;
+[command-execution-policy.md](command-execution-policy.md) regelt ihre
+Ausführung. Die angeführten Quellen beschreiben den festgelegten
+Upstream-Stand, während die folgenden Anweisungen die Pflege dieses
+Arbeitsrepositorys bestimmen.
 
-## Use the actual core build
+## Den tatsächlichen Core-Build verwenden
 
-Read [build-and-test.md](build-and-test.md) before choosing build or test
-commands. The Unix build uses Autotools and includes `others`, `src`, `doc`,
-`tools`, and conditionally `examples` and `test`. Windows has a separate
-`vcbuild.bat`/CMake route. Select the route matching the task and environment.
-Sources: [build subdirectories][subdirs], [bootstrap script][bootstrap],
-[Windows build script][windows].
+Lies [build-and-test.md](build-and-test.md), bevor du Build- oder Testbefehle
+wählst. Der Unix-Build verwendet Autotools und enthält `others`, `src`, `doc`,
+`tools` sowie bedingt `examples` und `test`. Windows hat einen eigenen Weg über
+`vcbuild.bat`/CMake. Wähle den Weg, der zur Aufgabe und Umgebung passt.
+Quellen: [Build-Unterverzeichnisse][subdirs],
+[Vorbereitungsskript][bootstrap], [Windows-Build-Skript][windows].
 
-Prefer existing build definitions and scripts over a new parallel build system.
-Inspect tool availability and version when the task depends on them. A command
-copied from CI describes that workflow's environment; it does not establish
-that the same packages, privileges, or binaries exist locally.
+Bevorzuge vorhandene Build-Definitionen und Skripte gegenüber einem neuen
+parallelen Build-System. Prüfe Werkzeugverfügbarkeit und Version, wenn die
+Aufgabe davon abhängt. Ein aus der CI kopierter Befehl beschreibt die Umgebung
+dieses Workflows; er belegt nicht, dass dieselben Pakete, Berechtigungen oder
+Programme lokal vorhanden sind.
 
-## C and C++
+## C und C++
 
-`configure.ac` probes C and C++ compilers and explicitly requires C++17 through
-`AX_CXX_COMPILE_STDCXX(17, noext, mandatory)`. The Windows CMake configuration
-also requires C++17. Use the real component flags for compilation and analysis;
-do not import a different repository's C17 requirement or silently raise the
-language baseline. Sources: [compiler checks][compilers], [Windows CMake][cmake].
+`configure.ac` prüft C- und C++-Compiler und verlangt über
+`AX_CXX_COMPILE_STDCXX(17, noext, mandatory)` ausdrücklich C++17. Auch die
+Windows-CMake-Konfiguration verlangt C++17. Verwende für Kompilierung und
+Analyse die tatsächlichen Komponenten-Flags; übernimm keine C17-Anforderung
+eines anderen Repositorys und erhöhe nicht stillschweigend die zugrunde gelegte
+Sprachversion. Quellen: [Compilerprüfungen][compilers], [Windows-CMake][cmake].
 
-Read [cpp-guide.md](cpp-guide.md) for public interfaces, ownership, and lifetime.
-Inspect declarations, implementations, and relevant callers together. Diagnostic
-builds, sanitizers, and a newer compiler mode are separate configurations; report
-their actual flags and results without presenting them as the normal build.
+Lies [cpp-guide.md](cpp-guide.md) zu öffentlichen Schnittstellen,
+Besitzverhältnissen und Lebensdauer. Untersuche Deklarationen, Implementierungen
+und relevante Aufrufer gemeinsam. Diagnose-Builds, Sanitizer und ein neuerer
+Compilermodus sind gesonderte Konfigurationen; berichte ihre tatsächlichen
+Flags und Ergebnisse, ohne sie als normalen Build darzustellen.
 
-Derive a compilation database from a real applicable build when one is needed.
-Record its source revision and configuration, and keep transient analysis
-artifacts out of commits. An editor or analyzer finding is a lead to investigate;
-it is not a successful compilation or runtime test.
+Leite eine Kompilierungsdatenbank bei Bedarf aus einem tatsächlichen,
+anwendbaren Build ab. Halte Quellrevision und Konfiguration fest und nimm
+vorübergehende Analyseartefakte nicht in Commits auf. Eine Meldung eines
+Editors oder Analysewerkzeugs ist ein Ansatzpunkt für eine Untersuchung;
+sie ist keine erfolgreiche Kompilierung oder Laufzeitprüfung.
 
-## Parser inputs and source style
+## Parsereingaben und Quelltextstil
 
-Parser generation is a build option disabled by default. When enabled, the
-configuration checks Flex and Bison; the parser Makefile uses the `.ll`/`.yy`
-inputs and performs additional header processing. Coordinate changes to these
-inputs with generated files rather than treating generated output as the sole
-language definition. Sources: [generation option][parser-option],
-[parser Makefile][parser-make].
+Die Parsererzeugung ist eine standardmäßig deaktivierte Build-Option. Bei
+Aktivierung prüft die Konfiguration Flex und Bison; das Parser-Makefile verwendet
+die `.ll`-/`.yy`-Eingaben und führt eine zusätzliche Header-Nachbearbeitung aus.
+Stimme Änderungen an diesen Eingaben mit den erzeugten Dateien ab, statt die
+erzeugte Ausgabe als alleinige Sprachdefinition zu behandeln.
+Quellen: [Erzeugungsoption][parser-option], [Parser-Makefile][parser-make].
 
-Follow the existing [EditorConfig][editorconfig] and surrounding file style.
-Review formatter output before applying it and keep unrelated reformatting out
-of a focused change. Read [configuration-and-rules.md](configuration-and-rules.md)
-when a change affects SecLang rather than only the C++ implementation.
+Beachte die vorhandene [EditorConfig][editorconfig] und den Stil der umgebenden
+Datei. Prüfe Formatiererausgaben vor der Anwendung und halte nicht zugehörige
+Umformatierungen aus einer gezielten Änderung heraus. Lies
+[configuration-and-rules.md](configuration-and-rules.md), wenn eine Änderung
+SecLang betrifft und nicht nur die C++-Implementierung.
 
-## Scripts, bindings, and optional helpers
+## Skripte, Anbindungen und optionale Hilfsprogramme
 
-Python work follows [python-policy.md](python-policy.md). The Python bindings
-are a separate submodule, and the top-level build's subdirectory list does not
-include that path. Inspect the bindings' own revision and instructions before
-working there. Sources: [declared submodules][submodules], [subdirectories][subdirs].
+Für Python-Arbeit gilt [python-policy.md](python-policy.md). Die
+Python-Anbindungen sind ein eigenständiges Submodul, und die
+Unterverzeichnisliste des Builds auf oberster Ebene enthält diesen Pfad nicht.
+Prüfe vor Arbeiten dort die eigene Revision und die Anweisungen der Anbindungen.
+Quellen: [deklarierte Submodule][submodules], [Unterverzeichnisse][subdirs].
 
-Use available search tools such as `rg` for navigation. Apply shell linting,
-formatters, or additional analyzers only when relevant to the changed files.
-The core Makefile defines `check-static` through cppcheck and `check-style`
-through `check-coding-style`; these require their actual tools and are not
-substitutes for behavior tests. Source: [analysis and style targets][analysis].
+Verwende verfügbare Suchwerkzeuge wie `rg` zur Navigation. Setze Shell-Linting,
+Formatierer oder weitere Analysewerkzeuge nur ein, wenn sie für die geänderten
+Dateien relevant sind. Das Core-Makefile definiert `check-static` über cppcheck
+und `check-style` über `check-coding-style`; diese benötigen ihre tatsächlichen
+Werkzeuge und ersetzen keine Verhaltenstests.
+Quelle: [Analyse- und Stilziele][analysis].
 
-Do not install or update compilers, interpreters, analyzers, or assistant tools
-as incidental cleanup. A necessary tool or dependency change belongs in the
-task scope, with its compatibility, provenance, and validation recorded.
+Installiere oder aktualisiere Compiler, Interpreter, Analyse- oder
+Assistentenwerkzeuge nicht als beiläufige Aufräumarbeit. Eine notwendige
+Werkzeug- oder Abhängigkeitsänderung gehört mit dokumentierter Kompatibilität,
+Herkunft und Validierung in den Aufgabenumfang.
 
 [subdirs]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/Makefile.am#L2-L17
 [bootstrap]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build.sh#L1-L33

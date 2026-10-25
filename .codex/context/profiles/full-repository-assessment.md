@@ -1,30 +1,30 @@
-# Optional full-repository assessment
+# Optionale Bewertung des gesamten Repositorys
 
-## Trigger and scope
+## Anlass und Umfang
 
-Use when the user explicitly requests a repository-wide assessment. Define whether that means source review, build/test execution, security analysis, maintainability, evidence integrity, or a stated combination. This profile does not silently add every possible scan or external integration.
+Nutze dieses Profil, wenn der Nutzer ausdrücklich eine repository-weite Bewertung verlangt. Lege fest, ob damit Quellcodeprüfung, Build- und Testausführung, Sicherheitsanalyse, Wartbarkeit, Nachweisintegrität oder eine genannte Kombination gemeint ist. Dieses Profil ergänzt nicht stillschweigend jeden möglichen Scan oder jede externe Integration.
 
-The [repository map](../repository-map.md) is an inventory entry point. Establish the actual tracked tree and revisions; distinguish main-repository code, generated files, submodules, documentation, and external projects. Inventory coverage is not semantic review.
+Die [Repository-Übersicht](../repository-map.md) ist ein Einstiegspunkt in das Inventar. Ermittle den tatsächlichen versionierten Dateibaum und die Revisionen; unterscheide Code des Haupt-Repositorys, generierte Dateien, Submodule, Dokumentation und externe Projekte. Inventarabdeckung ist keine inhaltliche Prüfung.
 
-## Compose the work
+## Die Arbeit zusammenstellen
 
-- Use [all-component coverage](all-components-assessment.md) for the six core areas.
-- Add [all-component security](all-components-security-assessment.md) when deep security analysis is explicitly part of the task.
-- Use [build/CI/supply-chain assessment](build-ci-supply-chain-assessment.md) for selected build and delivery definitions.
-- Use [evidence integrity](evidence-integrity-assessment.md) for existing and newly produced claims.
-- Add [external analysis](../security/analysis-services-policy.md) or [quality scoring](../security/quality-scoring-policy.md) only when requested.
-- Use [strict completeness](strict-completeness-assessment.md) only when the user explicitly selects that execution requirement.
+- Nutze die [Abdeckung aller Komponenten](all-components-assessment.md) für die sechs Kernbereiche.
+- Ergänze die [Sicherheit aller Komponenten](all-components-security-assessment.md), wenn eine vertiefte Sicherheitsanalyse ausdrücklich zur Aufgabe gehört.
+- Nutze die [Bewertung von Build, CI und Lieferkette](build-ci-supply-chain-assessment.md) für ausgewählte Build- und Bereitstellungsdefinitionen.
+- Nutze die [Nachweisintegrität](evidence-integrity-assessment.md) für bestehende und neu entstandene Aussagen.
+- Ergänze [externe Analyse](../security/analysis-services-policy.md) oder [Qualitätsbewertung](../security/quality-scoring-policy.md) nur auf Anfrage.
+- Nutze die [strikte Vollständigkeit](strict-completeness-assessment.md) nur, wenn der Nutzer diese Ausführungsanforderung ausdrücklich auswählt.
 
-## Coverage accounting
+## Abdeckung dokumentieren
 
-Record the selected directories/components, build/configuration variants, relevant tests, expected observations, actual commands, reached stage, results, and unreviewed/unexecuted areas. Include documentation, test infrastructure, and tooling when they belong to the declared scope.
+Halte ausgewählte Verzeichnisse und Komponenten, Build- und Konfigurationsvarianten, relevante Tests, erwartete Beobachtungen, tatsächliche Befehle, erreichte Stufe, Ergebnisse sowie ungeprüfte beziehungsweise unausgeführte Bereiche fest. Beziehe Dokumentation, Testinfrastruktur und Werkzeuge ein, wenn sie zum erklärten Umfang gehören.
 
-A failed prerequisite is a setup result and an unexecuted target gap. Missing access or environment does not make a relevant target technically inapplicable. Continue independent authorized work while preserving the gap.
+Eine fehlgeschlagene Voraussetzung ist ein Einrichtungsergebnis und eine Lücke beim unausgeführten Ziel. Fehlender Zugriff oder eine fehlende Umgebung machen ein relevantes Ziel nicht technisch unanwendbar. Setze unabhängige freigegebene Arbeit fort und erhalte dabei die Lücke.
 
-External connector behavior, external rulesets, submodule internals, and live deployments require their own selected sources and evidence. Do not import the reference repository's host-family or CRS/MRTS matrix.
+Verhalten externer Connectoren, externe Regelwerke, Submodulinterna und laufende Bereitstellungen benötigen jeweils eigene ausgewählte Quellen und Nachweise. Übernimm nicht die Host-Familien- oder CRS/MRTS-Matrix des Referenz-Repositorys.
 
-## Output and completion
+## Ergebnis und Abschluss
 
-Produce a useful report rather than empty placeholder files: scope/inventory, coverage table, source observations, executed results, candidate dispositions, limitations, and remaining steps. Record task-owned artifacts and cleanup where execution created them.
+Erstelle einen hilfreichen Bericht statt leerer Platzhalterdateien: Umfang und Inventar, Abdeckungstabelle, Quellbeobachtungen, ausgeführte Ergebnisse, Kandidateneinstufungen, Grenzen und verbleibende Schritte. Dokumentiere zur Aufgabe gehörende Artefakte und ihre Bereinigung, wenn die Ausführung solche erzeugt hat.
 
-Completion means the declared assessment scope was fully accounted for. It does not imply that all product checks passed, all vulnerabilities were excluded, or production use is approved.
+Abschluss bedeutet, dass der erklärte Bewertungsumfang vollständig erfasst wurde. Er bedeutet nicht, dass alle Produktprüfungen bestanden wurden, alle Sicherheitslücken ausgeschlossen sind oder die Produktionsnutzung freigegeben ist.

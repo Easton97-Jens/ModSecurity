@@ -1,99 +1,99 @@
-# Task workflow and cross-chat continuity
+# Aufgabenablauf und Fortsetzung über Chats hinweg
 
-Use saved context to resume efficiently, then verify the code and working state
-relevant to the new task. The files are a durable starting point, not a promise
-that every new chat has automatically read the repository or prior conversation.
+Nutze gespeicherten Kontext für einen effizienten Wiedereinstieg und prüfe anschließend den
+für die neue Aufgabe relevanten Code und Arbeitsstand. Die Dateien sind ein dauerhafter
+Ausgangspunkt, keine Zusicherung, dass jeder neue Chat das Repository oder frühere Gespräche
+automatisch gelesen hat.
 
-## Start with the actual task
+## Von der tatsächlichen Aufgabe ausgehen
 
-1. Read the applicable instructions, [index.md](index.md),
-   [current-state.md](current-state.md), and relevant entries in
-   [decisions.md](decisions.md).
-2. Identify the user's intended result, constraints, and earlier authorizations
-   that still apply. Treat new clarifications as updates to the active task
-   unless the user replaces or cancels it.
-3. Check the working repository, branch, commit, and existing changes. Separate
-   the working commit from the source baseline in
+1. Lies die anwendbaren Anweisungen, den [Index](index.md),
+   den [aktuellen Stand](current-state.md) und relevante Einträge in den
+   [Entscheidungen](decisions.md).
+2. Ermittle das beabsichtigte Nutzerergebnis, Vorgaben und frühere, weiterhin geltende Freigaben.
+   Behandle neue Präzisierungen als Aktualisierungen der laufenden Aufgabe, sofern der Nutzer
+   sie nicht ersetzt oder abbricht.
+3. Prüfe Arbeits-Repository, Branch, Commit und vorhandene Änderungen. Unterscheide den
+   Arbeitscommit vom Quellcode-Ausgangsstand in
    [upstream-lock.json](upstream-lock.json).
-4. Select the relevant technical chapters and policies. Read the affected source,
-   callers, build conditions, and tests rather than relying only on summaries.
-5. Establish a practical acceptance criterion and the next useful action.
+4. Wähle die relevanten technischen Kapitel und Richtlinien. Lies betroffenen Quellcode,
+   Aufrufer, Build-Bedingungen und Tests, statt dich nur auf Zusammenfassungen zu verlassen.
+5. Lege ein praktikables Abnahmekriterium und die nächste sinnvolle Handlung fest.
 
-Use [project-context.md](project-context.md) to learn the library,
-[repository-map.md](repository-map.md) to find code, and
-[architecture-and-boundaries.md](architecture-and-boundaries.md) to establish
-ownership. Use [feasibility-policy.md](feasibility-policy.md) when prerequisites
-or external actions materially affect execution.
+Nutze den [Projektkontext](project-context.md), um die Bibliothek kennenzulernen,
+die [Repository-Übersicht](repository-map.md), um Code zu finden, und
+[Architektur und Grenzen](architecture-and-boundaries.md), um die Zuständigkeit zu klären.
+Nutze die [Machbarkeitsrichtlinie](feasibility-policy.md), wenn Voraussetzungen oder
+externe Handlungen die Ausführung wesentlich beeinflussen.
 
-If a chat has no checkout, use the repository access actually available. Ask for
-a specific inaccessible file only when it is needed; do not claim to have read
-files or remembered conversations that are unavailable.
+Hat ein Chat keinen Checkout, nutze den tatsächlich verfügbaren Repository-Zugriff. Bitte nur
+dann um eine bestimmte nicht zugängliche Datei, wenn sie benötigt wird; behaupte nicht,
+nicht verfügbare Dateien gelesen zu haben oder dich an nicht verfügbare Gespräche zu erinnern.
 
-## Plan in proportion to the work
+## Dem Arbeitsumfang entsprechend planen
 
-For a small, reversible edit, a short task summary and focused check are enough.
-For substantial work, keep a compact plan containing the useful details:
+Für eine kleine reversible Änderung genügen eine kurze Aufgabenbeschreibung und eine gezielte Prüfung.
+Halte für umfangreiche Arbeit einen knappen Plan mit den hilfreichen Einzelheiten fest:
 
-- goal and deliverables;
-- repository and file ownership;
-- material constraints, assumptions, and unresolved decisions;
-- acceptance criteria and validation;
-- implementation steps and delivery state.
+- Ziel und Ergebnisse;
+- Repository- und Dateizuständigkeit;
+- wesentliche Vorgaben, Annahmen und offene Entscheidungen;
+- Abnahmekriterien und Prüfung;
+- Umsetzungsschritte und Bereitstellungsstand.
 
-Track each material requirement until it is satisfied, explicitly superseded,
-or identified as blocked. A table is optional. Do not silently omit a requested
-part or expand a task to unrelated code, dependencies, scans, or integration.
+Verfolge jede wesentliche Anforderung, bis sie erfüllt, ausdrücklich ersetzt oder als blockiert
+benannt ist. Eine Tabelle ist optional. Lasse keinen angefragten Teil stillschweigend aus und
+weite keine Aufgabe auf sachfremden Code, Abhängigkeiten, Scans oder Integration aus.
 
-## Questions, decisions, and authorization
+## Fragen, Entscheidungen und Freigaben
 
-Investigate available evidence before asking. Make reasonable implementation
-choices when they are within scope and reversible. Ask when an unresolved
-choice materially changes behavior, compatibility, ownership, cost, access,
-or a destructive action and the existing conversation does not resolve it.
+Untersuche verfügbare Nachweise, bevor du fragst. Triff angemessene Umsetzungsentscheidungen,
+wenn sie innerhalb des Umfangs liegen und reversibel sind. Frage, wenn eine offene Entscheidung
+Verhalten, Kompatibilität, Zuständigkeit, Kosten, Zugriff oder eine destruktive Handlung wesentlich
+ändert und das bisherige Gespräch sie nicht klärt.
 
-User authorization persists throughout the active task. A new phase or tool
-does not by itself require renewed permission. Prepare concrete, reviewable
-work before asking for a genuinely missing final authorization. If one part is
-blocked, complete useful independent parts and explain the exact remaining gap.
+Die Nutzerfreigabe gilt während der laufenden Aufgabe weiter. Eine neue Phase oder ein anderes
+Werkzeug verlangt für sich genommen keine erneute Freigabe. Bereite konkrete, prüfbare Arbeit vor,
+bevor du um eine tatsächlich fehlende abschließende Freigabe bittest. Ist ein Teil blockiert,
+schließe sinnvolle unabhängige Teile ab und erkläre die genaue verbleibende Lücke.
 
-## Work and verification
+## Arbeit und Prüfung
 
-Apply [change-workflow.md](change-workflow.md) to implementation and
-[documentation-and-traceability.md](documentation-and-traceability.md) to
-explanations. Preserve unrelated changes and assign disjoint files when work is
-delegated. Keep delegated findings tied to evidence and review the integrated
-result; delegation does not itself verify a claim.
+Wende den [Änderungsablauf](change-workflow.md) auf die Umsetzung und
+[Dokumentation und Nachvollziehbarkeit](documentation-and-traceability.md) auf Erklärungen an.
+Erhalte sachfremde Änderungen und weise bei Delegation überschneidungsfreie Dateien zu.
+Verknüpfe delegierte Befunde mit Nachweisen und prüfe das zusammengeführte Ergebnis;
+Delegation verifiziert für sich genommen keine Aussage.
 
-Use checks that establish the requested result. The context check entry points,
-run from the repository root, are:
+Nutze Prüfungen, die das angefragte Ergebnis belegen. Die Einstiegspunkte der Kontextprüfung,
+ausgeführt von der Repository-Wurzel, sind:
 
 ```sh
 python3 .codex/bin/verify-context.py
 python3 .codex/bin/validate-structure.py
 ```
 
-These checks concern the maintained context. Use
-[build-and-test.md](build-and-test.md) and actual build definitions for product
-verification. Do not describe a structural check as a C++ test run, or repeat
-broad tests after the necessary evidence is sufficient.
+Diese Prüfungen betreffen den gepflegten Kontext. Nutze für die Produktprüfung
+[Build und Tests](build-and-test.md) sowie die tatsächlichen Build-Definitionen.
+Beschreibe eine Strukturprüfung nicht als ausgeführten C++-Test und wiederhole keine
+breiten Tests, nachdem die notwendigen Nachweise ausreichen.
 
-## End with a resumable state
+## Mit einem fortsetzbaren Stand abschließen
 
-Apply [definition-of-done.md](definition-of-done.md) and reconcile the material
-requirements with the actual result. Update [current-state.md](current-state.md)
-with the working state, real verification, and next concrete step. Update
-[decisions.md](decisions.md) and [backlog.md](backlog.md) when decisions or open
-work changed.
+Wende die [Abschlusskriterien](definition-of-done.md) an und gleiche wesentliche Anforderungen
+mit dem tatsächlichen Ergebnis ab. Aktualisiere den [aktuellen Stand](current-state.md)
+mit Arbeitsstand, tatsächlicher Prüfung und nächstem konkreten Schritt. Aktualisiere
+[Entscheidungen](decisions.md) und [offene Aufgaben](backlog.md), wenn sich Entscheidungen
+oder ausstehende Arbeit geändert haben.
 
-For substantial work, save a concise record in
-[audit sessions](../audit/sessions/) using
-[handoff-template.md](handoff-template.md). Include the source revision, files,
-meaningful checks, unresolved questions, and delivery facts. Keep historical
-results attached to their actual revision and avoid duplicating whole technical
-chapters or private conversation transcripts.
+Speichere für umfangreiche Arbeit eine knappe Aufzeichnung in den
+[Sitzungsprotokollen](../audit/sessions/) mithilfe der
+[Übergabevorlage](handoff-template.md). Nenne Quellstand, Dateien, aussagekräftige Prüfungen,
+offene Fragen und tatsächliche Bereitstellung. Ordne historische Ergebnisse ihrer tatsächlichen
+Revision zu und vermeide das Duplizieren vollständiger technischer Kapitel oder privater Gesprächsabschriften.
 
-Finish with a self-contained account of what was achieved, how it was checked,
-what remains uncertain, and where the work stands. Follow
-[git-policy.md](git-policy.md) for authorized delivery and
-[upstream-sync.md](upstream-sync.md) when the task intentionally changes the
-official source baseline.
+Schließe mit einem eigenständig verständlichen Bericht darüber ab, was erreicht wurde,
+wie es geprüft wurde, was unsicher bleibt und wo die Arbeit steht. Beachte die
+[Git-Richtlinie](git-policy.md) für freigegebene Bereitstellung und
+[Upstream-Synchronisierung](upstream-sync.md), wenn die Aufgabe absichtlich den offiziellen
+Quellcode-Ausgangsstand ändert.

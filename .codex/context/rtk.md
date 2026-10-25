@@ -1,28 +1,33 @@
-# RTK: optional command-output reduction
+# RTK: optionale Verringerung von Befehlsausgaben
 
-Use this guide when RTK is available or its setup is part of the task. It supports
-[command-execution-policy.md](command-execution-policy.md); it is not a mandatory
-startup read. The reusable root agreement prefers supported RTK summaries and
-allows native tools when RTK is absent or full output is needed.
+Verwende diesen Leitfaden, wenn RTK verfügbar ist oder seine Einrichtung zur
+Aufgabe gehört. Er ergänzt
+[command-execution-policy.md](command-execution-policy.md) und muss nicht bei
+jedem Start gelesen werden. Die wiederverwendbare Vereinbarung im
+Stammverzeichnis bevorzugt unterstützte RTK-Zusammenfassungen und erlaubt
+native Werkzeuge, wenn RTK fehlt oder die vollständige Ausgabe benötigt wird.
 
-## Sources and scope
+## Quellen und Geltungsbereich
 
-Inspected on **2026-10-25**: RTK tag `v1.0.1`, commit
-[`4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`][rtk-tree]. This reference revision is
-not a minimum-version requirement or an installed dependency. Check the actual
-installed version and its help before using these examples.
+Untersucht am **2026-10-25**: RTK-Tag `v1.0.1`, Commit
+[`4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`][rtk-tree]. Dieser Referenzstand
+ist weder eine Mindestversionsvorgabe noch eine installierte Abhängigkeit.
+Prüfe vor Verwendung dieser Beispiele die tatsächlich installierte Version
+und ihre Hilfe.
 
-RTK provides commands that reduce terminal output presented to an assistant.
-Its [README][rtk-readme] explains the intended output reduction. For Codex
-behavior, use OpenAI's official [AGENTS.md guide][codex-agents] and
-[hooks reference][codex-hooks]. RTK is an external tool; these OpenAI sources do
-not establish an OpenAI recommendation or guarantee for RTK. Neither source
-changes the official ModSecurity product baseline in [upstream-lock.json](upstream-lock.json).
+RTK stellt Befehle bereit, die die einem Assistenten gezeigte Terminalausgabe
+verringern. Seine [README][rtk-readme] erklärt die beabsichtigte Reduktion.
+Verwende für das Verhalten von Codex OpenAIs offizielle
+[AGENTS.md-Anleitung][codex-agents] und [Hook-Referenz][codex-hooks]. RTK ist ein
+externes Werkzeug; diese OpenAI-Quellen belegen keine Empfehlung oder Garantie
+von OpenAI für RTK. Keine dieser Quellen ändert die offizielle
+ModSecurity-Produktbasis in [upstream-lock.json](upstream-lock.json).
 
-## Manual use with an available executable
+## Manuelle Nutzung einer verfügbaren ausführbaren Datei
 
-Check availability through the current environment, then inspect the installed
-CLI. These examples are commands to run deliberately, not recorded test results:
+Prüfe die Verfügbarkeit in der aktuellen Umgebung und anschließend die
+installierte CLI. Diese Beispiele sind bewusst auszuführende Befehle,
+keine aufgezeichneten Testergebnisse:
 
 ```sh
 rtk --version
@@ -30,102 +35,120 @@ rtk --help
 rtk git --help
 ```
 
-For routine exploration in this checkout, the inspected release implements:
+Für die übliche Erkundung dieses Checkouts implementiert der untersuchte
+Release Folgendes:
 
-| Command | Useful output and limit | Evidence |
+| Befehl | Nützliche Ausgabe und Grenze | Beleg |
 | --- | --- | --- |
-| `rtk git status` | Working-tree overview; use native status when exact entries or a machine-readable format matter. | [`run_status`][rtk-status] |
-| `rtk git diff -- src/transaction.cc` | A focused change overview. The default path compacts the diff and may elide content. Inspect the complete native diff before approving changes. | [`run_diff`][rtk-diff] |
-| `rtk git log -5` | Recent commit overview with an explicit count; inspect a full commit when its body or exact metadata matters. | [`run_log` argument handling][rtk-log] |
-| `rtk gain --project --text` | Static command-output figures for the current directory scope; these counts are estimates. A separate proxy section can have a different scope. | [Analytics guide][rtk-gain], [scope flag][rtk-gain-cli] |
-| `rtk gain --project --history` | Recent tracked commands in that scope; earlier tasks can still be included. | [Analytics guide][rtk-gain], [scope handling][rtk-gain-scope] |
+| `rtk git status` | Übersicht über den Arbeitsbaum; den nativen Status verwenden, wenn exakte Einträge oder ein maschinenlesbares Format benötigt werden. | [`run_status`][rtk-status] |
+| `rtk git diff -- src/transaction.cc` | Gezielte Änderungsübersicht. Der Standardpfad verdichtet den Diff und kann Inhalte auslassen. Vor dem Freigeben von Änderungen den vollständigen nativen Diff prüfen. | [`run_diff`][rtk-diff] |
+| `rtk git log -5` | Übersicht der letzten Commits mit ausdrücklich angegebener Anzahl; einen Commit vollständig prüfen, wenn sein Beschreibungstext oder exakte Metadaten relevant sind. | [Argumentbehandlung in `run_log`][rtk-log] |
+| `rtk gain --project --text` | Statische Kennzahlen zu Befehlsausgaben für den Bereich des aktuellen Verzeichnisses; diese Zahlen sind Schätzungen. Ein gesonderter Proxy-Abschnitt kann einen anderen Geltungsbereich haben. | [Analyseleitfaden][rtk-gain], [Bereichsflag][rtk-gain-cli] |
+| `rtk gain --project --history` | Zuletzt erfasste Befehle in diesem Bereich; frühere Aufgaben können weiterhin enthalten sein. | [Analyseleitfaden][rtk-gain], [Bereichsbehandlung][rtk-gain-scope] |
 
-Start with scoped searches and bounded file reads. Do not load every context
-chapter or collect repetitive logs merely because a filter is available.
-Use native `rg` and exact source ranges when establishing code behavior.
-In this release, `rtk read` defaults to `--level none`, so its presence alone
-does not imply compressed source. See the [CLI definition][rtk-read].
+Beginne mit eingegrenzten Suchen und begrenzten Dateiausschnitten. Lade nicht
+jedes Kontextkapitel und sammle keine wiederholten Logs, nur weil ein Filter
+verfügbar ist. Verwende natives `rg` und genaue Quellbereiche, um Codeverhalten
+zu belegen. In diesem Release verwendet `rtk read` standardmäßig `--level none`;
+seine bloße Verwendung bedeutet daher noch keine verdichtete Quelltextausgabe.
+Siehe [CLI-Definition][rtk-read].
 
-## Keep exact evidence available
+## Exakte Belege verfügbar halten
 
-RTK summaries are for orientation. Use full source, relevant raw diagnostics,
-complete diffs, and real exit statuses for conclusions. Do not pipe a filtered
-summary into a parser, generate a patch from it, or interpret a missing detail
-as evidence that the underlying output contained none.
+RTK-Zusammenfassungen dienen der Orientierung. Verwende für Schlussfolgerungen
+vollständigen Quellcode, relevante unveränderte Diagnostik, vollständige Diffs
+und tatsächliche Exitcodes. Leite keine gefilterte Zusammenfassung in einen
+Parser weiter, erzeuge daraus keinen Patch und werte ein fehlendes Detail nicht
+als Beleg dafür, dass es in der ursprünglichen Ausgabe nicht vorkam.
 
-With this repository's manual setup, run the native command directly. If an
-existing RTK integration rewrites it, the inspected release also provides an
-unfiltered execution command:
+Führe bei der manuellen Einrichtung dieses Repositorys den nativen Befehl direkt
+aus. Falls eine bestehende RTK-Integration ihn umschreibt, stellt der untersuchte
+Release außerdem einen Befehl zur ungefilterten Ausführung bereit:
 
 ```sh
 git --no-pager diff -- src/transaction.cc
 rtk bypass git --no-pager diff -- src/transaction.cc
 ```
 
-Choose one suitable form; both lines are alternatives. `rtk bypass` still tracks
-usage and remains subject to normal execution permissions. In this release,
-`rtk proxy` is a deprecated alias for it; the separate `llm-proxy` feature has a
-different purpose. See the [CLI definition][rtk-bypass]. For a command with side
-effects, retain its original output instead of rerunning it just to obtain a
-longer log. Do not assume every filter stores complete recoverable output.
+Wähle eine passende Form; die beiden Zeilen sind Alternativen. `rtk bypass`
+erfasst weiterhin die Nutzung und unterliegt den normalen Ausführungsrechten.
+In diesem Release ist `rtk proxy` ein veralteter Alias dafür; die eigenständige
+Funktion `llm-proxy` hat einen anderen Zweck. Siehe
+[CLI-Definition][rtk-bypass]. Bewahre bei einem Befehl mit Nebenwirkungen seine
+ursprüngliche Ausgabe auf, statt ihn nur für ein längeres Log erneut
+auszuführen. Nimm nicht an, dass jeder Filter eine vollständig
+wiederherstellbare Ausgabe speichert.
 
-Keep ModSecurity builds/tests and the three context checks on their documented
-native paths in [build-and-test.md](build-and-test.md) and
-[bin/README.md](../bin/README.md). Do not invent a `rtk make` command or substitute
-`rtk test make check`: the inspected generic runner classifies that test command
-as unknown, with a limited-output fallback. See [test-runner classification][rtk-test]
-and [fallback output][rtk-test-fallback].
-RTK does not add ModSecurity test coverage or prove that a test executed.
+Verwende für ModSecurity-Builds/-Tests und die drei Kontextprüfungen weiterhin
+die dokumentierten nativen Aufrufe in [build-and-test.md](build-and-test.md) und
+[bin/README.md](../bin/README.md). Erfinde keinen Befehl `rtk make` und ersetze
+die Aufrufe nicht durch `rtk test make check`: Der untersuchte allgemeine
+Test-Runner stuft diesen Testbefehl als unbekannt ein und fällt auf eine
+begrenzte Ausgabe zurück. Siehe [Test-Runner-Klassifizierung][rtk-test] und
+[Ersatzausgabe][rtk-test-fallback]. RTK ergänzt keine ModSecurity-Testabdeckung
+und belegt nicht, dass ein Test ausgeführt wurde.
 
-## Codex integration follows official OpenAI documentation
+## Codex-Integration folgt der offiziellen OpenAI-Dokumentation
 
-This repository uses explicit instructions in `AGENTS.md`, with details routed
-through the context index. OpenAI documents the instruction discovery chain;
-arbitrary `.codex` Markdown files are not all automatic startup instructions.
-Do not rely on an undocumented `@file` import. See [the official guide][codex-agents].
+Dieses Repository verwendet ausdrückliche Anweisungen in `AGENTS.md`; Details
+werden über den Kontextindex erschlossen. OpenAI dokumentiert die Reihenfolge,
+in der Anweisungsdateien gefunden werden; beliebige Markdown-Dateien unter
+`.codex` sind nicht alle automatisch Startanweisungen. Verlasse dich nicht auf
+einen undokumentierten `@file`-Import. Siehe
+[offizielle Anleitung][codex-agents].
 
-Optional automatic rewriting is a separate setup choice. OpenAI documents
-`PreToolUse` input rewriting, hook configuration, and review/trust through `/hooks`
-for supported Codex workflows. Project hooks require a trusted project layer.
-Local command hooks are not supported with cloud orchestration, even when tools
-execute locally. Check the actual client and current [hooks documentation][codex-hooks].
+Optionales automatisches Umschreiben ist eine gesonderte
+Einrichtungsentscheidung. OpenAI dokumentiert das Umschreiben von Eingaben über
+`PreToolUse`, die Hook-Konfiguration sowie Prüfung und Vertrauensfreigabe über
+`/hooks` für unterstützte Codex-Arbeitsabläufe. Projekt-Hooks benötigen eine als
+vertrauenswürdig eingestufte Projektebene. Lokale Befehls-Hooks werden bei
+Cloud-Orchestrierung nicht unterstützt, selbst wenn Werkzeuge lokal ausgeführt
+werden. Prüfe den tatsächlichen Client und die aktuelle
+[Hook-Dokumentation][codex-hooks].
 
-RTK's own [Codex setup guide][rtk-codex] describes its initializer. A deliberate
-setup review can start with `rtk init --codex --dry-run` after checking local help.
-The actual initializer writes `RTK.md`, patches `AGENTS.md`, and configures
-`.codex/hooks.json`; global mode targets personal Codex configuration instead.
-These are configuration changes, not prerequisites for manual invocation. See
-the [target paths][rtk-init], [write operations][rtk-init-writes], and
-[dry-run option][rtk-init-cli].
+RTKs eigene [Codex-Einrichtungsanleitung][rtk-codex] beschreibt seinen
+Initialisierer. Eine bewusste Einrichtungsprüfung kann nach dem Lesen der
+lokalen Hilfe mit `rtk init --codex --dry-run` beginnen. Der tatsächliche
+Initialisierer schreibt `RTK.md`, passt `AGENTS.md` an und konfiguriert
+`.codex/hooks.json`; der globale Modus richtet sich stattdessen an die
+persönliche Codex-Konfiguration. Das sind Konfigurationsänderungen, keine
+Voraussetzungen für einen manuellen Aufruf. Siehe [Zielpfade][rtk-init],
+[Schreiboperationen][rtk-init-writes] und [dry-run-Option][rtk-init-cli].
 
-This addition does not run that initializer, install hooks, enable a proxy, or
-change personal configuration. A later project-hook adoption must review its
-generated files and the context boundary: a new root `RTK.md` is outside the
-current `--strict-source` additions. Review actual loaded instructions and hooks
-in that client before claiming automatic use. Keep Codex permissions in effect.
+Diese Ergänzung führt den Initialisierer nicht aus, installiert keine Hooks,
+aktiviert keinen Proxy und ändert keine persönliche Konfiguration. Bei einer
+späteren Einführung von Projekt-Hooks müssen deren erzeugte Dateien und die
+Kontextgrenze geprüft werden: Eine neue `RTK.md` im Stammverzeichnis liegt
+außerhalb der aktuellen `--strict-source`-Ergänzungen. Prüfe die tatsächlich
+geladenen Anweisungen und Hooks im jeweiligen Client, bevor du eine
+automatische Nutzung behauptest. Die Codex-Berechtigungen bleiben wirksam.
 
-## Measure output reduction without inventing savings
+## Verringerte Ausgaben messen, ohne Einsparungen zu erfinden
 
-The inspected implementation estimates tokens as UTF-8 byte length divided by
-four, rounded up; it is not a model tokenizer. The [estimator][rtk-estimator]
-and [tracking calls][rtk-tracking] establish that calculation. The command-output
-figures in `rtk gain` use RTK's tracked estimates; output compression does not
-translate directly to the same percentage of total conversation tokens,
-subscription usage, or charges.
+Die untersuchte Implementierung schätzt Tokens als UTF-8-Bytelänge geteilt
+durch vier, aufgerundet; sie ist kein Modell-Tokenizer. Der
+[Schätzer][rtk-estimator] und die [Erfassungsaufrufe][rtk-tracking] belegen diese
+Berechnung. Die Kennzahlen zu Befehlsausgaben in `rtk gain` verwenden die von
+RTK erfassten Schätzungen; eine Ausgabeverdichtung lässt sich nicht unmittelbar
+in denselben Prozentsatz an gesamten Unterhaltungstokens, Abonnementnutzung
+oder Kosten übersetzen.
 
-An existing LLM Proxy can add a separate section to `rtk gain`. In this revision,
-that summary is loaded independently of the command-output project filter and
-aggregates proxy records without that project restriction. Do not attribute its
-values to this checkout merely because `--project` was used. See the
-[summary loading][rtk-gain-proxy] and [proxy aggregation][rtk-proxy-stats].
+Ein vorhandener LLM Proxy kann `rtk gain` um einen gesonderten Abschnitt
+ergänzen. In diesem Quellstand wird dessen Zusammenfassung unabhängig vom
+Projektfilter für Befehlsausgaben geladen und fasst Proxy-Datensätze ohne diese
+Projektbeschränkung zusammen. Ordne seine Werte nicht allein deshalb diesem
+Checkout zu, weil `--project` verwendet wurde. Siehe
+[Laden der Zusammenfassung][rtk-gain-proxy] und
+[Proxy-Zusammenfassung][rtk-proxy-stats].
 
-When reporting measurements, identify the RTK version, commands, scope/time
-window, and whether the evidence measures output bytes, estimated tokens, or
-actual provider usage. Keep results from other projects or earlier runs separate.
-Do not run expensive or state-changing commands twice solely to compare sizes.
-No RTK execution, token saving, or billing reduction was measured while preparing
-this guide. The selected source and documentation were inspected; runtime
-integration and savings in a real development session remain unverified.
+Benenne bei Messberichten RTK-Version, Befehle, Geltungsbereich und Zeitfenster
+sowie, ob die Belege Ausgabebytes, geschätzte Tokens oder tatsächliche
+Anbieternutzung messen. Halte Ergebnisse anderer Projekte oder früherer Läufe
+getrennt. Führe aufwendige oder zustandsändernde Befehle nicht allein zum
+Größenvergleich zweimal aus. Bei der Erstellung dieses Leitfadens wurden weder
+eine RTK-Ausführung noch Token- oder Kosteneinsparungen gemessen. Die ausgewählten
+Quellen und Dokumentationen wurden untersucht; Laufzeitintegration und
+Einsparungen in einer tatsächlichen Entwicklungssitzung bleiben ungeprüft.
 
 [rtk-tree]: https://github.com/rtk-ai/rtk/tree/4ef8730cf3a0dea11c8d64a9b90bc0616fe52100
 [rtk-readme]: https://github.com/rtk-ai/rtk/blob/4ef8730cf3a0dea11c8d64a9b90bc0616fe52100/README.md#L45-L76

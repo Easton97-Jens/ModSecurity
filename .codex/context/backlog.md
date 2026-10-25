@@ -1,18 +1,19 @@
-# Backlog and open questions
+# Backlog und offene Fragen
 
-The English context adaptation is published through
-[draft PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120).
-This list records actual remaining work. It is not a claim that the repository
-already has a defect or that any optional assessment has been performed.
+Diese Liste hält tatsächlich verbleibende Arbeit fest. Sie behauptet weder einen
+bereits vorhandenen Repository-Fehler noch eine durchgeführte optionale Untersuchung.
+Die deutsche Variante wird im Branch `codex/kontext-v3-de` bereitgestellt;
+ein Pull Request dafür ist ausdrücklich nicht beauftragt.
 
-| Item | Current state | Next concrete action |
+| Punkt | Aktueller Stand | Nächste konkrete Aktion |
 | --- | --- | --- |
-| Integrate context into `v3/master` | Not merged | Review the concrete PR and integrate when authorized; use `codex/kontext-v3` meanwhile |
-| First product-code task | No behavior change selected in this context task | Specify the intended change; inspect the relevant implementation and tests |
-| Actual target development environment | No user deployment/build environment established | For a build task, identify OS/compiler/dependencies and initialize the pinned submodules |
-| First C++ build and executed product tests | Not run in this documentation task | Follow `build-and-test.md`; record configured features, commands, executed/skipped tests, and results |
-| Future upstream updates | Baseline pinned and current at inspection | Use `upstream-sync.md`, reread changed behavior, and refresh evidence deliberately |
+| Deutsche Kontextvariante bereitstellen | Übersetzung und lokale Prüfungen abgeschlossen | Ausschließlich `codex/kontext-v3-de` im bestehenden Fork hochladen und den Remote-Stand bestätigen |
+| Frühere englische Integration nach `v3/master` | Historisch über [Entwurfs-PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) vorbereitet; kein Merge in dieser Übersetzungsaufgabe | Nur bei einem späteren entsprechenden Auftrag aktuellen PR-Stand prüfen und gegebenenfalls integrieren |
+| Erste Produktcode-Aufgabe | Keine Verhaltensänderung in dieser Kontextaufgabe ausgewählt | Gewünschte Änderung benennen; relevante Implementierung und Tests untersuchen |
+| Tatsächliche Entwicklungs-Zielumgebung | Keine Nutzer-Deployment-/Build-Umgebung festgelegt | Für eine Build-Aufgabe Betriebssystem, Compiler und Abhängigkeiten bestimmen und festgehaltene Submodule initialisieren |
+| Erster C++-Build und ausgeführte Produkttests | In dieser Dokumentationsaufgabe nicht ausgeführt | `build-and-test.md` folgen; konfigurierte Funktionen, Befehle, ausgeführte/übersprungene Tests und Ergebnisse festhalten |
+| Künftige Upstream-Aktualisierungen | Grundlage festgehalten und bei ihrer Untersuchung aktuell | `upstream-sync.md` nutzen, verändertes Verhalten erneut lesen und Nachweise bewusst aktualisieren |
 
-Do not replace unknowns with plausible defaults. Add a new task only when it is
-requested or follows from a verified issue within the authorized scope. Remove
-or update completed entries instead of carrying stale plans into future chats.
+Ersetze Unbekanntes nicht durch plausible Standardannahmen. Ergänze eine Aufgabe nur,
+wenn sie angefragt wird oder aus einem überprüften Problem im freigegebenen Umfang folgt.
+Entferne oder aktualisiere erledigte Einträge, statt veraltete Pläne in neue Chats mitzunehmen.

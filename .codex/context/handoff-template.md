@@ -1,51 +1,52 @@
-# Session handover template
+# Vorlage für eine Sitzungsübergabe
 
-Replace placeholders with actual information before saving. Mark unknowns
-explicitly. Create a session file under `.codex/audit/sessions/`; keep this file as a template.
+Ersetze Platzhalter vor dem Speichern durch tatsächliche Angaben. Kennzeichne Unbekanntes
+ausdrücklich. Lege eine Sitzungsdatei unter `.codex/audit/sessions/` an;
+behalte diese Datei als Vorlage.
 
-## Identification
+## Identifikation
 
-- Date and time zone:
-- User's task:
-- Repository and branch:
-- Working commit before/after the session:
-- Baseline from `upstream-lock.json`:
-- Relevant uncommitted changes:
+- Datum und Zeitzone:
+- Nutzerauftrag:
+- Repository und Branch:
+- Arbeits-Commit vor/nach der Sitzung:
+- Grundlage aus `upstream-lock.json`:
+- Relevante noch nicht committete Änderungen:
 
-## Completed outcome
+## Abgeschlossenes Ergebnis
 
-What concrete work is complete? Which files changed, and why?
+Welche konkrete Arbeit ist fertig? Welche Dateien wurden geändert und warum?
 
-## Evidence-backed findings
+## Nachvollziehbar belegte Erkenntnisse
 
-| Finding | Source path and symbol | Commit/link | Direct evidence or inference |
+| Erkenntnis | Quellpfad und Symbol | Commit/Link | Direkter Nachweis oder Schlussfolgerung |
 | --- | --- | --- | --- |
-| Fill in | Fill in | Fill in | Fill in |
+| Ausfüllen | Ausfüllen | Ausfüllen | Ausfüllen |
 
-## Checks actually executed
+## Tatsächlich ausgeführte Prüfungen
 
-| Command | Working directory | Exit code/result | Limitation |
+| Befehl | Arbeitsverzeichnis | Exit-Code/Ergebnis | Einschränkung |
 | --- | --- | --- | --- |
-| Fill in | Fill in | Fill in | Fill in |
+| Ausfüllen | Ausfüllen | Ausfüllen | Ausfüllen |
 
-List unperformed checks and their reasons separately. Do not record planned
-commands as successfully executed.
+Führe nicht ausgeführte Prüfungen und ihre Gründe separat auf. Halte geplante
+Befehle nicht als erfolgreich ausgeführt fest.
 
-## Decisions
+## Entscheidungen
 
-State new decisions and their reasons. Record durable decisions in
-`decisions.md`, or link to their entries there.
+Benenne neue Entscheidungen und ihre Gründe. Halte dauerhafte Entscheidungen
+in `decisions.md` fest oder verlinke die dortigen Einträge.
 
-## Open or blocked
+## Offen oder blockiert
 
-Record specific remaining work, missing information, and observed blockers.
-Do not present a guessed cause as established.
+Halte konkrete verbleibende Arbeit, fehlende Informationen und beobachtete
+Hindernisse fest. Stelle eine vermutete Ursache nicht als gesichert dar.
 
-## Next concrete step
+## Nächster konkreter Schritt
 
-Describe one actionable continuation, its entry point, required context, and
-completion criterion.
+Beschreibe eine ausführbare Fortsetzung, ihren Einstiegspunkt, den benötigten
+Kontext und das Abschlusskriterium.
 
-## Context files updated
+## Aktualisierte Kontextdateien
 
-Which state, decision, task, and subject documents were updated?
+Welche Stand-, Entscheidungs-, Aufgaben- und Fachdokumente wurden aktualisiert?

@@ -1,44 +1,46 @@
-# Project-local context validators
+# Projektlokale Kontextprüfer
 
-These helpers are additions for this fork. They are separate from ModSecurity's
-build system and tests. Run them from a checkout; they derive the root from their
-own location. They do not fetch, build, install, invoke scanners, or change files
-unless the explicit digest refresh option below is used.
+Diese Hilfsprogramme sind Ergänzungen für diesen Fork. Sie sind vom Build-System
+und den Tests von ModSecurity getrennt. Führe sie in einem Checkout aus; sie ermitteln
+das Hauptverzeichnis aus ihrem eigenen Speicherort. Sie laden nichts herunter, bauen
+oder installieren nichts, rufen keine Scanner auf und ändern keine Dateien, außer
+bei Verwendung der unten ausdrücklich beschriebenen Option zur Prüfsummenaktualisierung.
 
-| Command | What it establishes |
+| Befehl | Was er nachweist |
 | --- | --- |
-| `python3 .codex/bin/verify-context.py` | Pinned Git baseline, complete source inventory, local Markdown targets, full-commit ModSecurity source paths/line ranges, and reported source drift |
-| `python3 .codex/bin/verify-context.py --strict-source` | The same checks, failing if source differs outside `AGENTS.md`, `CODEX_START.md`, and `.codex/` |
-| `python3 .codex/bin/validate-structure.py` | Required layout, schema, routing targets, profile/component/check inventories, and root routing marker |
-| `python3 .codex/bin/validate-codex-inheritance.py --check` | The local primary-policy catalog exactly matches routed policy files and their SHA-256 digests |
+| `python3 .codex/bin/verify-context.py` | Festgehaltene Git-Grundlage, vollständiges Quelleninventar, lokale Markdown-Ziele, ModSecurity-Quellpfade/Zeilenbereiche mit vollständiger Commit-ID und gemeldete Quellabweichungen |
+| `python3 .codex/bin/verify-context.py --strict-source` | Dieselben Prüfungen; schlägt bei Quellabweichungen außerhalb von `AGENTS.md`, `CODEX_START.md` und `.codex/` fehl |
+| `python3 .codex/bin/validate-structure.py` | Erforderliche Struktur, Schema, Verweisziele, Profil-/Komponenten-/Prüfinventare und Zuordnungsmarkierung in der Hauptanweisung |
+| `python3 .codex/bin/validate-codex-inheritance.py --check` | Der lokale Katalog der primären Richtlinien stimmt genau mit den zugeordneten Richtliniendateien und ihren SHA-256-Prüfsummen überein |
 
-The source verifier uses the Python standard library and Git with
-`--no-lazy-fetch` so missing objects are reported instead of downloaded. The TOML
-validators require **Python 3.11 or later** (`tomllib`); no package installation is
-needed. Ordinary mismatch exits with `1`; unreadable inputs or unavailable
-prerequisites exit with `2`. Successful checks exit with `0`.
+Der Quellenprüfer verwendet die Python-Standardbibliothek und Git mit `--no-lazy-fetch`,
+damit fehlende Objekte gemeldet und nicht heruntergeladen werden. Die TOML-Prüfer benötigen
+**Python 3.11 oder neuer** (`tomllib`); eine Paketinstallation ist nicht erforderlich.
+Gewöhnliche Abweichungen führen zum Exit-Code `1`; unlesbare Eingaben oder nicht verfügbare
+Voraussetzungen zum Exit-Code `2`. Erfolgreiche Prüfungen enden mit `0`.
 
-## Deliberate policy maintenance
+## Bewusste Richtlinienpflege
 
-After reviewing a primary-policy edit, regenerate only the local catalog:
+Erzeuge nach der Überprüfung einer Änderung an einer primären Richtlinie nur den lokalen Katalog neu:
 
 ```sh
 python3 .codex/bin/validate-codex-inheritance.py --refresh
 python3 .codex/bin/validate-codex-inheritance.py --check
 ```
 
-`--refresh` writes `.codex/inheritance-manifest.toml` from the current routing
-manifest. Review that diff. Hash updates record changed content; they do not
-establish that the change is correct. Routine session checks use `--check`.
-No child/submodule policy inheritance is active or automatically discovered.
+`--refresh` schreibt `.codex/inheritance-manifest.toml` aus der aktuellen Zuordnungsdatei neu.
+Prüfe diesen Diff. Aktualisierte Hashwerte halten geänderten Inhalt fest; sie beweisen
+nicht die Richtigkeit der Änderung. Routinemäßige Sitzungsprüfungen verwenden `--check`.
+Es gibt keine aktive oder automatisch erkannte Richtlinienvererbung an untergeordnete Repositories/Submodule.
 
-## Limits
+## Grenzen
 
-Source links are checked against locally available Git objects. Historical
-source revisions are allowed only in decision and session records. Fenced
-examples are excluded from Markdown-link parsing. External websites and local
-heading anchors are not fetched or fully validated. Source excerpts still need
-human/code review to determine whether they support the associated claim.
+Quellverweise werden gegen lokal verfügbare Git-Objekte geprüft. Historische
+Quellrevisionen sind nur in Entscheidungs- und Sitzungsaufzeichnungen zulässig.
+Eingezäunte Codebeispiele werden beim Auswerten von Markdown-Links ausgeschlossen.
+Externe Websites und lokale Überschriftenanker werden nicht abgerufen oder vollständig geprüft.
+Quellauszüge müssen weiterhin inhaltlich geprüft werden, um festzustellen, ob sie die
+zugehörige Aussage tatsächlich stützen.
 
-A passing context check establishes neither a successful library build nor
-runtime behavior, security, integration coverage, or complete C++ documentation.
+Eine erfolgreiche Kontextprüfung belegt weder einen erfolgreichen Bibliotheks-Build
+noch Laufzeitverhalten, Sicherheit, Integrationsabdeckung oder vollständige C++-Dokumentation.

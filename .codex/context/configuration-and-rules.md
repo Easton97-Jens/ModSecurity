@@ -1,110 +1,110 @@
-# Understanding configuration and SecRules from the code
+# Konfiguration und SecRules anhand des Codes verstehen
 
-## Scope
+## Geltungsbereich
 
-This explanation applies to the inspected official `v3/master` revision
+Diese Erklärung gilt für den untersuchten offiziellen `v3/master`-Quellstand
 `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`.
-It provides orientation to existing implementations and test cases.
-It is not a complete directive reference or a claim that a web server
-has been successfully deployed.
+Sie dient der Orientierung in vorhandenen Implementierungen und Testfällen.
+Sie ist weder eine vollständige Direktivenreferenz noch eine Aussage über
+einen erfolgreich bereitgestellten Webserver.
 
-## 1. Distinguish three layers
+## 1. Drei Ebenen unterscheiden
 
-| Layer | Purpose in this repository | Source entry point |
+| Ebene | Zweck in diesem Repository | Einstieg in die Quellen |
 | --- | --- | --- |
-| Library configuration | Directives set ruleset properties, such as the engine mode, access to bodies, and size limits. | [Parser actions for engine mode and body access][engine-grammar], [limits][limits-grammar] |
-| SecRules | Rules combine a variable selection, an operator, and actions. The parser creates `RuleWithOperator` objects for them. | [SecRule grammar][rule-grammar] |
-| Calling application or connector | Supplies HTTP data to the library and uses its interventions to decide how processing should continue. The main v3 repository contains the library; connectors are separate projects. | [README: Connectors][connectors], [transaction API][transaction-header] |
+| Bibliothekskonfiguration | Direktiven setzen Eigenschaften des Regelsatzes, etwa Engine-Modus, Zugriff auf Bodies und Größenlimits. | [Parseraktionen für Engine-Modus und Body-Zugriff][engine-grammar], [Limits][limits-grammar] |
+| SecRules | Regeln verbinden eine Variablenauswahl, einen Operator und Aktionen. Der Parser erzeugt dafür `RuleWithOperator`-Objekte. | [SecRule-Grammatik][rule-grammar] |
+| Aufrufende Anwendung oder Connector | Liefert HTTP-Daten an die Bibliothek und entscheidet anhand ihrer Interventionen über die weitere Verarbeitung. Das v3-Hauptrepository enthält die Bibliothek; Connectors sind eigenständige Projekte. | [README: Connectors][connectors], [Transaktions-API][transaction-header] |
 
-SecLang is the rule language read by this project. C++ is the language
-of the engine implementation described here. A textual rule is not
-translated into a separate C++ program: the grammar creates variable,
-operator, and action objects that are later evaluated against a
-`Transaction`. Sources: [parser object construction][rule-grammar],
+SecLang ist die Regelsprache, die dieses Projekt einliest. C++ ist die Sprache
+der hier beschriebenen Engine-Implementierung. Eine textuelle Regel wird nicht
+in ein eigenständiges C++-Programm übersetzt: Die Grammatik erzeugt Variablen-,
+Operator- und Aktionsobjekte, die später anhand einer `Transaction` ausgewertet
+werden. Quellen: [Objektaufbau im Parser][rule-grammar],
 [RuleWithOperator::evaluate][rule-evaluation].
 
-## 2. The engine mode affects actual behavior
+## 2. Der Engine-Modus beeinflusst das tatsächliche Verhalten
 
-`modsecurity.conf-recommended` starts with
-`SecRuleEngine DetectionOnly`. This is the content of that example
-configuration, not evidence of which configuration an application has
-actually loaded. The parser distinguishes `Off`, `On`, and
-`DetectionOnly`; `RuleWithActions::executeAction` runs disruptive
-actions only in `EnabledRuleEngine`.
-Sources: [example configuration][recommended-engine],
-[engine grammar][engine-grammar], [action execution][actions].
+`modsecurity.conf-recommended` beginnt mit `SecRuleEngine DetectionOnly`.
+Dies ist der Inhalt dieser Beispielkonfiguration, kein Beleg dafür, welche
+Konfiguration eine Anwendung tatsächlich geladen hat. Der Parser unterscheidet
+`Off`, `On` und `DetectionOnly`; `RuleWithActions::executeAction` führt disruptive
+Aktionen nur in `EnabledRuleEngine` aus.
+Quellen: [Beispielkonfiguration][recommended-engine],
+[Engine-Grammatik][engine-grammar], [Aktionsausführung][actions].
 
-| Value | What the source establishes here |
+| Wert | Was der Quellcode hier belegt |
 | --- | --- |
-| `On` | The parser sets `EnabledRuleEngine`; the engine-state check permits disruptive rule actions. |
-| `Off` | The parser sets `DisabledRuleEngine`; existing engine regressions expect no blocking in their disabled-engine scenario. |
-| `DetectionOnly` | The parser sets `DetectionOnlyRuleEngine`; the central action check does not execute disruptive rule actions. |
+| `On` | Der Parser setzt `EnabledRuleEngine`; die Prüfung des Engine-Zustands lässt disruptive Regelaktionen zu. |
+| `Off` | Der Parser setzt `DisabledRuleEngine`; vorhandene Engine-Regressionen erwarten in ihrem Szenario mit deaktivierter Engine keine Blockierung. |
+| `DetectionOnly` | Der Parser setzt `DetectionOnlyRuleEngine`; die zentrale Aktionsprüfung führt keine disruptiven Regelaktionen aus. |
 
-Sources: [parser values][engine-grammar], [action check][actions],
-[engine regressions][engine-tests]. The JSON expectations are existing
-test cases; this document does not establish that they have just been run.
+Quellen: [Parserwerte][engine-grammar], [Aktionsprüfung][actions],
+[Engine-Regressionen][engine-tests]. Die JSON-Erwartungen sind vorhandene
+Testfälle; dieses Dokument belegt nicht, dass sie gerade ausgeführt wurden.
 
-The `ctl:ruleEngine=...` action can set a transaction-specific state.
-`Transaction::getRuleEngineState()` uses that state when set and otherwise
-uses the ruleset's state. Explaining a particular request may therefore
-require more than inspecting a single global directive.
-Sources: [ctl implementation][ctl-engine],
+Die Aktion `ctl:ruleEngine=...` kann einen transaktionsspezifischen Zustand
+setzen. `Transaction::getRuleEngineState()` verwendet diesen Zustand, wenn er
+gesetzt ist, andernfalls den Zustand des Regelsatzes. Um eine konkrete Anfrage
+zu erklären, kann es daher nötig sein, mehr als eine einzelne globale Direktive
+zu prüfen.
+Quellen: [ctl-Implementierung][ctl-engine],
 [getRuleEngineState][engine-state].
 
-## 3. Read an existing rule in full
+## 3. Eine vorhandene Regel vollständig lesen
 
-The following rule appears exactly as shown in `modsecurity.conf-recommended`:
+Die folgende Regel steht genau so in `modsecurity.conf-recommended`:
 
 ```apache
 SecRule REQUEST_HEADERS:Content-Type "^application/json" \
      "id:'200001',phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
 ```
 
-Source: [the example configuration's JSON rule][recommended-json].
+Quelle: [JSON-Regel der Beispielkonfiguration][recommended-json].
 
-| Part | Meaning in this rule | Code evidence |
+| Bestandteil | Bedeutung in dieser Regel | Beleg im Code |
 | --- | --- | --- |
-| `SecRule` | Creates a rule with variables and an operator. | [Grammar branch][rule-grammar] |
-| `REQUEST_HEADERS:Content-Type` | Selects the named entry in the request-header collection. | [Header variables in the grammar][header-variables] |
-| `"^application/json"` | Regular expression used in the example configuration. Operator resolution and regex execution are implemented in the parser and `Rx`. | [Operator grammar][operators-grammar], [Rx][rx] |
-| `id:'200001'` | Rule identifier. For rules that are not appended as chain members, `Driver::addSecRule` checks for missing IDs and duplicate operator-rule IDs. | [Driver::addSecRule][driver-rules] |
-| `phase:1` | Assigns the rule to the request-header phase. | [Phase::init][phases] |
-| `t:none,t:lowercase` | Suppresses earlier transformations for this evaluation, then applies the specified lowercase conversion. | [Transformation flow][transformations], [LowerCase implementation][lowercase] |
-| `pass` | The action implementation frees the existing intervention contents and resets the intervention. Its execution is subject to the disruptive-action check. | [Pass][pass], [action check][actions] |
-| `nolog` | Sets `ruleMessage.m_saveMessage` to `false`. | [NoLog][nolog] |
-| `ctl:requestBodyProcessor=JSON` | Sets the requested body processor for the transaction. | [Body-processor action][body-ctl] |
+| `SecRule` | Erzeugt eine Regel mit Variablen und einem Operator. | [Grammatikzweig][rule-grammar] |
+| `REQUEST_HEADERS:Content-Type` | Wählt den benannten Eintrag aus der Collection der Anfrage-Header. | [Header-Variablen in der Grammatik][header-variables] |
+| `"^application/json"` | Regulärer Ausdruck aus der Beispielkonfiguration. Operatorauflösung und Regex-Ausführung sind im Parser und in `Rx` implementiert. | [Operatorgrammatik][operators-grammar], [Rx][rx] |
+| `id:'200001'` | Regelkennung. Bei Regeln, die nicht als Kettenglieder angehängt werden, prüft `Driver::addSecRule` auf fehlende IDs und doppelte IDs von Operatorregeln. | [Driver::addSecRule][driver-rules] |
+| `phase:1` | Ordnet die Regel der Phase für Anfrage-Header zu. | [Phase::init][phases] |
+| `t:none,t:lowercase` | Unterdrückt frühere Transformationen für diese Auswertung und führt danach die angegebene Umwandlung in Kleinbuchstaben aus. | [Transformationsablauf][transformations], [LowerCase-Implementierung][lowercase] |
+| `pass` | Die Aktionsimplementierung gibt vorhandene Interventionsinhalte frei und setzt die Intervention zurück. Ihre Ausführung unterliegt der Prüfung für disruptive Aktionen. | [Pass][pass], [Aktionsprüfung][actions] |
+| `nolog` | Setzt `ruleMessage.m_saveMessage` auf `false`. | [NoLog][nolog] |
+| `ctl:requestBodyProcessor=JSON` | Setzt den angeforderten Body-Prozessor für die Transaktion. | [Body-Prozessor-Aktion][body-ctl] |
 
-Start by identifying the selected input, then the transformations,
-the operator, and finally the actions and engine mode. This follows
-`RuleWithOperator::evaluate`: evaluate variables, apply transformations,
-execute the operator, and run further actions on matches.
-Source: [RuleWithOperator::evaluate][rule-evaluation].
+Bestimme zuerst die ausgewählte Eingabe, dann die Transformationen, den Operator
+und schließlich die Aktionen und den Engine-Modus. Das entspricht
+`RuleWithOperator::evaluate`: Variablen auswerten, Transformationen anwenden,
+den Operator ausführen und bei Treffern weitere Aktionen ausführen.
+Quelle: [RuleWithOperator::evaluate][rule-evaluation].
 
-### Variable lists and collections
+### Variablenlisten und Collections
 
-The grammar includes variable lists with `PIPE`, plus exclusion and
-count modifiers. It also distinguishes forms such as `ARGS`,
-`ARGS:<Element>`, and selection by regular expression. These are
-entry points for a rule that examines multiple inputs, excludes
-particular targets, or compares a count. An existing count example is
-`SecRule &ARGS "@ge 1000"` in the recommended configuration.
-Sources: [variable grammar][variable-grammar],
-[argument-count rule][arguments-rule].
+Die Grammatik enthält Variablenlisten mit `PIPE` sowie Ausschluss- und
+Zählmodifikatoren. Sie unterscheidet außerdem Formen wie `ARGS`,
+`ARGS:<Element>` und die Auswahl per regulärem Ausdruck. Diese Stellen sind
+Einstiegspunkte für eine Regel, die mehrere Eingaben untersucht, bestimmte
+Ziele ausschließt oder eine Anzahl vergleicht. Ein vorhandenes Zählbeispiel
+ist `SecRule &ARGS "@ge 1000"` in der empfohlenen Konfiguration.
+Quellen: [Variablengrammatik][variable-grammar],
+[Regel zur Argumentanzahl][arguments-rule].
 
-`TX` has a separate `InMemoryPerProcess` object for each `Collections`
-instance. The other collections, `GLOBAL`, `IP`, `SESSION`, `USER`,
-and `RESOURCE`, are passed into the transaction's collections object;
-the `ModSecurity` constructor chooses their LMDB or in-memory backend
-according to `WITH_LMDB`. Do not assume that all variables are stored
-persistently or shared across processes.
-Sources: [Collections constructor][tx-collection],
-[backend selection][collections].
+`TX` besitzt für jede `Collections`-Instanz ein eigenes
+`InMemoryPerProcess`-Objekt. Die anderen Collections `GLOBAL`, `IP`, `SESSION`,
+`USER` und `RESOURCE` werden dem Collections-Objekt der Transaktion übergeben;
+der `ModSecurity`-Konstruktor wählt für sie abhängig von `WITH_LMDB` das LMDB-
+oder In-Memory-Backend. Nimm nicht an, dass alle Variablen dauerhaft gespeichert
+oder prozessübergreifend geteilt werden.
+Quellen: [Collections-Konstruktor][tx-collection],
+[Backend-Auswahl][collections].
 
-## 4. Phases and when data becomes available
+## 4. Phasen und Verfügbarkeit der Daten
 
-The rule language maps the usual numeric phase values as follows:
+Die Regelsprache ordnet die üblichen numerischen Phasenwerte wie folgt zu:
 
-| SecRule setting | Phase name selected by the parser |
+| SecRule-Einstellung | Vom Parser gewählter Phasenname |
 | --- | --- |
 | `phase:1` | `RequestHeadersPhase` |
 | `phase:2` | `RequestBodyPhase` |
@@ -112,69 +112,69 @@ The rule language maps the usual numeric phase values as follows:
 | `phase:4` | `ResponseBodyPhase` |
 | `phase:5` | `LoggingPhase` |
 
-Source: [Phase::init mapping][phases]. The same function also accepts
-`request`, `response`, and `logging`, mapping them to rule-language
-phases 2, 4, and 5. It additionally recognizes `phase:0` as
-`ConnectionPhase`; that alone does not prove this phase executes at
-a particular connector call. Check the mapping before equating
-internal enum values with rule-language numbers. For the API sequence,
-see [architecture.md](architecture.md).
+Quelle: [Zuordnung in Phase::init][phases]. Dieselbe Funktion akzeptiert auch
+`request`, `response` und `logging` und ordnet sie den Regelsprache-Phasen 2, 4
+und 5 zu. Zusätzlich erkennt sie `phase:0` als `ConnectionPhase`; das allein
+belegt nicht, dass diese Phase bei einem bestimmten Connector-Aufruf ausgeführt
+wird. Prüfe die Zuordnung, bevor du interne Enum-Werte mit den Nummern der
+Regelsprache gleichsetzt. Die API-Abfolge steht in
+[architecture.md](architecture.md).
 
-The example configuration selects the JSON processor in phase 1.
-`processRequestBody()` later processes XML, JSON, or multipart data
-according to the selection and compiled libraries, setting error
-variables among other state. A body rule can only assess the data
-that this processing path actually supplied.
-Sources: [JSON-processor selection][recommended-json],
-[body processing][body-processing].
+Die Beispielkonfiguration wählt den JSON-Prozessor in Phase 1 aus.
+`processRequestBody()` verarbeitet später abhängig von der Auswahl und den
+einkompilierten Bibliotheken XML-, JSON- oder Multipart-Daten und setzt dabei
+unter anderem Fehlervariablen. Eine Body-Regel kann nur die Daten beurteilen,
+die dieser Verarbeitungspfad tatsächlich geliefert hat.
+Quellen: [Auswahl des JSON-Prozessors][recommended-json],
+[Body-Verarbeitung][body-processing].
 
-## 5. Transformations, actions, and chaining
+## 5. Transformationen, Aktionen und Verkettung
 
-### Transformations
+### Transformationen
 
-`executeTransformations()` starts with a copy of the value under
-inspection. It considers ruleset defaults, the rule's transformations,
-and rule updates. `t:none` affects which earlier transformations
-execute. With `multiMatch`, intermediate values are also collected
-for operator checks. Without `multiMatch`, the final resulting value
-is added at the end. An explanation must therefore retain the
-transformation order.
-Source: [executeTransformations][transformations].
+`executeTransformations()` beginnt mit einer Kopie des untersuchten Werts.
+Die Funktion berücksichtigt Regelsatzvorgaben, die Transformationen der Regel
+und Regelaktualisierungen. `t:none` beeinflusst, welche früheren Transformationen
+ausgeführt werden. Mit `multiMatch` werden auch Zwischenwerte für
+Operatorprüfungen gesammelt. Ohne `multiMatch` wird der endgültige Ergebniswert
+am Ende hinzugefügt. Eine Erklärung muss daher die Reihenfolge der
+Transformationen berücksichtigen.
+Quelle: [executeTransformations][transformations].
 
-### Actions and `SecDefaultAction`
+### Aktionen und `SecDefaultAction`
 
-Actions do not all wait for the same condition. The code distinguishes,
-among other groups, actions that run independently of a subsequent
-chained rule's result and actions that run after a full match.
-`SetVar` belongs to the first group in the inspected flow. The final
-disruptive action is handled elsewhere.
-Sources: [executeActionsIndependentOfChainedRuleResult and executeActionsAfterFullMatch][actions],
-[call order in the rule evaluator][rule-evaluation].
+Nicht alle Aktionen warten auf dieselbe Bedingung. Der Code unterscheidet unter
+anderem Aktionen, die unabhängig vom Ergebnis einer nachfolgenden verketteten
+Regel laufen, und Aktionen, die nach einem vollständigen Treffer ausgeführt
+werden. `SetVar` gehört im untersuchten Ablauf zur ersten Gruppe. Die endgültige
+disruptive Aktion wird an anderer Stelle behandelt.
+Quellen: [executeActionsIndependentOfChainedRuleResult und executeActionsAfterFullMatch][actions],
+[Aufrufreihenfolge im Regelauswerter][rule-evaluation].
 
-`SecDefaultAction` is not an arbitrary text suffix in the parser.
-Among other checks, the parser requires a disruptive action,
-prohibits `t:none` within default actions, and allows only one
-such default action set per phase and configuration context.
-These constraints are relevant when diagnosing loading errors.
-Source: [SecDefaultAction grammar][default-actions].
+`SecDefaultAction` ist im Parser kein beliebiger Textanhang. Neben weiteren
+Prüfungen verlangt der Parser eine disruptive Aktion, verbietet `t:none`
+innerhalb der Standardaktionen und lässt pro Phase und Konfigurationskontext
+nur einen solchen Standardaktionssatz zu. Diese Einschränkungen sind für die
+Diagnose von Ladefehlern relevant.
+Quelle: [SecDefaultAction-Grammatik][default-actions].
 
 ### `chain`
 
-When appending a chained rule, the driver inherits the preceding
-rule's phase and rejects disruptive actions in the appended chain
-member. At runtime, `RuleWithOperator::evaluate` recursively calls
-the child rule; in the shown path, actions after a full match are
-reached only if that further match succeeds. This does not imply
-that no earlier action could have run: independent actions are
-invoked before the chain check.
-Sources: [chaining in the driver][driver-rules],
-[evaluation order][rule-evaluation], [action groups][actions].
+Beim Anhängen einer verketteten Regel übernimmt der Treiber die Phase der
+vorhergehenden Regel und weist disruptive Aktionen im angehängten Kettenglied
+zurück. Zur Laufzeit ruft `RuleWithOperator::evaluate` die untergeordnete Regel
+rekursiv auf; im gezeigten Pfad werden Aktionen nach einem vollständigen
+Treffer nur erreicht, wenn auch dieser weitere Treffer gelingt. Daraus folgt
+nicht, dass zuvor keine andere Aktion ausgeführt worden sein kann:
+Unabhängige Aktionen werden vor der Kettenprüfung aufgerufen.
+Quellen: [Verkettung im Treiber][driver-rules],
+[Auswertungsreihenfolge][rule-evaluation], [Aktionsgruppen][actions].
 
-## 6. Bodies, limits, and error states
+## 6. Bodies, Limits und Fehlerzustände
 
-The values in `modsecurity.conf-recommended` are concrete examples:
+Die Werte in `modsecurity.conf-recommended` sind konkrete Beispiele:
 
-| Setting | Value in the file |
+| Einstellung | Wert in der Datei |
 | --- | --- |
 | `SecRequestBodyAccess` | `On` |
 | `SecRequestBodyLimit` | `13107200` |
@@ -187,113 +187,113 @@ The values in `modsecurity.conf-recommended` are concrete examples:
 | `SecResponseBodyLimit` | `524288` |
 | `SecResponseBodyLimitAction` | `ProcessPartial` |
 
-Sources: [request settings][recommended-request],
-[response settings][recommended-response]. This table inventories
-the file. It does not recommend sizes for your application or
-describe every internal default.
+Quellen: [Anfrageeinstellungen][recommended-request],
+[Antworteinstellungen][recommended-response]. Diese Tabelle erfasst den Inhalt
+der Datei. Sie empfiehlt keine Größen für deine Anwendung und beschreibt nicht
+jeden internen Standardwert.
 
-When a request-body limit is exceeded, `appendRequestBody()` sets
-`INBOUND_DATA_ERROR`. For the configured `ProcessPartial` action,
-the shown branch writes only the remaining available space and
-returns `false`. For `Reject`, it sets a disruptive intervention
-with status 403 only when the rule engine is enabled. The response
-path similarly checks size and action and sets `OUTBOUND_DATA_ERROR`.
-Sources: [request buffering][request-limit],
-[response buffering][response-limit].
+Bei Überschreitung eines Anfrage-Body-Limits setzt `appendRequestBody()`
+`INBOUND_DATA_ERROR`. Für die konfigurierte Aktion `ProcessPartial` schreibt
+der gezeigte Zweig nur so viel, wie noch Platz verfügbar ist, und gibt `false`
+zurück.
+Bei `Reject` setzt er nur bei aktivierter Regel-Engine eine disruptive
+Intervention mit Status 403. Der Antwortpfad prüft entsprechend Größe und
+Aktion und setzt `OUTBOUND_DATA_ERROR`.
+Quellen: [Pufferung der Anfrage][request-limit],
+[Pufferung der Antwort][response-limit].
 
-**Distinguish comments from implementation:** A comment in the example
-configuration describes an automatic switch to `ProcessPartial` in
-`DetectionOnly`. However, the cited `appendRequestBody()` branch
-directly establishes only that it checks the configured limit action
-and suppresses rejection outside `EnabledRuleEngine`. This
-documentation does not assert a general automatic switch that is
-not implemented at that location.
-Sources: [configuration comment][recommended-request],
-[implemented branch][request-limit].
+**Kommentare und Implementierung unterscheiden:** Ein Kommentar in der
+Beispielkonfiguration beschreibt einen automatischen Wechsel zu `ProcessPartial`
+in `DetectionOnly`. Der zitierte Zweig in `appendRequestBody()` belegt jedoch
+unmittelbar nur, dass er die konfigurierte Limit-Aktion prüft und außerhalb
+von `EnabledRuleEngine` eine Zurückweisung unterdrückt. Diese Dokumentation
+behauptet keinen allgemeinen automatischen Wechsel, der an dieser Stelle nicht
+implementiert ist.
+Quellen: [Konfigurationskommentar][recommended-request],
+[implementierter Zweig][request-limit].
 
-On XML or JSON errors, body processing sets variables such as
-`REQBODY_ERROR`, `REQBODY_ERROR_MSG`, and
-`REQBODY_PROCESSOR_ERROR`. The example configuration contains
-explicit rules for these conditions. Investigate such error
-variables together with the loaded rules; a failed parser operation
-is not automatically the same event as an HTTP rejection carried
-out by the connector.
-Sources: [body-processor error handling][body-processing],
-[parser-error rules][recommended-errors], [disruptive-action check][actions].
+Bei XML- oder JSON-Fehlern setzt die Body-Verarbeitung Variablen wie
+`REQBODY_ERROR`, `REQBODY_ERROR_MSG` und `REQBODY_PROCESSOR_ERROR`.
+Die Beispielkonfiguration enthält ausdrückliche Regeln für diese Zustände.
+Untersuche solche Fehlervariablen gemeinsam mit den geladenen Regeln; ein
+fehlgeschlagener Parser-Vorgang ist nicht automatisch dasselbe Ereignis wie
+eine vom Connector durchgeführte HTTP-Zurückweisung.
+Quellen: [Fehlerbehandlung der Body-Prozessoren][body-processing],
+[Regeln für Parserfehler][recommended-errors],
+[Prüfung disruptiver Aktionen][actions].
 
-## 7. Regex behavior is also a build decision
+## 7. Regex-Verhalten ist auch eine Build-Entscheidung
 
-`Rx::init()` creates a `Regex` for a static pattern; parameters
-containing a macro produce a transaction-specific pattern in
-`Rx::evaluate()`. An invalid static pattern can therefore be caught
-when loading the rule. Evaluation respects a configured
-`m_pcreMatchLimit` and reports regex errors through transaction
-variables.
-Source: [Rx implementation][rx].
+`Rx::init()` erzeugt für ein statisches Muster ein `Regex`; Parameter mit einem
+Makro ergeben in `Rx::evaluate()` ein transaktionsspezifisches Muster. Ein
+ungültiges statisches Muster kann daher schon beim Laden der Regel erkannt
+werden. Die Auswertung berücksichtigt ein konfiguriertes `m_pcreMatchLimit`
+und meldet Regex-Fehler über Transaktionsvariablen.
+Quelle: [Rx-Implementierung][rx].
 
-`kRxMultiLine` defaults to `true` and is set to `false` by
-`MODSEC_REGEX_DOLLAR_ENDONLY`. The `Regex` constructor then
-uses either `DOTALL | MULTILINE` or `DOTALL | DOLLAR_ENDONLY`
-for PCRE2 or PCRE. The build option
-`--enable-regex-dollar-endonly=yes` sets the corresponding macro.
-Regressions for this particular build use the
-`regex-dollar-endonly` resource; a skipped case in another build
-does not confirm its semantics.
-Sources: [Rx switch][rx], [Regex constructor][regex-constructor],
-[configure switch][regex-option], [existing regressions][regex-test].
+`kRxMultiLine` steht standardmäßig auf `true` und wird durch
+`MODSEC_REGEX_DOLLAR_ENDONLY` auf `false` gesetzt. Der `Regex`-Konstruktor
+verwendet dann für PCRE2 oder PCRE entweder `DOTALL | MULTILINE` oder
+`DOTALL | DOLLAR_ENDONLY`. Die Build-Option
+`--enable-regex-dollar-endonly=yes` setzt das entsprechende Makro.
+Regressionen für diesen konkreten Build verwenden die Ressource
+`regex-dollar-endonly`; ein in einem anderen Build übersprungener Fall
+bestätigt dessen Semantik nicht.
+Quellen: [Rx-Schalter][rx], [Regex-Konstruktor][regex-constructor],
+[configure-Schalter][regex-option], [vorhandene Regressionen][regex-test].
 
-## 8. Some familiar directives are not implemented
+## 8. Einige bekannte Direktiven sind nicht implementiert
 
-A directive name appearing in examples does not establish that its
-behavior is fully implemented. The inspected grammar includes
-the following distinctions:
+Dass ein Direktivenname in Beispielen vorkommt, belegt nicht, dass sein
+Verhalten vollständig implementiert ist. Die untersuchte Grammatik enthält
+folgende Unterschiede:
 
-| Directive | What the grammar actually does | Source |
+| Direktive | Was die Grammatik tatsächlich tut | Quelle |
 | --- | --- | --- |
-| `SecRequestBodyInMemoryLimit` | Raises a parser error referring users to web server configuration. | [Grammar, 1655–1662][limits-grammar] |
-| `SecPcreMatchLimitRecursion` | Accepts the branch without an effect in the shown parser code; the unsupported-feature message is commented out. Do not equate it with the implemented `SecPcreMatchLimit`. | [Grammar, 1696–1707][limits-grammar] |
-| `SecTmpDir` | The shown branch sets no value; the unsupported-feature error message is commented out. | [Grammar, 1748–1758][compatibility] |
-| `SecDataDir` | No assignment is implemented at this location either; a comment refers to backend behavior. | [Grammar, 1759–1767][compatibility] |
-| `SecStatusEngine` | No action is implemented in the shown grammar branch; the error message is commented out. | [Grammar, 1781–1785][compatibility] |
+| `SecRequestBodyInMemoryLimit` | Löst einen Parserfehler aus, der auf die Webserver-Konfiguration verweist. | [Grammatik, 1655–1662][limits-grammar] |
+| `SecPcreMatchLimitRecursion` | Akzeptiert den Zweig ohne Wirkung im gezeigten Parsercode; die Meldung zur nicht unterstützten Funktion ist auskommentiert. Nicht mit dem implementierten `SecPcreMatchLimit` gleichsetzen. | [Grammatik, 1696–1707][limits-grammar] |
+| `SecTmpDir` | Der gezeigte Zweig setzt keinen Wert; die Fehlermeldung zur nicht unterstützten Funktion ist auskommentiert. | [Grammatik, 1748–1758][compatibility] |
+| `SecDataDir` | Auch hier ist keine Zuweisung implementiert; ein Kommentar verweist auf das Verhalten des Backends. | [Grammatik, 1759–1767][compatibility] |
+| `SecStatusEngine` | Im gezeigten Grammatikzweig ist keine Aktion implementiert; die Fehlermeldung ist auskommentiert. | [Grammatik, 1781–1785][compatibility] |
 
-This table describes inspected locations. It is not a complete
-list of differences from ModSecurity v2. For another directive,
-trace the scanner, grammar action, stored property, and runtime
-consumer first.
+Diese Tabelle beschreibt untersuchte Stellen. Sie ist keine vollständige Liste
+der Unterschiede zu ModSecurity v2. Verfolge bei einer anderen Direktive zuerst
+Scanner, Grammatikaktion, gespeicherte Eigenschaft und deren Verwendung zur
+Laufzeit.
 
-## 9. Loading configuration and establishing behavior
+## 9. Konfiguration laden und Verhalten belegen
 
-`Include` is handled in the scanner: the code locates resources
-relative to the current file context, expands the resolved path
-expression, and opens further scanner buffers. On failure, it
-reports the affected file path. A missing include can therefore
-explain a loading error even if an individual rule appears
-syntactically correct.
-Source: [Include handling][include].
+`Include` wird im Scanner behandelt: Der Code findet Ressourcen relativ zum
+aktuellen Dateikontext, expandiert den aufgelösten Pfadausdruck und öffnet
+weitere Scannerpuffer. Bei einem Fehler meldet er den betroffenen Dateipfad.
+Ein fehlendes Include kann daher einen Ladefehler erklären, auch wenn eine
+einzelne Regel syntaktisch korrekt erscheint.
+Quelle: [Include-Behandlung][include].
 
-The rule checker loads files or SecLang text through `RulesSet`,
-but creates no HTTP transaction of its own. Successful loading
-therefore establishes a different part of the behavior from a
-regression test. Existing regressions combine rules, request and
-response data, and expected results; `secruleengine.json`, for
-example, contains different engine states and expected HTTP codes.
-Sources: [rule checker][rules-check],
-[engine regressions][engine-tests].
+Das Regelprüfprogramm lädt Dateien oder SecLang-Text über `RulesSet`, erzeugt
+aber keine eigene HTTP-Transaktion. Erfolgreiches Laden belegt daher einen
+anderen Teil des Verhaltens als ein Regressionstest. Vorhandene Regressionen
+verbinden Regeln, Anfrage- und Antwortdaten sowie erwartete Ergebnisse;
+`secruleengine.json` enthält zum Beispiel unterschiedliche Engine-Zustände und
+erwartete HTTP-Codes.
+Quellen: [Regelprüfprogramm][rules-check],
+[Engine-Regressionen][engine-tests].
 
-The resulting workflow for changes is:
+Daraus ergibt sich für Änderungen folgende Vorgehensweise:
 
-1. Trace the affected directive or rule to concrete implementations.
-2. Record the required build capabilities and engine mode.
-3. Read a relevant existing regression; for a behavior change,
-   add the specific observable case.
-4. Report loading checks separately from behavior tests.
-5. Save results and remaining uncertainties in the current state.
+1. Die betroffene Direktive oder Regel bis zu konkreten Implementierungen
+   verfolgen.
+2. Erforderliche Build-Fähigkeiten und den Engine-Modus festhalten.
+3. Eine passende vorhandene Regression lesen; bei einer Verhaltensänderung
+   den konkreten beobachtbaren Fall ergänzen.
+4. Ladeprüfungen getrennt von Verhaltenstests berichten.
+5. Ergebnisse und verbleibende Unsicherheiten im aktuellen Stand speichern.
 
-These steps are project working rules. The corresponding commands,
-checked against the source, are in
+Diese Schritte sind Arbeitsregeln des Projekts. Die zugehörigen, anhand des
+Quellcodes geprüften Befehle stehen in
 [build-and-test.md](build-and-test.md).
 
-## Sources
+## Quellen
 [engine-grammar]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/parser/seclang-parser.yy#L1281-L1308
 [limits-grammar]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/parser/seclang-parser.yy#L1628-L1708
 [rule-grammar]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/parser/seclang-parser.yy#L1116-L1166

@@ -1,106 +1,106 @@
-# Project context: understanding and working with ModSecurity v3
+# Projektkontext: ModSecurity v3 verstehen und damit arbeiten
 
-## Reliable basis
+## Verlässliche Grundlage
 
-This introduction describes the official ModSecurity source revision **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`** on `v3/master`. The sources at the end are pinned to that commit. This explanation provides a starting point; for a concrete change, read the affected implementations next.
+Diese Einführung beschreibt den offiziellen ModSecurity-Quellstand **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`** auf `v3/master`. Die Quellen am Ende sind auf diesen Commit festgelegt. Die Erklärung bietet einen Einstieg; lies für eine konkrete Änderung anschließend die betroffenen Implementierungen.
 
-`AGENTS.md`, `CODEX_START.md`, and `.codex/` are working conventions added to this repository. They explain the code and record work results. They are not features of the upstream library.
+`AGENTS.md`, `CODEX_START.md` und `.codex/` sind Arbeitskonventionen, die diesem Repository hinzugefügt wurden. Sie erklären den Code und halten Arbeitsergebnisse fest. Sie sind keine Funktionen der Upstream-Bibliothek.
 
-## 1. What ModSecurity is for
+## 1. Wozu ModSecurity dient
 
-ModSecurity v3 provides **libmodsecurity**, a library for inspecting HTTP data using rules. The code can load rules, accept request and response data, evaluate conditions, and produce messages and an intervention state. The central build target is `libmodsecurity.la`. Sources: [project description][scope], [library target][build], [transaction API][transaction].
+ModSecurity v3 stellt **libmodsecurity** bereit, eine Bibliothek zur regelbasierten Prüfung von HTTP-Daten. Der Code kann Regeln laden, Anfrage- und Antwortdaten entgegennehmen, Bedingungen auswerten sowie Meldungen und einen Interventionszustand erzeugen. Das zentrale Build-Ziel ist `libmodsecurity.la`. Quellen: [Projektbeschreibung][scope], [Bibliotheksziel][build], [Transaktions-API][transaction].
 
-Distinguish three components:
+Unterscheide drei Komponenten:
 
-| Component | Role | Where this distinction appears |
+| Komponente | Rolle | Wo diese Unterscheidung sichtbar wird |
 | --- | --- | --- |
-| **Library** | Processes supplied data according to the loaded ruleset. | `Transaction`, `RulesSet`, and their implementations. [Sources][transaction] [Rule evaluation][rules-evaluate] |
-| **Connector or calling application** | Supplies HTTP data to the library and responds to its results in the relevant server or application context. | The API receives data as parameters; upstream describes connectors as separate projects. [Sources][scope] [API example][example] |
-| **Ruleset and configuration** | Determines the variables, conditions, actions, phases, and settings to use. | SecLang grammar and `modsecurity.conf-recommended`. [Sources][grammar] [Configuration][config] |
+| **Bibliothek** | Verarbeitet übergebene Daten entsprechend dem geladenen Ruleset. | `Transaction`, `RulesSet` und ihre Implementierungen. [Quellen][transaction] [Regelauswertung][rules-evaluate] |
+| **Connector oder aufrufende Anwendung** | Liefert der Bibliothek HTTP-Daten und reagiert im jeweiligen Server- oder Anwendungskontext auf ihre Ergebnisse. | Die API nimmt Daten als Parameter entgegen; Upstream beschreibt Connectors als separate Projekte. [Quellen][scope] [API-Beispiel][example] |
+| **Ruleset und Konfiguration** | Bestimmt die zu verwendenden Variablen, Bedingungen, Aktionen, Phasen und Einstellungen. | SecLang-Grammatik und `modsecurity.conf-recommended`. [Quellen][grammar] [Konfiguration][config] |
 
-A library change, a new rule, and a web server connector change are therefore different tasks. The repository's example configuration and an external ruleset must also be considered separately; the sources described here establish the contents of this library and its included files. Further reading: [architecture](architecture.md) and [rules and configuration](configuration-and-rules.md).
+Eine Bibliotheksänderung, eine neue Regel und eine Änderung an einem Webserver-Connector sind daher unterschiedliche Aufgaben. Auch die Beispielkonfiguration des Repositorys und ein externes Ruleset müssen getrennt betrachtet werden; die hier beschriebenen Quellen belegen den Inhalt dieser Bibliothek und ihrer mitgelieferten Dateien. Weiterführend: [Architektur](architecture.md) und [Regeln und Konfiguration](configuration-and-rules.md).
 
-## 2. Which languages matter here
+## 2. Welche Sprachen hier wichtig sind
 
-The library is built with **C++17**: `configure.ac` explicitly requires that standard, and the Windows CMake build sets it as well. Classes such as `modsecurity::Transaction` and `modsecurity::RulesSet` are declared in headers under `headers/modsecurity/`; their implementations are mostly under `src/`. Sources: [C++17 with Autotools][cxx17], [C++17 on Windows][cxx17-win], [public API][transaction].
+Die Bibliothek wird mit **C++17** gebaut: `configure.ac` verlangt diesen Standard ausdrücklich, und der Windows-CMake-Build setzt ihn ebenfalls. Klassen wie `modsecurity::Transaction` und `modsecurity::RulesSet` werden in Headern unter `headers/modsecurity/` deklariert; ihre Implementierungen liegen überwiegend unter `src/`. Quellen: [C++17 mit Autotools][cxx17], [C++17 unter Windows][cxx17-win], [öffentliche API][transaction].
 
-There is also a **C API** with functions such as `msc_init()`, `msc_new_transaction()`, and `msc_process_request_body()`. These functions delegate to C++ objects. A program can use the C interface without calling the C++ classes directly. This does not imply complete equivalence between every capability of the two interfaces. Sources: [C entry point][c-engine], [transaction wrappers][c-transaction], [C declarations][c-api].
+Zusätzlich gibt es eine **C-API** mit Funktionen wie `msc_init()`, `msc_new_transaction()` und `msc_process_request_body()`. Diese Funktionen delegieren an C++-Objekte. Ein Programm kann die C-Schnittstelle nutzen, ohne die C++-Klassen direkt aufzurufen. Daraus folgt keine vollständige Gleichwertigkeit sämtlicher Möglichkeiten beider Schnittstellen. Quellen: [C-Einstiegspunkt][c-engine], [Transaktions-Wrapper][c-transaction], [C-Deklarationen][c-api].
 
-**SecLang, or SecRules**, is the input language for rules and directives. Its scanner and grammar sources are `.ll` and `.yy` files, which are distinct from C++ implementation code. Shell, JSON, Python, Lua, and build formats appear in other areas. The exact mapping is in the [repository map](repository-map.md). Sources for the rule language: [parser build][parser-build], [grammar][grammar].
+**SecLang beziehungsweise SecRules** ist die Eingabesprache für Regeln und Direktiven. Ihre Scanner- und Grammatikquellen sind `.ll`- und `.yy`-Dateien, die vom C++-Implementierungscode zu unterscheiden sind. Shell, JSON, Python, Lua und Build-Formate kommen in anderen Bereichen vor. Die genaue Zuordnung steht in der [Repository-Übersicht](repository-map.md). Quellen zur Regelsprache: [Parser-Build][parser-build], [Grammatik][grammar].
 
-The public header contains the version macros `3`, `0`, and `17`, together `3.0.17`. This is information in the inspected source code. On its own, it establishes neither a published release version for this commit nor the version of an installed library. Source: [version macros][version].
+Der öffentliche Header enthält die Versionsmakros `3`, `0` und `17`, zusammen `3.0.17`. Dies ist eine Angabe im untersuchten Quellcode. Für sich genommen belegt sie weder eine veröffentlichte Release-Version dieses Commits noch die Version einer installierten Bibliothek. Quelle: [Versionsmakros][version].
 
-## 3. The three core classes
+## 3. Die drei Kernklassen
 
-| Class | Plain explanation | Concrete responsibilities in the code |
+| Klasse | Einfache Erklärung | Konkrete Aufgaben im Code |
 | --- | --- | --- |
-| `ModSecurity` | Shared library context. | Creates collection backends and holds connector information and the logging callback. [Constructor][engine], [API][engine-api] |
-| `RulesSet` | Loaded rules and their settings. | `loadFromUri()` loads a file; `load()` loads rule text; `evaluate()` evaluates the rules for a phase. [Loading][load], [evaluation][rules-evaluate] |
-| `Transaction` | State of a single HTTP transaction. | Accepts connection data, URI, headers, and bodies; holds variables, messages, and interventions. [API][transaction], [lifetime][lifetime] |
+| `ModSecurity` | Gemeinsam genutzter Bibliothekskontext. | Erzeugt Collection-Backends und hält Connector-Informationen sowie den Logging-Callback vor. [Konstruktor][engine], [API][engine-api] |
+| `RulesSet` | Geladene Regeln und ihre Einstellungen. | `loadFromUri()` lädt eine Datei; `load()` lädt Regeltext; `evaluate()` wertet die Regeln einer Phase aus. [Laden][load], [Auswertung][rules-evaluate] |
+| `Transaction` | Zustand einer einzelnen HTTP-Transaktion. | Nimmt Verbindungsdaten, URI, Header und Bodys entgegen; hält Variablen, Meldungen und Interventionen vor. [API][transaction], [Lebensdauer][lifetime] |
 
-The caller supplies the engine and ruleset to the transaction. The transaction stores the pointers but does not delete the two objects itself. Those objects must remain valid while they are used. The existing chunked-body example destroys the transaction first, then the ruleset, and finally the engine. Sources: [constructor and destructor][lifetime], [example][example]. The [C++/C guide](cpp-guide.md) explains the precise ownership and cleanup rules.
+Der Aufrufer übergibt Engine und Ruleset an die Transaktion. Die Transaktion speichert die Zeiger, löscht die beiden Objekte aber nicht selbst. Diese Objekte müssen während ihrer Verwendung gültig bleiben. Das vorhandene Beispiel mit stückweise übergebenen Bodys zerstört zuerst die Transaktion, dann das Ruleset und zuletzt die Engine. Quellen: [Konstruktor und Destruktor][lifetime], [Beispiel][example]. Der [C++/C-Leitfaden](cpp-guide.md) erklärt die genauen Besitz- und Freigaberegeln.
 
-## 4. Inputs and results handled by the library
+## 4. Eingaben und Ergebnisse der Bibliothek
 
-| Input | Typical API entry point | Meaning |
+| Eingabe | Typischer API-Einstiegspunkt | Bedeutung |
 | --- | --- | --- |
-| Rules and directives | `RulesSet::loadFromUri()` or `load()` | Builds the ruleset and its settings. [Source][load] |
-| Connection and request line | `processConnection()` and `processURI()` | Addresses, ports, URI, HTTP method, and protocol version. [Source][transaction] |
-| Request/response headers | `addRequestHeader()` and `addResponseHeader()` | Supplies header names and values. [Source][transaction] |
-| Request/response body | `appendRequestBody()` and `appendResponseBody()` | Supplies data buffers with explicit lengths; size limits can already take effect at this point. [Request][append], [response][response-body] |
+| Regeln und Direktiven | `RulesSet::loadFromUri()` oder `load()` | Baut das Ruleset und seine Einstellungen auf. [Quelle][load] |
+| Verbindung und Anfragezeile | `processConnection()` und `processURI()` | Adressen, Ports, URI, HTTP-Methode und Protokollversion. [Quelle][transaction] |
+| Anfrage-/Antwortheader | `addRequestHeader()` und `addResponseHeader()` | Übergibt Header-Namen und -Werte. [Quelle][transaction] |
+| Anfrage-/Antwortbody | `appendRequestBody()` und `appendResponseBody()` | Übergibt Datenpuffer mit expliziten Längen; Größenbegrenzungen können bereits an dieser Stelle greifen. [Anfrage][append], [Antwort][response-body] |
 
-| Result | What it tells you | Limit of that conclusion |
+| Ergebnis | Was es aussagt | Grenze dieser Aussage |
 | --- | --- | --- |
-| Loading result and parser errors | Whether the loading path could take in rules and which errors it reports. | It does not test a later HTTP transaction. [Source][load] |
-| Transaction variables and match data | Which data and matches evaluation determines or stores. | Their meaning depends on the phase and evaluation path. [Source][rule-evaluate] |
-| Intervention | A state the caller must query, containing a status, URL, log text, and disruptive flag, among other fields. | The caller must implement the actual HTTP response to that state. [Source][intervention] |
-| Rule messages, debug output, and audit output | Information about matches, processing, or selected transactions. | The output paths have different configurations and conditions. [Logging][logging], [callback][callback] |
+| Ladeergebnis und Parserfehler | Ob der Ladepfad Regeln übernehmen konnte und welche Fehler er meldet. | Es prüft keine spätere HTTP-Transaktion. [Quelle][load] |
+| Transaktionsvariablen und Trefferdaten | Welche Daten und Treffer die Auswertung ermittelt oder speichert. | Ihre Bedeutung hängt von der Phase und dem Auswertungspfad ab. [Quelle][rule-evaluate] |
+| Intervention | Ein Zustand, den der Aufrufer abfragen muss und der unter anderem Status, URL, Logtext und ein Flag für den eingreifenden Zustand enthält. | Der Aufrufer muss die tatsächliche HTTP-Reaktion auf diesen Zustand umsetzen. [Quelle][intervention] |
+| Regelmeldungen, Debug-Ausgabe und Audit-Ausgabe | Informationen über Treffer, Verarbeitung oder ausgewählte Transaktionen. | Die Ausgabepfade haben unterschiedliche Konfigurationen und Bedingungen. [Logging][logging], [Callback][callback] |
 
-A successful method call is therefore not automatically a decision to allow a request. For example, in its reject branch, `appendRequestBody()` can set an intervention and still return `true`. Interpret the return value and intervention according to their respective contracts. Source: [request body limit path][append].
+Ein erfolgreicher Methodenaufruf ist daher nicht automatisch eine Entscheidung, eine Anfrage zu erlauben. Beispielsweise kann `appendRequestBody()` im Ablehnungszweig eine Intervention setzen und trotzdem `true` zurückgeben. Interpretiere Rückgabewert und Intervention nach ihren jeweiligen Verträgen. Quelle: [Begrenzungspfad des Anfragebodys][append].
 
-## 5. Typical transaction sequence
+## 5. Typischer Transaktionsablauf
 
-The existing chunked-body example shows a full API sequence. The following order summarizes it in plain terms; an actual connector may stop further HTTP processing after an intervention. Source: [example program][example].
+Das vorhandene Beispiel mit stückweise übergebenen Bodys zeigt einen vollständigen API-Ablauf. Die folgende Reihenfolge fasst ihn in einfachen Worten zusammen; ein tatsächlicher Connector kann die weitere HTTP-Verarbeitung nach einer Intervention beenden. Quelle: [Beispielprogramm][example].
 
-1. Create the library context and ruleset; load rules and check for loading errors.
-2. Create a transaction using those objects; supply connection data, URI, and request headers.
-3. Execute the request header phase; check the intervention state.
-4. Supply request body data; invoke body processing and the request body phase; check for an intervention.
-5. Perform the corresponding steps for response headers and the response body while the application continues processing.
-6. Complete logging and release transaction resources.
+1. Bibliothekskontext und Ruleset erzeugen; Regeln laden und auf Ladefehler prüfen.
+2. Mit diesen Objekten eine Transaktion erzeugen; Verbindungsdaten, URI und Anfrageheader übergeben.
+3. Die Anfrageheader-Phase ausführen; den Interventionszustand prüfen.
+4. Daten des Anfragebodys übergeben; Body-Verarbeitung und Anfragebody-Phase aufrufen; auf eine Intervention prüfen.
+5. Die entsprechenden Schritte für Antwortheader und Antwortbody ausführen, solange die Anwendung die Verarbeitung fortsetzt.
+6. Logging abschließen und Transaktionsressourcen freigeben.
 
-The methods have conditions and early returns. For example, `processLogging()` skips both the logging phase and audit selection when the engine is disabled. Request and response bodies have their own access, format, and limit conditions. Sources: [logging][logging], [request processing][request-body], [response processing][response-body].
+Die Methoden enthalten Bedingungen und vorzeitige Rückkehr. Beispielsweise überspringt `processLogging()` bei deaktivierter Engine sowohl die Logging-Phase als auch die Audit-Auswahl. Anfrage- und Antwortbodys haben eigene Bedingungen für Zugriff, Format und Begrenzungen. Quellen: [Logging][logging], [Anfrageverarbeitung][request-body], [Antwortverarbeitung][response-body].
 
-The numbering also requires attention: SecRules phases and the internal C++ enum do not align because the enum also contains `UriPhase`. The `Phase` action class translates the rule specification; `processURI()` populates data without calling `RulesSet::evaluate(UriPhase, ...)`. The full table is in [architecture.md](architecture.md). Sources: [enum][phases], [translation][phase-action], [URI processing][uri].
+Auch die Nummerierung erfordert Aufmerksamkeit: SecRules-Phasen und das interne C++-Enum stimmen nicht überein, weil das Enum zusätzlich `UriPhase` enthält. Die Aktionsklasse `Phase` übersetzt die Regelangabe; `processURI()` befüllt Daten, ohne `RulesSet::evaluate(UriPhase, ...)` aufzurufen. Die vollständige Tabelle steht in [architecture.md](architecture.md). Quellen: [Enum][phases], [Übersetzung][phase-action], [URI-Verarbeitung][uri].
 
-## 6. What "evaluating a rule" means in the code
+## 6. Was „eine Regel auswerten“ im Code bedeutet
 
-A rule can select data through variables, transform those data, test a condition with an operator, and execute actions. `RuleWithOperator::evaluate()` connects these steps. It also accounts for exclusions and rule chains. Sources: [rule evaluation][rule-evaluate], [transformations][transformations].
+Eine Regel kann Daten über Variablen auswählen, diese Daten transformieren, eine Bedingung mit einem Operator prüfen und Aktionen ausführen. `RuleWithOperator::evaluate()` verbindet diese Schritte. Die Methode berücksichtigt außerdem Ausnahmen und Regelketten. Quellen: [Regelauswertung][rule-evaluate], [Transformationen][transformations].
 
-An operator tests the specific condition; a transformation changes the comparison value. Actions can, for example, add a message, set a value, or request an intervention. For rule chains, actions before and after a complete chain match must be considered separately. Sources: [rule evaluation][rule-evaluate], [action control][actions].
+Ein Operator prüft die konkrete Bedingung; eine Transformation ändert den Vergleichswert. Aktionen können beispielsweise eine Meldung ergänzen, einen Wert setzen oder eine Intervention anfordern. Bei Regelketten müssen Aktionen vor und nach einem vollständigen Kettentreffer getrennt betrachtet werden. Quellen: [Regelauswertung][rule-evaluate], [Aktionssteuerung][actions].
 
-The included configuration starts with `SecRuleEngine DetectionOnly`. In `executeAction()`, disruptive actions run only with `EnabledRuleEngine`. A match or the presence of a `deny` action alone therefore does not prove that a request was actually blocked. Sources: [configuration][config], [engine condition for actions][actions].
+Die mitgelieferte Konfiguration beginnt mit `SecRuleEngine DetectionOnly`. In `executeAction()` laufen eingreifende Aktionen nur bei `EnabledRuleEngine`. Ein Treffer oder das bloße Vorhandensein einer `deny`-Aktion beweist daher nicht, dass eine Anfrage tatsächlich blockiert wurde. Quellen: [Konfiguration][config], [Engine-Bedingung für Aktionen][actions].
 
-## 7. Learning effectively and preparing changes
+## 7. Sinnvoll lernen und Änderungen vorbereiten
 
-| Goal | Recommended starting point | What to read next in the code |
+| Ziel | Empfohlener Einstieg | Was anschließend im Code zu lesen ist |
 | --- | --- | --- |
-| Get an overview | [Repository map](repository-map.md) | Root build files, public headers, and relevant subdirectories. |
-| Understand HTTP data flow | [Architecture](architecture.md) | `src/transaction.cc` and an existing API example. |
-| Map C++ and C correctly | [C++/C guide](cpp-guide.md) | Signature, implementation, callers, and cleanup path together. |
-| Understand a rule or directive | [Configuration and rules](configuration-and-rules.md) | Scanner, grammar, and concrete operator/action implementation. |
-| Locate a defect or feature | [Feature map](feature-map.md) | The implementations and existing tests mapped there. |
-| Verify your own build | [Build and tests](build-and-test.md) | `configure.ac`, the platform build, and actual test output. |
+| Überblick gewinnen | [Repository-Übersicht](repository-map.md) | Build-Dateien im Wurzelverzeichnis, öffentliche Header und relevante Unterverzeichnisse. |
+| HTTP-Datenfluss verstehen | [Architektur](architecture.md) | `src/transaction.cc` und ein vorhandenes API-Beispiel. |
+| C++ und C richtig zuordnen | [C++/C-Leitfaden](cpp-guide.md) | Signatur, Implementierung, Aufrufer und Freigabepfad im Zusammenhang. |
+| Eine Regel oder Direktive verstehen | [Konfiguration und Regeln](configuration-and-rules.md) | Scanner, Grammatik und konkrete Operator-/Aktionsimplementierung. |
+| Einen Fehler oder eine Funktion finden | [Funktionsübersicht](feature-map.md) | Die dort zugeordneten Implementierungen und vorhandenen Tests. |
+| Eigenen Build verifizieren | [Build und Tests](build-and-test.md) | `configure.ac`, der Plattform-Build und tatsächliche Testausgaben. |
 
-This reading sequence is a recommendation for this working repository. Before changing code, record the desired observable behavior, then identify the relevant files and existing checks. Finding a symbol or an existing test case does not replace an executed check of the behavior.
+Diese Lesereihenfolge ist eine Empfehlung für dieses Arbeitsrepository. Halte vor einer Codeänderung das gewünschte beobachtbare Verhalten fest und ermittle anschließend die relevanten Dateien und vorhandenen Prüfungen. Das Auffinden eines Symbols oder eines vorhandenen Testfalls ersetzt keine ausgeführte Prüfung des Verhaltens.
 
-## 8. How new chats continue existing work
+## 8. Wie neue Chats bestehende Arbeit fortsetzen
 
-The working convention is to read `AGENTS.md`, the [documentation index](../README.md), and the recorded current work state first, then open the chapters and sources relevant to the task. At the end, hand over results, evidence, checks actually performed, and remaining steps in a traceable form. The [session workflow](session-workflow.md) and [handoff template](handoff-template.md) describe this process.
+Die Arbeitskonvention besteht darin, zuerst `AGENTS.md`, den [Dokumentationsindex](../README.md) und den festgehaltenen aktuellen Arbeitsstand zu lesen und anschließend die für die Aufgabe relevanten Kapitel und Quellen zu öffnen. Übergib am Ende Ergebnisse, Belege, tatsächlich ausgeführte Prüfungen und verbleibende Schritte in nachvollziehbarer Form. Der [Sitzungsablauf](session-workflow.md) und die [Übergabevorlage](handoff-template.md) beschreiben diesen Prozess.
 
-These files deliberately provide readable project context. They guarantee neither automatic memory across chats nor access to files unavailable in a new session. Unknown facts remain unresolved until the relevant sources have been read or checks have actually been performed.
+Diese Dateien stellen bewusst lesbaren Projektkontext bereit. Sie garantieren weder automatisches Erinnern über Chats hinweg noch Zugriff auf Dateien, die in einer neuen Sitzung nicht verfügbar sind. Unbekannte Tatsachen bleiben ungeklärt, bis die relevanten Quellen gelesen oder Prüfungen tatsächlich durchgeführt wurden.
 
-## Sources at the pinned commit
+## Quellen am festgelegten Commit
 
 [scope]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L21-L46
 [build]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/Makefile.am#L11-L14

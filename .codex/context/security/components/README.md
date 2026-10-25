@@ -1,16 +1,16 @@
-# Core component review map
+# Übersicht zur Prüfung der Kernkomponenten
 
-This is a thematic navigation map for optional reviews, not a declaration of isolated upstream modules or completed coverage. A data path may cross several rows; record the shared boundary rather than duplicating or silently transferring results.
+Dies ist eine thematische Navigationsübersicht für optionale Prüfungen, keine Erklärung isolierter Upstream-Module oder abgeschlossener Abdeckung. Ein Datenpfad kann mehrere Zeilen durchlaufen; halte die gemeinsame Grenze fest, statt Ergebnisse zu duplizieren oder stillschweigend zu übertragen.
 
-| Component | Main questions |
+| Komponente | Hauptfragen |
 | --- | --- |
-| [Engine and rule execution](engine.md) | Phase selection, engine state, rule/action control flow, transaction state. |
-| [Rules and parser](rules-parser.md) | Input acceptance, properties, rule construction, chains, and phase translation. |
-| [Body processors](body-processors.md) | Bytes, format selection, buffering, limits, errors, optional processors. |
-| [Logging and storage](logging-storage.md) | Callback lifetime, audit decisions, collections, paths, and disclosure. |
-| [C++/C API boundary](api-boundary.md) | Ownership, explicit lengths, returns, cleanup, callbacks, and caller contracts. |
-| [Build and dependencies](build-dependencies.md) | Feature identity, generated sources, gitlinks, tests, CI, and provenance. |
+| [Engine und Regelausführung](engine.md) | Phasenauswahl, Engine-Zustand, Regel- und Aktionskontrollfluss, Transaktionszustand. |
+| [Regeln und Parser](rules-parser.md) | Eingabeakzeptanz, Eigenschaften, Regelerzeugung, Ketten und Phasenübersetzung. |
+| [Verarbeitung der Nachrichtenkörper](body-processors.md) | Bytes, Formatauswahl, Pufferung, Grenzen, Fehler, optionale Prozessoren. |
+| [Protokollierung und Speicherung](logging-storage.md) | Callback-Lebensdauer, Audit-Entscheidungen, Kollektionen, Pfade und Offenlegung. |
+| [C++-/C-API-Grenze](api-boundary.md) | Eigentümerschaft, explizite Längen, Rückgaben, Freigabe, Callbacks und Aufruferverträge. |
+| [Build und Abhängigkeiten](build-dependencies.md) | Funktionsidentität, generierte Quellen, Gitlinks, Tests, CI und Herkunft. |
 
-Begin with the [selected profile](../../profiles/README.md). The [shared assessment procedure](../core-deep-assessment.md) applies only when a deep review is requested. Each component names suggested check modules; select those relevant to the actual question.
+Beginne mit dem [ausgewählten Profil](../../profiles/README.md). Der [gemeinsame Bewertungsablauf](../core-deep-assessment.md) gilt nur, wenn eine vertiefte Prüfung angefragt ist. Jede Komponente nennt vorgeschlagene Prüfmodule; wähle diejenigen, die zur tatsächlichen Frage passen.
 
-External connectors, their host-specific routes, wire transports, and external rulesets have separate source and evidence boundaries. Include them only when the task explicitly reaches those boundaries.
+Externe Connectoren, ihre host-spezifischen Routen, Übertragungsprotokolle und externe Regelwerke haben getrennte Quellen- und Nachweisgrenzen. Beziehe sie nur ein, wenn die Aufgabe diese Grenzen ausdrücklich erreicht.

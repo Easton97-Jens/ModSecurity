@@ -1,102 +1,104 @@
-# ModSecurity context index
+# Kontextverzeichnis für ModSecurity
 
-The root `AGENTS.md` is a reusable agreement for any repository. First read
-[repository-context.md](repository-context.md) for this checkout's identity,
-source constraints, startup checks, and file-language requirements. Then read
-[current-state.md](current-state.md), [decisions.md](decisions.md), and
-[upstream-lock.json](upstream-lock.json), followed by only the guides and policies
-relevant to the task. The routing is recorded in [manifest.toml](manifest.toml).
-These `.codex` files remain specific to this fork.
+Die `AGENTS.md` im Hauptverzeichnis ist eine wiederverwendbare Vereinbarung für beliebige
+Repositories. Lies zuerst [repository-context.md](repository-context.md) für Identität,
+Quellenvorgaben, Startprüfungen und Dateisprache dieses Checkouts. Lies danach
+[current-state.md](current-state.md), [decisions.md](decisions.md) und
+[upstream-lock.json](upstream-lock.json), anschließend nur die für die Aufgabe
+relevanten Leitfäden und Richtlinien. Die Zuordnung steht in [manifest.toml](manifest.toml).
+Diese `.codex`-Dateien bleiben auf den Fork zugeschnitten. Der Branch `codex/kontext-v3-de`
+enthält die deutsche Variante; er legt keine Chatsprache fest.
 
-## Technical guides: learn the actual repository
+## Technische Leitfäden: das tatsächliche Repository kennenlernen
 
-| Question | Primary guide |
+| Frage | Hauptleitfaden |
 | --- | --- |
-| What does libmodsecurity provide? | [Project context](project-context.md) |
-| Where are source, languages, builds, tests, and utilities? | [Repository map](repository-map.md) |
-| How do transactions, rules, phases, and interventions interact? | [Architecture](architecture.md) |
-| How do C++17, ownership, callbacks, and the C API work here? | [C++ guide](cpp-guide.md) |
-| Where is a feature implemented and tested? | [Feature map](feature-map.md) |
-| How do SecRules, configuration, operators, and transformations connect? | [Configuration and rules](configuration-and-rules.md) |
-| How do I prepare, build, and test this checkout? | [Build and test](build-and-test.md) |
-| Which comments/examples or apparent features need caution? | [Fact check](fact-check.md) |
-| Which source revisions and limits support these explanations? | [Provenance](provenance.md) |
-| How do I adopt a newer upstream revision? | [Upstream sync](upstream-sync.md) |
-| How do I open this work in the existing fork? | [Using this fork](using-this-fork.md) |
+| Was bietet libmodsecurity? | [Projektkontext](project-context.md) |
+| Wo liegen Quellcode, Sprachen, Builds, Tests und Hilfsprogramme? | [Repository-Übersicht](repository-map.md) |
+| Wie wirken Transaktionen, Regeln, Phasen und Interventionen zusammen? | [Architektur](architecture.md) |
+| Wie funktionieren C++17, Besitzverhältnisse, Callbacks und die C-API hier? | [C++-Leitfaden](cpp-guide.md) |
+| Wo wird eine Funktion implementiert und getestet? | [Funktionsübersicht](feature-map.md) |
+| Wie hängen SecRules, Konfiguration, Operatoren und Transformationen zusammen? | [Konfiguration und Regeln](configuration-and-rules.md) |
+| Wie bereite ich diesen Checkout vor, baue und teste ihn? | [Build und Tests](build-and-test.md) |
+| Welche Kommentare, Beispiele oder vermeintlichen Funktionen erfordern Vorsicht? | [Faktenprüfung](fact-check.md) |
+| Welche Quellstände und Grenzen stützen die Erklärungen? | [Quellenherkunft](provenance.md) |
+| Wie übernehme ich eine neuere Upstream-Revision? | [Upstream-Aktualisierung](upstream-sync.md) |
+| Wie öffne ich diese Arbeit im bestehenden Fork? | [Diesen Fork verwenden](using-this-fork.md) |
 
-The technical guides cite immutable official ModSecurity source. An inventory
-entry is not a claim that every function was reviewed. Read actual affected code
-before changing it.
+Die technischen Leitfäden zitieren unveränderliche offizielle ModSecurity-Quellen.
+Ein Inventareintrag behauptet nicht, dass jede Funktion geprüft wurde. Lies vor
+Änderungen den tatsächlich betroffenen Code.
 
-## Working policies: one primary owner per decision
+## Arbeitsrichtlinien: eine primäre Zuständigkeit je Entscheidung
 
-| Task or decision | Primary owner |
+| Aufgabe oder Entscheidung | Primär zuständige Richtlinie |
 | --- | --- |
-| Instruction conflicts, product authority, current user intent | [Policy precedence](policy-precedence.md) |
-| Task scope, requirements, assumptions, proportional planning | [Task workflow](task-workflow.md) |
-| Missing prerequisites and feasibility | [Feasibility](feasibility-policy.md) |
-| Core, connectors, dependencies, and source ownership | [Architecture and boundaries](architecture-and-boundaries.md) |
-| Feature, fix, refactor, behavior change | [Change workflow](change-workflow.md) |
-| Commands and actual tool availability | [Command execution](command-execution-policy.md) |
-| Optional RTK summaries and Codex setup | [RTK guide](rtk.md), supporting the command policy |
-| Checks, test selection, execution evidence | [Testing and evidence](testing-and-evidence.md) |
-| CPU, memory, build output, and storage | [Resources and storage](resources-and-storage.md) |
-| Languages, native build files, generated inputs | [Tooling and language](tooling-and-language.md) |
-| Project-local Python helpers | [Python policy](python-policy.md) |
-| Git state, branches, commits, remotes | [Git policy](git-policy.md) |
-| Push, PR, and observed CI results | [Delivery and CI](delivery-and-ci.md) |
-| Review feedback and failed CI | [PR remediation](pr-remediation.md) |
-| Integration into `v3/master` | [Master integration](master-integration.md) |
-| Task-owned temporary data and cleanup | [Cleanup and restoration](cleanup-and-restoration.md) |
-| English documentation, citations, handovers | [Documentation and traceability](documentation-and-traceability.md) |
-| Parallel work and background processes | [Subagents and background](subagents-and-background.md) |
-| Security-sensitive tasks | [Security policy](security-policy.md) |
-| Isolated runtime prerequisites for a security task | [Security runtime preflight](security-runtime-preflight.md) |
-| Library input boundaries and targeted hardening | [Protocol and hardening](protocol-and-hardening.md) |
-| Observations, confirmed findings, remediation | [Findings policy](findings-policy.md) |
-| Optional SonarQube use when actually configured | [SonarQube policy](sonarqube-policy.md) |
-| Completion and honest delivery | [Definition of done](definition-of-done.md) |
+| Anweisungskonflikte, Produktautorität, aktueller Nutzerwunsch | [Rangfolge der Vorgaben](policy-precedence.md) |
+| Aufgabenabgrenzung, Anforderungen, Annahmen, angemessene Planung | [Aufgabenablauf](task-workflow.md) |
+| Fehlende Voraussetzungen und Machbarkeit | [Machbarkeit](feasibility-policy.md) |
+| Kernbibliothek, Connectoren, Abhängigkeiten und Quellzuständigkeit | [Architektur und Grenzen](architecture-and-boundaries.md) |
+| Neue Funktion, Fehlerbehebung, Refactoring, Verhaltensänderung | [Änderungsablauf](change-workflow.md) |
+| Befehle und tatsächliche Werkzeugverfügbarkeit | [Befehlsausführung](command-execution-policy.md) |
+| Optionale RTK-Zusammenfassungen und Codex-Einrichtung | [RTK-Leitfaden](rtk.md), als Ergänzung zur Befehlsrichtlinie |
+| Prüfungen, Testauswahl, Ausführungsnachweise | [Tests und Nachweise](testing-and-evidence.md) |
+| CPU, Arbeitsspeicher, Build-Ausgaben und Speicherorte | [Ressourcen und Speicher](resources-and-storage.md) |
+| Programmiersprachen, vorhandene Build-Dateien, generierte Eingaben | [Werkzeuge und Sprachen](tooling-and-language.md) |
+| Projektlokale Python-Hilfsprogramme | [Python-Richtlinie](python-policy.md) |
+| Git-Zustand, Branches, Commits, Remotes | [Git-Richtlinie](git-policy.md) |
+| Push, PR und beobachtete CI-Ergebnisse | [Bereitstellung und CI](delivery-and-ci.md) |
+| Review-Rückmeldungen und fehlgeschlagene CI | [PR-Nachbearbeitung](pr-remediation.md) |
+| Integration nach `v3/master` | [Integration in den Zielbranch](master-integration.md) |
+| Aufgabenbezogene temporäre Daten und Aufräumen | [Aufräumen und Wiederherstellen](cleanup-and-restoration.md) |
+| Deutsche Dokumentation dieser Variante, Quellenangaben und Übergaben | [Dokumentation und Nachvollziehbarkeit](documentation-and-traceability.md) |
+| Parallele Arbeit und Hintergrundprozesse | [Unteragenten und Hintergrundarbeit](subagents-and-background.md) |
+| Sicherheitsrelevante Aufgaben | [Sicherheitsrichtlinie](security-policy.md) |
+| Isolierte Laufzeitvoraussetzungen für eine Sicherheitsaufgabe | [Vorprüfung der Sicherheits-Testumgebung](security-runtime-preflight.md) |
+| Eingabegrenzen der Bibliothek und gezielte Härtung | [Protokoll und Härtung](protocol-and-hardening.md) |
+| Beobachtungen, bestätigte Befunde und Behebung | [Befundrichtlinie](findings-policy.md) |
+| Optionale SonarQube-Nutzung bei tatsächlicher Konfiguration | [SonarQube-Richtlinie](sonarqube-policy.md) |
+| Abschluss und ehrlicher Bereitstellungsstand | [Abschlusskriterien](definition-of-done.md) |
 
-## Assessment profiles: load only for the requested assessment
+## Prüfprofile: nur für die angefragte Untersuchung laden
 
-| Request | Profile |
+| Auftrag | Profil |
 | --- | --- |
-| Focused core-library behavior review | [Core library](profiles/core-library-assessment.md) |
-| Functional coverage across core components | [All components](profiles/all-components-assessment.md) |
-| Security review of a selected component | [Component security](profiles/component-security-assessment.md) |
-| Security review across core components | [All components security](profiles/all-components-security-assessment.md) |
-| Build, CI, dependencies, and supply chain | [Build and CI](profiles/build-ci-supply-chain-assessment.md) |
-| Claims, citations, results, and evidence integrity | [Evidence integrity](profiles/evidence-integrity-assessment.md) |
-| Explicit full repository assessment | [Full repository](profiles/full-repository-assessment.md) |
-| Response phase and intervention behavior | [Response phase](profiles/response-phase-assessment.md) |
-| Strict completeness for explicitly selected coverage | [Completeness overlay](profiles/strict-completeness-assessment.md) |
+| Gezielte Prüfung des Verhaltens der Kernbibliothek | [Kernbibliothek](profiles/core-library-assessment.md) |
+| Funktionale Abdeckung über Kernkomponenten hinweg | [Alle Komponenten](profiles/all-components-assessment.md) |
+| Sicherheitsprüfung einer gewählten Komponente | [Komponentensicherheit](profiles/component-security-assessment.md) |
+| Sicherheitsprüfung über Kernkomponenten hinweg | [Sicherheit aller Komponenten](profiles/all-components-security-assessment.md) |
+| Build, CI, Abhängigkeiten und Lieferkette | [Build und CI](profiles/build-ci-supply-chain-assessment.md) |
+| Aussagen, Quellenangaben, Ergebnisse und Nachweisintegrität | [Integrität der Nachweise](profiles/evidence-integrity-assessment.md) |
+| Ausdrückliche Prüfung des gesamten Repositorys | [Gesamtes Repository](profiles/full-repository-assessment.md) |
+| Antwortphase und Interventionsverhalten | [Antwortphase](profiles/response-phase-assessment.md) |
+| Strenge Vollständigkeit für ausdrücklich gewählte Abdeckung | [Ergänzung zur Vollständigkeit](profiles/strict-completeness-assessment.md) |
 
-The [profiles index](profiles/README.md) and [security index](security/README.md)
-route to core [component guides](security/components/README.md) and focused
-`security/checks/` modules. Their presence does not report completed scans or
-create an obligation to run every assessment for each edit.
+Das [Profilverzeichnis](profiles/README.md) und das [Sicherheitsverzeichnis](security/README.md)
+führen zu [Leitfäden der Kernkomponenten](security/components/README.md) und gezielten
+Modulen unter `security/checks/`. Ihr Vorhandensein meldet keine abgeschlossenen Scans
+und verpflichtet nicht dazu, für jede Änderung sämtliche Untersuchungen durchzuführen.
 
-## Durable session context
+## Dauerhaft gespeicherter Sitzungskontext
 
-| File | Use |
+| Datei | Verwendung |
 | --- | --- |
-| [Current state](current-state.md) | Actual progress, checked revision, results, and next step |
-| [Decisions](decisions.md) | Durable choices with reasons and evidence |
-| [Backlog](backlog.md) | Real remaining tasks and unknowns |
-| [Session workflow](session-workflow.md) | Explain, change, verify, hand over |
-| [Handoff template](handoff-template.md) | Record a reproducible closeout |
-| [Session records](../audit/sessions/README.md) | Dated history, outside normal policy routing |
-| [Start prompt](prompts/start-new-chat.md) | Copy into a new chat with repository access |
-| [End prompt](prompts/end-session.md) | Finish with saved context |
-| [Template adaptation](template-adaptation.md) | What was reused, adapted, or intentionally omitted |
+| [Aktueller Stand](current-state.md) | Tatsächlicher Fortschritt, geprüfte Revision, Ergebnisse und nächster Schritt |
+| [Entscheidungen](decisions.md) | Dauerhafte Festlegungen mit Gründen und Nachweisen |
+| [Backlog](backlog.md) | Tatsächlich verbleibende Aufgaben und Unbekanntes |
+| [Sitzungsablauf](session-workflow.md) | Erklären, ändern, prüfen, übergeben |
+| [Übergabevorlage](handoff-template.md) | Einen reproduzierbaren Abschluss festhalten |
+| [Sitzungsaufzeichnungen](../audit/sessions/README.md) | Datierte Historie außerhalb der normalen Richtlinienzuordnung |
+| [Startprompt](prompts/start-new-chat.md) | In einen neuen Chat mit Repository-Zugriff kopieren |
+| [Abschlussprompt](prompts/end-session.md) | Mit gespeichertem Kontext abschließen |
+| [Vorlagenanpassung](template-adaptation.md) | Was übernommen, angepasst oder bewusst ausgelassen wurde |
 
-For first-time learning: project context → repository map → architecture → C++
-guide → one concrete implementation and its tests. For a defect: current state →
-feature map → implementation and callers → a relevant regression → build guide.
+Zum ersten Kennenlernen: Projektkontext → Repository-Übersicht → Architektur →
+C++-Leitfaden → eine konkrete Implementierung und ihre Tests. Für einen Fehler:
+aktueller Stand → Funktionsübersicht → Implementierung und Aufrufer →
+ein relevanter Regressionstest → Build-Anleitung.
 
-## Validation and historical material
+## Validierung und historisches Material
 
-See [bin/README.md](../bin/README.md) for the local validators and
-[audit/README.md](../audit/README.md) for inventories. History is evidence for its
-stated revision, not a replacement for current source. The manifests are read by
-these helpers; they are not a built-in Codex configuration mechanism.
+[bin/README.md](../bin/README.md) beschreibt die lokalen Prüfprogramme,
+[audit/README.md](../audit/README.md) die Inventare. Historie belegt ihren angegebenen
+Stand und ersetzt keinen aktuellen Quelltext. Die Manifeste werden von diesen
+Hilfsprogrammen gelesen; sie sind kein eingebauter Codex-Konfigurationsmechanismus.

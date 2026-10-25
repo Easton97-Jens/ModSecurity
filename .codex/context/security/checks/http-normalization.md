@@ -1,13 +1,13 @@
-# HTTP representation and normalization questions
+# Fragen zur HTTP-Darstellung und Normalisierung
 
-Begin with the bytes and lengths actually supplied to the library. Trace raw and decoded URI/query values, header names/values, body values, transformations, and reported match origins in the selected path.
+Beginne mit den tatsächlich an die Bibliothek gelieferten Bytes und Längen. Verfolge im ausgewählten Pfad rohe und dekodierte URI- beziehungsweise Abfragewerte, Header-Namen und -Werte, Körperwerte, Transformationen und gemeldete Trefferursprünge.
 
-- Which representation does each variable or operator receive?
-- What happens to percent encoding, repeated decoding, separators, duplicate arguments, controls, embedded NULs, and malformed text in the applicable path?
-- Are explicit lengths, offsets, and derived values consistent after a transformation changes the data?
-- Is a parser error or partial body visible in the configuration/rules used by the case?
-- Does the downstream application use the same representation, or is that an unverified external boundary?
+- Welche Darstellung erhält jede Variable oder jeder Operator?
+- Was geschieht im anwendbaren Pfad mit Prozentkodierung, wiederholter Dekodierung, Trennzeichen, doppelten Argumenten, Steuerzeichen, eingebetteten NULs und fehlerhaftem Text?
+- Bleiben explizite Längen, Versätze und abgeleitete Werte konsistent, nachdem eine Transformation die Daten verändert hat?
+- Ist ein Parserfehler oder ein nur teilweise verarbeiteter Körper in der vom Fall verwendeten Konfiguration beziehungsweise den Regeln sichtbar?
+- Nutzt die nachgelagerte Anwendung dieselbe Darstellung, oder ist das eine ungeprüfte externe Grenze?
 
-A differential matters only when its reachable consequence is established. Record input representation, derived value, responsible function, effective rule, expected/observed result, legitimate control, and remaining uncertainty.
+Ein Unterschied ist nur dann relevant, wenn seine erreichbare Folge nachgewiesen ist. Halte Eingabedarstellung, abgeleiteten Wert, verantwortliche Funktion, wirksame Regel, erwartetes und beobachtetes Ergebnis, zulässigen Kontrollfall und verbleibende Unsicherheit fest.
 
-Entry points: [API boundary](../components/api-boundary.md), [body processors](../components/body-processors.md), [rules/parser](../components/rules-parser.md), and [integration representation](integration-representation.md).
+Einstiegspunkte: [API-Grenze](../components/api-boundary.md), [Verarbeitung der Nachrichtenkörper](../components/body-processors.md), [Regeln und Parser](../components/rules-parser.md) und [Datendarstellung an Integrationsgrenzen](integration-representation.md).

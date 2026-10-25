@@ -1,13 +1,13 @@
-# Failure, cleanup, and follow-up questions
+# Fragen zu Fehlern, Freigabe und Folgefällen
 
-Select failures reachable in the actual library/harness: invalid rules, unavailable optional processing, malformed bodies, limit handling, failed file/backend operations, callback problems, or caller error handling. Verify the concrete failure mechanism rather than assuming it exists.
+Wähle Fehler, die in der tatsächlichen Bibliothek beziehungsweise im Testgerüst erreichbar sind: ungültige Regeln, nicht verfügbare optionale Verarbeitung, fehlerhafte Körper, Grenzwertbehandlung, fehlgeschlagene Datei- oder Backend-Operationen, Callback-Probleme oder Fehlerbehandlung des Aufrufers. Prüfe den konkreten Fehlermechanismus, statt seine Existenz anzunehmen.
 
-- What return value, error text, variable, intervention, or exception carries the failure?
-- Does the caller preserve that signal or convert it into apparent success?
-- Which transaction/shared resources are left after the failure?
-- Does cleanup occur once with the correct owner, and is a legitimate follow-up case unaffected?
-- Did a later success follow a setup correction, or is there unexplained intermittent behavior?
+- Welcher Rückgabewert, Fehlertext, welche Variable, Intervention oder Ausnahme transportiert den Fehler?
+- Erhält der Aufrufer dieses Signal oder wandelt er es in scheinbaren Erfolg um?
+- Welche Transaktionsressourcen oder gemeinsamen Ressourcen bleiben nach dem Fehler zurück?
+- Erfolgt die Freigabe einmal durch den richtigen Eigentümer, und bleibt ein zulässiger Folgefall unbeeinträchtigt?
+- Folgte ein späterer Erfolg auf eine Einrichtungskorrektur, oder gibt es unerklärtes sporadisches Verhalten?
 
-Record the original failure and every meaningful correction. A successful retry does not erase the earlier observation. Host/service restarts or network timeouts belong here only when a separately scoped integration actually supplies them.
+Halte den ursprünglichen Fehler und jede wesentliche Korrektur fest. Ein erfolgreicher Wiederholungsversuch löscht die frühere Beobachtung nicht. Host- oder Dienstneustarts sowie Netzwerkzeitüberschreitungen gehören nur dann hierher, wenn eine gesondert abgegrenzte Integration sie tatsächlich bereitstellt.
 
-Entry points: [API boundary](../components/api-boundary.md), [body processors](../components/body-processors.md), [logging/storage](../components/logging-storage.md), and [evidence integrity](evidence-integrity.md).
+Einstiegspunkte: [API-Grenze](../components/api-boundary.md), [Verarbeitung der Nachrichtenkörper](../components/body-processors.md), [Protokollierung und Speicherung](../components/logging-storage.md) und [Nachweisintegrität](evidence-integrity.md).

@@ -1,22 +1,22 @@
-# Logging and storage review
+# Prüfung von Protokollierung und Speicherung
 
-## Source entry points
+## Einstiegspunkte im Quellcode
 
-`ModSecurity::serverLog()` supplies either callback text or a `RuleMessage`. The text path uses a local string's `c_str()` during the callback. `processLogging()` returns early with the engine disabled; otherwise it evaluates the logging phase and considers audit storage through `saveIfRelevant()`. Sources: [callback](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L193-L212), [logging](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1304-L1346), [audit decision](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/audit_log/audit_log.cc#L278-L325).
+`ModSecurity::serverLog()` liefert entweder Callback-Text oder eine `RuleMessage`. Der Textpfad nutzt während des Callbacks `c_str()` einer lokalen Zeichenfolge. `processLogging()` kehrt bei deaktivierter Engine vorzeitig zurück; andernfalls wertet es die Protokollierungsphase aus und prüft die Audit-Speicherung über `saveIfRelevant()`. Quellen: [Callback](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L193-L212), [Protokollierung](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1304-L1346), [Audit-Entscheidung](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/audit_log/audit_log.cc#L278-L325).
 
-The engine creates shared collection backends with LMDB under `WITH_LMDB`, otherwise `InMemoryPerProcess`; transaction collections create a separate in-memory `TX` backend. Sources: [engine backends](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L62-L109), [transaction collections](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/collection/collections.cc#L37-L56).
+Die Engine erzeugt unter `WITH_LMDB` gemeinsame Kollektions-Backends mit LMDB, andernfalls `InMemoryPerProcess`; Transaktionskollektionen erzeugen ein getrenntes speicherinternes `TX`-Backend. Quellen: [Engine-Backends](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L62-L109), [Transaktionskollektionen](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/collection/collections.cc#L37-L56).
 
-## Review questions
+## Prüffragen
 
-- Which fields can contain sensitive or attacker-controlled text, and which escaping/serialization path writes them?
-- What are the effective logging/audit settings, callback properties, and backend feature macros?
-- Does the callback copy data needed after it returns, and does its user context outlive every call?
-- Who owns the collection, writer, path, file, and synchronization involved in the selected operation?
-- What happens on a missing directory, failed write, full storage, malformed value, or cleanup path?
-- Does the evidence establish a callback, an audit-selection decision, or an actually persisted record?
+- Welche Felder können sensiblen oder vom Angreifer kontrollierten Text enthalten, und welcher Maskierungs- beziehungsweise Serialisierungspfad schreibt sie?
+- Welche Protokollierungs- und Audit-Einstellungen, Callback-Eigenschaften und Backend-Funktionsmakros sind wirksam?
+- Kopiert der Callback Daten, die nach seiner Rückkehr benötigt werden, und überdauert sein Nutzerkontext jeden Aufruf?
+- Wem gehören die an der ausgewählten Operation beteiligten Kollektionen, Schreiber, Pfade, Dateien und Synchronisationsmittel?
+- Was geschieht bei einem fehlenden Verzeichnis, fehlgeschlagenem Schreibvorgang, vollem Speicher, fehlerhaftem Wert oder Freigabepfad?
+- Belegt der Nachweis einen Callback, eine Audit-Auswahlentscheidung oder einen tatsächlich dauerhaft gespeicherten Datensatz?
 
-Do not infer universal persistence, thread safety, or audit delivery from the presence of a backend or callback. Inspect the concrete writer/backend and caller for those questions.
+Leite aus dem Vorhandensein eines Backends oder Callbacks weder allgemeine Persistenz noch Threadsicherheit oder erfolgreiche Audit-Ausgabe ab. Untersuche für diese Fragen den konkreten Schreiber beziehungsweise das Backend und den Aufrufer.
 
-## Select relevant checks
+## Relevante Prüfungen auswählen
 
-[Disclosure](../checks/logging-disclosure.md), [file/storage boundaries](../checks/filesystem-storage.md), [concurrency](../checks/concurrency-races.md), [memory lifecycle](../checks/memory-lifecycle.md), [resource bounds](../checks/resource-exhaustion.md), and [evidence integrity](../checks/evidence-integrity.md).
+[Offenlegung](../checks/logging-disclosure.md), [Datei- und Speichergrenzen](../checks/filesystem-storage.md), [Nebenläufigkeit](../checks/concurrency-races.md), [Speicherlebenszyklus](../checks/memory-lifecycle.md), [Ressourcengrenzen](../checks/resource-exhaustion.md) und [Nachweisintegrität](../checks/evidence-integrity.md).

@@ -1,15 +1,15 @@
-# API call sequencing and transaction state
+# API-Aufrufreihenfolge und Transaktionszustand
 
-Use for the actual C or C++ caller/harness. Read its setup, phase calls, intervention handling, logging, and cleanup together with the implementation.
+Für den tatsächlichen C- oder C++-Aufrufer beziehungsweise das Testgerüst verwenden. Lies dessen Einrichtung, Phasenaufrufe, Interventionsbehandlung, Protokollierung und Freigabe gemeinsam mit der Implementierung.
 
-- When are connection, URI, headers, and body chunks supplied relative to phase evaluation?
-- Which early returns and engine/body-access conditions apply?
-- Does the caller distinguish incomplete input, append limits, processing results, and intervention state?
-- Are repeated calls, missing steps, error paths, and cleanup supported by the documented/implemented contract, or merely assumptions of the harness?
-- Are per-transaction IDs and user callback contexts kept separate across actual caller lifetimes?
+- Wann werden Verbindung, URI, Header und Körperabschnitte im Verhältnis zur Phasenauswertung geliefert?
+- Welche vorzeitigen Rückgaben und Bedingungen für Engine und Körperzugriff gelten?
+- Unterscheidet der Aufrufer unvollständige Eingaben, Grenzen beim Anhängen, Verarbeitungsergebnisse und Interventionszustand?
+- Sind wiederholte Aufrufe, fehlende Schritte, Fehlerpfade und Freigabe durch den dokumentierten beziehungsweise implementierten Vertrag unterstützt oder lediglich Annahmen des Testgerüsts?
+- Werden transaktionsbezogene Kennungen und Nutzerkontexte von Callbacks über die tatsächlichen Aufruferlebensdauern hinweg getrennt gehalten?
 
-Record the exact sequence and state observed at each relevant step. A robustness test of an unsupported call order must not be reported as ordinary supported behavior.
+Halte die genaue Reihenfolge und den an jedem relevanten Schritt beobachteten Zustand fest. Ein Robustheitstest einer nicht unterstützten Aufrufreihenfolge darf nicht als gewöhnliches unterstütztes Verhalten berichtet werden.
 
-Do not import SPOE, gRPC, UDS frames, response companions, or host stream lifecycle into this library checklist. Those require their own implementations and scope.
+Übernimm weder SPOE, gRPC, UDS-Frames, begleitende Antwortkomponenten noch den Lebenszyklus von Host-Streams in diese Bibliotheksprüfliste. Sie benötigen eigene Implementierungen und einen eigenen Umfang.
 
-Entry points: [API boundary](../components/api-boundary.md), [engine](../components/engine.md), and [architecture](../../architecture.md).
+Einstiegspunkte: [API-Grenze](../components/api-boundary.md), [Engine](../components/engine.md) und [Architektur](../../architecture.md).

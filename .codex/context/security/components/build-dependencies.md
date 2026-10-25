@@ -1,22 +1,22 @@
-# Build, dependency, and CI review
+# Prüfung von Build, Abhängigkeiten und CI
 
-## Source entry points
+## Einstiegspunkte im Quellcode
 
-Read `configure.ac`, the relevant Makefiles, platform build files, `.gitmodules`, and selected workflow definitions. The pinned Unix and Windows builds set C++17. Test utilities are enabled by the configure condition only when `YAJL_FOUND=1`. Sources: [Unix standard](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L49-L63), [Windows standard](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build/win32/CMakeLists.txt#L102-L104), [test utility condition](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L313-L324).
+Lies `configure.ac`, die relevanten Makefiles, plattformspezifischen Build-Dateien, `.gitmodules` und ausgewählten Workflow-Definitionen. Die festgelegten Unix- und Windows-Builds setzen C++17. Testwerkzeuge werden durch die configure-Bedingung nur bei `YAJL_FOUND=1` aktiviert. Quellen: [Unix-Standard](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L49-L63), [Windows-Standard](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build/win32/CMakeLists.txt#L102-L104), [Bedingung für Testwerkzeuge](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L313-L324).
 
-## Review questions
+## Prüffragen
 
-- Which compiler, dependency versions, feature macros, linkage mode, and actual binary belong to the claimed result?
-- Are generated parser outputs consistent with their `.ll`/`.yy` inputs and build rules?
-- Do submodule checkouts match the main repository's gitlink commits rather than a moving remote branch?
-- Which workflow inputs can reach shell commands, paths, downloads, caches, artifacts, or credentials?
-- Were the intended tests built, discovered, and executed with meaningful assertions?
-- Do local and remote results belong to the same source, configuration, and artifact?
+- Welcher Compiler, welche Abhängigkeitsversionen, Funktionsmakros, Verknüpfungsart und tatsächliche Binärdatei gehören zum behaupteten Ergebnis?
+- Stimmen generierte Parser-Ausgaben mit ihren `.ll`/`.yy`-Eingaben und Build-Regeln überein?
+- Entsprechen Submodul-Checkouts den Gitlink-Commits des Haupt-Repositorys statt einem veränderlichen Remote-Branch?
+- Welche Workflow-Eingaben können Shell-Befehle, Pfade, Downloads, Caches, Artefakte oder Zugangsdaten erreichen?
+- Wurden die vorgesehenen Tests gebaut, gefunden und mit aussagekräftigen Prüfaussagen ausgeführt?
+- Gehören lokale und externe Ergebnisse zu denselben Quellen, derselben Konfiguration und demselben Artefakt?
 
-A regression runner built with `NO_LOGS` can return `0` before loading tests. The scanner Dockerfile catches `make check` failure with a warning. These are reasons to inspect execution evidence, not claims that a particular run passed or failed. Sources: [runner early return](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/regression/regression.cc#L437-L442), [Dockerfile test handling](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.oss-scanner/Dockerfile#L29-L37).
+Ein mit `NO_LOGS` gebauter Regressionsrunner kann `0` zurückgeben, bevor Tests geladen werden. Das Scanner-Dockerfile fängt einen Fehler von `make check` mit einer Warnung ab. Das sind Gründe, Ausführungsnachweise zu prüfen, keine Aussagen darüber, ob ein bestimmter Lauf bestanden wurde oder fehlgeschlagen ist. Quellen: [vorzeitige Runner-Rückgabe](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/regression/regression.cc#L437-L442), [Testbehandlung im Dockerfile](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.oss-scanner/Dockerfile#L29-L37).
 
-## Select relevant checks
+## Relevante Prüfungen auswählen
 
-[Supply chain](../checks/supply-chain.md), [configuration/input injection](../checks/config-injection.md), [advisory research](../checks/advisory-research.md), [disclosure](../checks/logging-disclosure.md), and [evidence integrity](../checks/evidence-integrity.md).
+[Lieferkette](../checks/supply-chain.md), [Konfigurations- und Eingabeinjektion](../checks/config-injection.md), [Recherche zu Sicherheitshinweisen](../checks/advisory-research.md), [Offenlegung](../checks/logging-disclosure.md) und [Nachweisintegrität](../checks/evidence-integrity.md).
 
-Use [build and test guidance](../../build-and-test.md) for actual repository commands. Inventory submodule contents and external packages only when in scope; their existence or pin does not establish a completed dependency audit.
+Nutze die [Build- und Testhinweise](../../build-and-test.md) für tatsächliche Repository-Befehle. Inventarisiere Submodulinhalte und externe Pakete nur, wenn sie zum Umfang gehören; ihre Existenz oder Versionsbindung belegt kein abgeschlossenes Abhängigkeitsaudit.

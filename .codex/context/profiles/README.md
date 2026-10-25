@@ -1,19 +1,19 @@
-# Optional assessment profiles
+# Optionale Bewertungsprofile
 
-Select a profile only when it matches the user's requested task. These files are reusable plans, not completed reviews, mandatory startup scans, or claims that tools and runtimes are available.
+Wähle ein Profil nur, wenn es zur angefragten Nutzeraufgabe passt. Diese Dateien sind wiederverwendbare Pläne, keine abgeschlossenen Prüfungen, verpflichtenden Startscans oder Aussagen darüber, dass Werkzeuge und Laufzeitumgebungen verfügbar sind.
 
-| Profile | Select when the requested goal is |
+| Profil | Auswählen, wenn das angefragte Ziel Folgendes ist |
 | --- | --- |
-| [Core library](core-library-assessment.md) | Exercise a bounded library behavior through actual build/test/API evidence. |
-| [All components](all-components-assessment.md) | Review coverage across the six core areas without implying a deep security scan. |
-| [Component security](component-security-assessment.md) | Investigate security questions in one selected component and its reachable dependencies. |
-| [All-component security](all-components-security-assessment.md) | Conduct a requested deep review across the core areas. |
-| [Build, CI, and supply chain](build-ci-supply-chain-assessment.md) | Check build identity, dependencies, workflows, and their evidence. |
-| [Evidence integrity](evidence-integrity-assessment.md) | Determine whether existing claims are supported and correctly bound. |
-| [Full repository](full-repository-assessment.md) | Assess the declared repository-wide scope and expose coverage gaps. |
-| [Response phases](response-phase-assessment.md) | Check core response inspection, phase conditions, and intervention semantics. |
-| [Strict completeness](strict-completeness-assessment.md) | Apply an explicitly requested execution-completeness overlay to another profile. |
+| [Kernbibliothek](core-library-assessment.md) | Ein begrenztes Bibliotheksverhalten anhand tatsächlicher Build-, Test- oder API-Nachweise prüfen. |
+| [Alle Komponenten](all-components-assessment.md) | Die Abdeckung der sechs Kernbereiche prüfen, ohne einen tiefgehenden Sicherheitsscan zu unterstellen. |
+| [Komponentensicherheit](component-security-assessment.md) | Sicherheitsfragen in einer ausgewählten Komponente und ihren erreichbaren Abhängigkeiten untersuchen. |
+| [Sicherheit aller Komponenten](all-components-security-assessment.md) | Eine angefragte vertiefte Prüfung über die Kernbereiche hinweg durchführen. |
+| [Build, CI und Lieferkette](build-ci-supply-chain-assessment.md) | Build-Identität, Abhängigkeiten, Workflows und ihre Nachweise prüfen. |
+| [Nachweisintegrität](evidence-integrity-assessment.md) | Feststellen, ob bestehende Aussagen belegt und korrekt zugeordnet sind. |
+| [Gesamtes Repository](full-repository-assessment.md) | Den erklärten repository-weiten Umfang bewerten und Abdeckungslücken aufzeigen. |
+| [Antwortphasen](response-phase-assessment.md) | Antwortprüfung im Kern, Phasenbedingungen und Interventionssemantik prüfen. |
+| [Strikte Vollständigkeit](strict-completeness-assessment.md) | Eine ausdrücklich verlangte Ergänzung zur vollständigen Ausführung auf ein anderes Profil anwenden. |
 
-Use the [component index](../security/components/README.md) for source entry points and focused checks. Assessment scope does not by itself authorize source fixes, dependency changes, remote publication, or external connector operations.
+Nutze den [Komponentenindex](../security/components/README.md) für Einstiegspunkte im Quellcode und gezielte Prüfungen. Der Bewertungsumfang erlaubt für sich genommen weder Quellcodekorrekturen noch Änderungen an Abhängigkeiten, externe Veröffentlichung oder Vorgänge an externen Connectoren.
 
-Read [security policy](../security-policy.md) for candidate/result handling and [protocol/build boundaries](../protocol-and-hardening.md) before making integration or diagnostic-build claims.
+Lies die [Sicherheitsrichtlinie](../security-policy.md) zum Umgang mit Kandidaten und Ergebnissen sowie die [Protokoll- und Build-Grenzen](../protocol-and-hardening.md), bevor du Aussagen zu Integration oder Diagnose-Builds machst.

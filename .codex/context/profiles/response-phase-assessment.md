@@ -1,23 +1,23 @@
-# Core response-phase and intervention assessment
+# Bewertung von Antwortphasen und Interventionen im Kern
 
-## Trigger
+## Anlass
 
-Use for a requested review or change involving response headers, response bodies, phase mapping, engine/body settings, intervention retrieval, or related logging. This is a current-code assessment; no connector migration target is assumed.
+Nutze dieses Profil für eine angefragte Prüfung oder Änderung an Antwortheadern, Antwortkörpern, Phasenzuordnung, Engine- und Körpereinstellungen, Interventionsabfrage oder zugehöriger Protokollierung. Bewertet wird der aktuelle Code; ein Connector-Migrationsziel wird nicht vorausgesetzt.
 
-## Source baseline
+## Quellcode-Ausgangsstand
 
-SecRules `phase:3` maps to `ResponseHeadersPhase` and `phase:4` to `ResponseBodyPhase`; their internal enum values are `4` and `5`. Sources: [mapping](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/actions/phase.cc#L25-L72), [enum](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/modsecurity.h#L97-L170).
+SecRules `phase:3` wird `ResponseHeadersPhase` und `phase:4` wird `ResponseBodyPhase` zugeordnet; ihre internen Enum-Werte sind `4` und `5`. Quellen: [Zuordnung](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/actions/phase.cc#L25-L72), [Enum](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/modsecurity.h#L97-L170).
 
-`processResponseHeaders()` guards phase evaluation when the engine is disabled. Response-body processing has engine, body-access, MIME, and limit conditions. `processLogging()` also returns early when the engine is disabled. Sources: [headers](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L992-L1097), [body](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1117-L1230), [logging](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1304-L1346).
+`processResponseHeaders()` verhindert die Phasenauswertung bei deaktivierter Engine. Die Verarbeitung des Antwortkörpers hat Bedingungen für Engine, Körperzugriff, MIME und Grenzwerte. Auch `processLogging()` kehrt bei deaktivierter Engine vorzeitig zurück. Quellen: [Header](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L992-L1097), [Nachrichtenkörper](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1117-L1230), [Protokollierung](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1304-L1346).
 
-## Selected review
+## Ausgewählte Prüfung
 
-Read [body processors](../security/components/body-processors.md), [API boundary](../security/components/api-boundary.md), [response intervention](../security/checks/response-intervention.md), and [protocol boundaries](../protocol-and-hardening.md).
+Lies [Verarbeitung der Nachrichtenkörper](../security/components/body-processors.md), [API-Grenze](../security/components/api-boundary.md), [Antwortintervention](../security/checks/response-intervention.md) und [Protokollgrenzen](../protocol-and-hardening.md).
 
-Record actual settings, supplied data, phase method, reached branch, rule result, intervention, and cleanup. Choose applicable normal, disabled/detection-only, MIME/body-access, partial/limit, empty, and error cases from the concrete code and test scope.
+Halte tatsächliche Einstellungen, übergebene Daten, Phasenmethode, erreichten Zweig, Regelergebnis, Intervention und Freigabe fest. Wähle anhand des konkreten Codes und Testumfangs anwendbare Normalfälle sowie Fälle mit deaktivierter Engine beziehungsweise reinem Erkennungsmodus, MIME- oder Körperzugriffsbedingungen, Teilverarbeitung beziehungsweise Grenzwerten, leeren Eingaben und Fehlern.
 
-For each statement classify the evidence as current source, executed core result, proposed behavior, or external integration gap. Do not assert client-visible blocking, post-commit abort, reset, or `off`/`safe`/`strict` connector semantics without separately scoped evidence.
+Ordne für jede Aussage die Nachweise als aktuellen Quellcode, ausgeführtes Kernergebnis, vorgeschlagenes Verhalten oder externe Integrationslücke ein. Behaupte ohne gesondert abgegrenzte Nachweise weder clientseitig sichtbares Blockieren, Abbruch nach bereits festgeschriebener Antwort, Reset noch die Connector-Semantik `off`/`safe`/`strict`.
 
-## Output
+## Ergebnis
 
-A table of condition, source branch, expected observation, actual check/result, and limitation. A successful append/process call alone does not replace an intervention check.
+Eine Tabelle mit Bedingung, Quellcodezweig, erwarteter Beobachtung, tatsächlicher Prüfung und Ergebnis sowie Grenze. Ein erfolgreicher Aufruf zum Anhängen oder Verarbeiten allein ersetzt keine Interventionsprüfung.

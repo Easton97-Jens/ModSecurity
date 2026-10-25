@@ -1,12 +1,12 @@
-# Session records
+# Sitzungsaufzeichnungen
 
-Record completed sessions here using
-[handoff-template.md](../../context/handoff-template.md). A suggested filename is the date
-followed by a short task description, such as `2026-10-25-context-foundation.md`.
+Halte abgeschlossene Sitzungen hier mit
+[handoff-template.md](../../context/handoff-template.md) fest. Als Dateiname bietet
+sich das Datum mit einer kurzen Aufgabenbeschreibung an, etwa `2026-10-25-context-foundation.md`.
 
-A sample filename does not establish that a session occurred. The actual
-foundation work is recorded in [current-state.md](../../context/current-state.md).
+Ein Beispieldateiname belegt nicht, dass eine Sitzung stattgefunden hat. Die tatsächliche
+Grundlagenarbeit ist in [current-state.md](../../context/current-state.md) festgehalten.
 
-Records should contain checkable outcomes and context needed for continuation.
-Credentials, private HTTP requests, and complete sensitive logs do not belong
-in this versioned directory.
+Aufzeichnungen sollen überprüfbare Ergebnisse und den zur Fortsetzung benötigten Kontext
+enthalten. Zugangsdaten, private HTTP-Anfragen und vollständige sensible Protokolle
+gehören nicht in dieses versionierte Verzeichnis.

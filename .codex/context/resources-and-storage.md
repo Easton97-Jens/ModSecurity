@@ -1,78 +1,92 @@
-# Resources and storage
+# Ressourcen und Speicher
 
-## Scope
+## Geltungsbereich
 
-This policy governs task-owned build, analysis, and temporary data. It does not
-assume a particular machine directory, exported environment variable, storage
-budget service, or numeric quota. Discover the actual workspace permissions
-and capacity when the task needs substantial resources.
+Diese Richtlinie regelt Build-, Analyse- und temporäre Daten, die zur Aufgabe
+gehören. Sie setzt weder ein bestimmtes Rechnerverzeichnis noch eine
+exportierte Umgebungsvariable, einen Speicherbudget-Dienst oder ein
+numerisches Kontingent voraus. Ermittle die tatsächlichen Berechtigungen und
+Kapazitäten des Arbeitsbereichs, wenn die Aufgabe erhebliche Ressourcen
+benötigt.
 
-Keep maintained source and documentation in the repository. Put transient
-downloads, bulky logs, compiler databases, scanner output, and runtime data in
-an appropriate task-owned location supported by the active environment. Record
-the location and retention needs without embedding machine-specific paths in
-the repository's general instructions.
+Halte gepflegten Quellcode und Dokumentation im Repository. Lege vorübergehende
+Downloads, umfangreiche Logs, Kompilierungsdatenbanken, Scanner-Ausgaben und
+Laufzeitdaten an einem geeigneten, der Aufgabe zugeordneten Ort ab, den die
+aktive Umgebung unterstützt. Halte Ort und Aufbewahrungsbedarf fest, ohne
+rechnerspezifische Pfade in die allgemeinen Anweisungen des Repositorys
+aufzunehmen.
 
-## Respect the actual build layout
+## Die tatsächliche Build-Struktur beachten
 
-The checked-in `.gitignore` lists common Autotools outputs, libraries, test
-executables, and the Windows build directory. `build.sh` rewrites
-`src/headers.mk` and creates/removes build intermediates. These are concrete
-in-checkout effects to account for when preparing a build.
-Sources: [ignored build products][ignore], [bootstrap operations][bootstrap].
+Die versionierte `.gitignore` führt übliche Autotools-Ausgaben, Bibliotheken,
+Testprogramme und das Windows-Build-Verzeichnis auf. `build.sh` schreibt
+`src/headers.mk` neu und erzeugt beziehungsweise entfernt Build-Zwischendateien.
+Diese konkreten Auswirkungen innerhalb des Checkouts sind bei der
+Build-Vorbereitung zu berücksichtigen.
+Quellen: [ignorierte Build-Ergebnisse][ignore],
+[Operationen der Build-Vorbereitung][bootstrap].
 
-An ignored path is not proof that its contents are disposable or task-owned.
-Inspect it before cleanup. Do not claim that an arbitrary relocated build
-directory is supported without checking the actual build instructions and
-paths. When isolation is useful, use a task-owned checkout or worktree that
-preserves the supported source layout.
+Ein ignorierter Pfad beweist nicht, dass sein Inhalt entbehrlich ist oder zur
+Aufgabe gehört. Prüfe ihn vor dem Aufräumen. Behaupte keine Unterstützung eines
+beliebig verlagerten Build-Verzeichnisses, ohne die tatsächlichen
+Build-Anweisungen und Pfade zu prüfen. Verwende bei sinnvoller Isolation einen
+aufgabeneigenen Checkout oder Worktree, der die unterstützte Quellstruktur
+erhält.
 
-Follow [build-and-test.md](build-and-test.md) for installation prefixes. Avoid
-system-wide installation for ordinary source investigation when a local build
-or writable task-specific prefix satisfies the task.
+Beachte für Installationspräfixe [build-and-test.md](build-and-test.md).
+Vermeide systemweite Installationen bei gewöhnlicher Quelluntersuchung, wenn
+ein lokaler Build oder ein beschreibbarer aufgabenspezifischer Präfix die
+Aufgabe erfüllt.
 
-## Capacity and concurrency
+## Kapazität und Parallelität
 
-Before a large build, download, or runtime assessment, inspect free disk space
-and available memory. Estimate output and retained evidence, choose a sensible
-job count, and avoid oversubscribing memory or disk. Do not use every CPU merely
-because it is available, or set a global `MAKEFLAGS` that changes unrelated work.
+Prüfe vor einem großen Build, Download oder einer Laufzeitbewertung freien
+Plattenplatz und verfügbaren Arbeitsspeicher. Schätze Ausgabeumfang und
+aufzubewahrende Belege ab, wähle eine vernünftige Anzahl paralleler Jobs und
+vermeide Überlastung von Speicher oder Datenträger. Nutze nicht jede CPU allein
+deshalb, weil sie verfügbar ist, und setze kein globales `MAKEFLAGS`, das
+andere Arbeiten verändert.
 
-Compiler parallelism, multiple builds, background processes, and assistant
-agents consume different resources. Account for their combined load. If work
-grows beyond the available capacity, reduce concurrency or stop it cleanly
-while preserving useful results.
+Compilerparallelität, mehrere Builds, Hintergrundprozesse und
+Assistentenagenten beanspruchen unterschiedliche Ressourcen. Berücksichtige
+ihre Gesamtlast. Überschreitet die Arbeit die verfügbare Kapazität, reduziere
+die Parallelität oder beende sie geordnet und erhalte dabei nützliche Ergebnisse.
 
-Run independent jobs concurrently only when their build files, generated
-configuration, caches that require exclusive use, temporary files, logs, and
-other mutable outputs do not conflict. Reconfiguring the same checkout under
-one build while another compiles it is not independent work.
+Führe unabhängige Jobs nur parallel aus, wenn ihre Build-Dateien, erzeugte
+Konfiguration, exklusiv benötigte Caches, temporäre Dateien, Logs und sonstige
+veränderliche Ausgaben nicht kollidieren. Denselben Checkout für einen Build
+neu zu konfigurieren, während ein anderer ihn kompiliert, ist keine
+unabhängige Arbeit.
 
-Do not delete another task's files, silently relocate data into a constrained
-filesystem, or install tools globally to avoid a resource limitation.
+Lösche keine Dateien einer anderen Aufgabe, verlagere Daten nicht
+stillschweigend in ein begrenztes Dateisystem und installiere keine Werkzeuge
+global, um eine Ressourcenbeschränkung zu umgehen.
 
-## Submodule boundaries
+## Submodulgrenzen
 
-The core repository declares `others/libinjection`, `others/mbedtls`,
-`test/test-cases/secrules-language-tests`, and `bindings/python` as submodules.
-Treat their working directories, commits, and generated data as separate
-ownership scopes. The mbedTLS prerequisite check refers to the nested
-`tf-psa-crypto/utilities/base64.c` path.
-Sources: [submodule declarations][submodules], [dependency checks][dependencies].
+Das Core-Repository deklariert `others/libinjection`, `others/mbedtls`,
+`test/test-cases/secrules-language-tests` und `bindings/python` als Submodule.
+Behandle ihre Arbeitsverzeichnisse, Commits und erzeugten Daten als getrennte
+Zuständigkeitsbereiche. Die mbedTLS-Voraussetzungsprüfung verweist auf den
+verschachtelten Pfad `tf-psa-crypto/utilities/base64.c`.
+Quellen: [Submoduldeklarationen][submodules],
+[Abhängigkeitsprüfungen][dependencies].
 
-Do not substitute the reference connector repository's Framework/MRTS layout
-or storage variables for these actual dependencies. Dependency initialization
-and updates follow the task's scope; a resource policy does not authorize a
-gitlink change or an unrequested dependency upgrade.
+Ersetze diese tatsächlichen Abhängigkeiten nicht durch die Framework-/MRTS-Struktur
+oder Speichervariablen des Connector-Referenzrepositorys. Initialisierung und
+Aktualisierung von Abhängigkeiten richten sich nach dem Aufgabenumfang;
+eine Ressourcenrichtlinie erlaubt weder eine Gitlink-Änderung noch eine nicht
+beauftragte Aktualisierung von Abhängigkeiten.
 
-## Retention and cleanup
+## Aufbewahren und aufräumen
 
-Track which temporary directories, processes, and evidence belong to this task.
-Retain enough evidence to explain the result, and remove only data that is no
-longer needed and whose ownership is clear. Follow
-[cleanup-and-restoration.md](cleanup-and-restoration.md) for worktrees and
-repository state. If a retained artifact is unavailable to the next session,
-say so instead of treating a local path as durable shared evidence.
+Halte fest, welche temporären Verzeichnisse, Prozesse und Belege zu dieser
+Aufgabe gehören. Bewahre ausreichend Belege auf, um das Ergebnis zu erklären,
+und entferne nur nicht mehr benötigte Daten mit klarer Zugehörigkeit.
+Für Worktrees und den Repository-Zustand gilt
+[cleanup-and-restoration.md](cleanup-and-restoration.md). Ist ein
+aufbewahrtes Artefakt in der nächsten Sitzung nicht verfügbar, benenne das,
+statt einen lokalen Pfad als dauerhaft gemeinsamen Beleg zu behandeln.
 
 [ignore]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitignore
 [bootstrap]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build.sh#L1-L33

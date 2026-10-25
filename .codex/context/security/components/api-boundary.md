@@ -1,24 +1,24 @@
-# C++/C API-boundary review
+# Prüfung der C++-/C-API-Grenze
 
-## Source entry points
+## Einstiegspunkte im Quellcode
 
-Read the public headers together with the wrapper and C++ method implementations. `Transaction` stores engine/ruleset pointers without deleting those two objects in its destructor; their lifetime must cover their use. Sources: [public transaction API](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h#L335-L419), [C declarations](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h#L677-L767), [constructor/destructor](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L113-L182).
+Lies die öffentlichen Header gemeinsam mit den Wrappern und C++-Methodenimplementierungen. `Transaction` speichert Engine- und Regelwerkzeiger, ohne diese beiden Objekte in seinem Destruktor zu löschen; ihre Lebensdauer muss ihre Nutzung abdecken. Quellen: [öffentliche Transaktions-API](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h#L335-L419), [C-Deklarationen](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h#L677-L767), [Konstruktor und Destruktor](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L113-L182).
 
-Header overloads without lengths use `strlen()`, while explicit-length overloads pass the supplied lengths to string operations. Callback text is backed by a local string during the call. Sources: [header overloads](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L618-L654), [callback](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L193-L212).
+Überladungen für Header ohne Längenangaben nutzen `strlen()`, während Überladungen mit expliziten Längen die gelieferten Längen an Zeichenfolgenoperationen übergeben. Der Callback-Text liegt während des Aufrufs in einer lokalen Zeichenfolge. Quellen: [Header-Überladungen](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L618-L654), [Callback](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L193-L212).
 
-## Review questions
+## Prüffragen
 
-- Which pointers are borrowed, transferred, newly allocated, or references into another object's storage?
-- Do lengths describe valid accessible buffers, and is null termination required by this particular overload?
-- Does a public-header change affect callers, class layout, ABI, cleanup ownership, or C/C++ behavior?
-- Does the caller distinguish loading counts, method success, parser errors, and intervention state?
-- Are callback properties, user-context type, lifetime, and any retained data compatible?
-- Which errors or exceptions cross the actual wrapper, and where does the caller recover?
+- Welche Zeiger sind ausgeliehen, übertragen, neu allokiert oder Verweise in den Speicher eines anderen Objekts?
+- Beschreiben Längen gültige zugängliche Puffer, und verlangt diese konkrete Überladung eine Nullterminierung?
+- Beeinflusst eine Änderung öffentlicher Header Aufrufer, Klassenlayout, ABI, Freigabeverantwortung oder C-/C++-Verhalten?
+- Unterscheidet der Aufrufer Ladeanzahlen, Methodenerfolg, Parserfehler und Interventionszustand?
+- Sind Callback-Eigenschaften, Typ des Nutzerkontexts, Lebensdauer und eventuell aufbewahrte Daten vereinbar?
+- Welche Fehler oder Ausnahmen überschreiten den tatsächlichen Wrapper, und wo stellt der Aufrufer einen brauchbaren Zustand wieder her?
 
-The C constructor wrappers use `new`; do not assume a universal exception-to-error-code translation. Interventions copy buffers and reset internal state; use the corresponding cleanup path. Sources: [engine wrapper](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L411-L482), [transaction wrapper](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1804-L1829), [intervention](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1350-L1389), [cleanup](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L2153-L2195).
+Die C-Konstruktor-Wrapper verwenden `new`; setze keine allgemeine Übersetzung von Ausnahmen in Fehlercodes voraus. Interventionen kopieren Puffer und setzen internen Zustand zurück; nutze den entsprechenden Freigabepfad. Quellen: [Engine-Wrapper](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/modsecurity.cc#L411-L482), [Transaktions-Wrapper](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1804-L1829), [Intervention](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1350-L1389), [Freigabe](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L2153-L2195).
 
-## Select relevant checks
+## Relevante Prüfungen auswählen
 
-[Memory lifecycle](../checks/memory-lifecycle.md), [API sequencing](../checks/api-sequencing.md), [normalization](../checks/http-normalization.md), [integration representation](../checks/integration-representation.md), [failure/recovery](../checks/runtime-failure-recovery.md), and [finding validation](../checks/finding-validation.md).
+[Speicherlebenszyklus](../checks/memory-lifecycle.md), [API-Aufrufreihenfolge](../checks/api-sequencing.md), [Normalisierung](../checks/http-normalization.md), [Datendarstellung an Integrationsgrenzen](../checks/integration-representation.md), [Fehler und Wiederherstellung](../checks/runtime-failure-recovery.md) und [Befundvalidierung](../checks/finding-validation.md).
 
-A caller-contract violation and a reachable library defect are different hypotheses. Establish which one the actual case supports.
+Eine Verletzung des Aufrufervertrags und ein erreichbarer Bibliotheksfehler sind unterschiedliche Hypothesen. Kläre, welche der tatsächliche Fall stützt.

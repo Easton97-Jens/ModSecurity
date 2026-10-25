@@ -1,83 +1,83 @@
-# Workflow for reproducible sessions
+# Ablauf für reproduzierbare Sitzungen
 
-This chapter defines the collaboration approach selected for this working
-repository. It is not a feature implemented by ModSecurity.
+Dieses Kapitel legt den für dieses Arbeitsrepository gewählten Zusammenarbeitsablauf fest.
+Es ist keine von ModSecurity implementierte Funktion.
 
-## 1. Establish the task and starting point
+## 1. Aufgabe und Ausgangspunkt klären
 
-Read the reusable [AGENTS.md](../../AGENTS.md) and this checkout's startup
-instructions in [repository-context.md](repository-context.md). Check the branch
-and status, and identify the task. Compare the checkout with
-[upstream-lock.json](upstream-lock.json). Older notes apply to their stated
-revisions. Check whether relevant files have changed since those notes were made.
+Lies die wiederverwendbare [AGENTS.md](../../AGENTS.md) und die Startanweisungen
+dieses Checkouts in [repository-context.md](repository-context.md). Prüfe Branch und
+Status und ermittle die Aufgabe. Vergleiche den Checkout mit
+[upstream-lock.json](upstream-lock.json). Ältere Notizen gelten für ihre angegebenen
+Revisionen. Prüfe, ob relevante Dateien seit diesen Notizen verändert wurden.
 
-Keep user decisions, code findings, and working hypotheses distinguishable.
-Ask about an unresolved decision with material consequences. Routine choices
-within the authorized task can be made, explained, and recorded.
+Halte Nutzerentscheidungen, Code-Erkenntnisse und Arbeitshypothesen unterscheidbar.
+Frage nach einer offenen Entscheidung mit wesentlichen Folgen. Routinemäßige Entscheidungen
+innerhalb des freigegebenen Auftrags können getroffen, erklärt und festgehalten werden.
 
-## 2. Derive explanations from code
+## 2. Erklärungen aus dem Code ableiten
 
-Find concrete symbols and paths, for example with `rg`. Read implementations,
-callers, error paths, and relevant tests as well as declarations. For optional
-features, also inspect build definitions and parser acceptance.
+Suche konkrete Symbole und Pfade, beispielsweise mit `rg`. Lies neben Deklarationen
+auch Implementierungen, Aufrufer, Fehlerpfade und relevante Tests. Prüfe bei optionalen
+Funktionen außerdem Build-Definitionen und die vom Parser akzeptierten Eingaben.
 
-A useful explanation answers these questions in order:
+Eine hilfreiche Erklärung beantwortet diese Fragen in Reihenfolge:
 
-1. What purpose does the function serve in this repository?
-2. What data does it receive, and who owns that data?
-3. What state or return values can it change?
-4. Who calls it, and in what order?
-5. What conditions, feature switches, and limits apply?
-6. Which test defines the expected behavior, and was that test executed?
+1. Welchen Zweck erfüllt die Funktion in diesem Repository?
+2. Welche Daten erhält sie und wem gehören diese Daten?
+3. Welchen Zustand oder welche Rückgabewerte kann sie ändern?
+4. Wer ruft sie auf und in welcher Reihenfolge?
+5. Welche Bedingungen, Funktionsschalter und Grenzen gelten?
+6. Welcher Test legt das erwartete Verhalten fest und wurde dieser Test ausgeführt?
 
-Use links containing full commit IDs. Moving branch links are useful for
-navigation but do not provide a stable evidence baseline. Label conclusions
-inferred from multiple functions and state the evidence behind them.
+Verwende Links mit vollständigen Commit-IDs. Veränderliche Branch-Links sind zur
+Navigation hilfreich, bilden aber keine stabile Nachweisgrundlage. Kennzeichne aus
+mehreren Funktionen abgeleitete Schlussfolgerungen und nenne ihre Nachweise.
 
-## 3. Make changes
+## 3. Änderungen vornehmen
 
-First define the observable behavior required. Limit edits to the affected
-files and inspect instructions applicable to their directories. Preserve
-unrelated changes and avoid an unrequested redesign.
+Definiere zuerst das erforderliche beobachtbare Verhalten. Begrenze Änderungen auf
+betroffene Dateien und prüfe Anweisungen für ihre Verzeichnisse. Erhalte sachfremde
+Änderungen und vermeide eine nicht angefragte Neugestaltung.
 
-For a defect, use an existing or focused new regression test that can actually
-detect it. Explanations and documentation corrections call for corresponding
-source and document checks. A test that merely repeats an implementation detail
-is not a substitute for a requirement.
+Nutze für einen Fehler einen vorhandenen oder gezielten neuen Regressionstest, der ihn
+tatsächlich erkennen kann. Erklärungen und Dokumentationskorrekturen benötigen entsprechende
+Quellen- und Dokumentprüfungen. Ein Test, der lediglich ein Implementierungsdetail
+wiederholt, ersetzt keine Anforderung.
 
-## 4. Record verification results
+## 4. Prüfergebnisse festhalten
 
-| Field | Information to record |
+| Feld | Festzuhaltende Information |
 | --- | --- |
-| Target | The behavior or document consistency being checked |
-| Revision | Commit, branch, and relevant uncommitted changes |
-| Environment | Relevant platform and available dependencies |
-| Command | The exact command executed, not an idealized later version |
-| Working directory | A repository-relative directory or clear local path |
-| Result | Exit code, material output, executed tests, and skipped tests |
-| Limit | What the run did not cover or what prevented completion |
+| Ziel | Geprüftes Verhalten oder geprüfte Dokumentationskonsistenz |
+| Revision | Commit, Branch und relevante noch nicht committete Änderungen |
+| Umgebung | Relevante Plattform und verfügbare Abhängigkeiten |
+| Befehl | Exakt ausgeführter Befehl, keine idealisierte spätere Fassung |
+| Arbeitsverzeichnis | Repository-relatives Verzeichnis oder eindeutiger lokaler Pfad |
+| Ergebnis | Exit-Code, wesentliche Ausgabe, ausgeführte und übersprungene Tests |
+| Grenze | Was der Lauf nicht abdeckte oder was seinen Abschluss verhinderte |
 
-The context checker is an added project helper, not an upstream test. A passing
-run does not establish correctness for every platform, configuration, or
-security property.
+Der Kontextprüfer ist ein ergänztes Projekthilfsprogramm und kein Upstream-Test.
+Ein erfolgreicher Lauf belegt keine Korrektheit für jede Plattform, Konfiguration
+oder Sicherheitseigenschaft.
 
-## 5. Prepare the next chat
+## 5. Den nächsten Chat vorbereiten
 
-Keep `current-state.md` concise and current. Record the last reliable state,
-outstanding questions, and the next concrete action. Store longer historical
-records under `.codex/audit/sessions/`.
+Halte `current-state.md` knapp und aktuell. Dokumentiere den letzten verlässlichen
+Stand, offene Fragen und die nächste konkrete Aktion. Speichere längere historische
+Aufzeichnungen unter `.codex/audit/sessions/`.
 
-Use `decisions.md` for durable decisions and their reasons. Use `backlog.md` for
-actual remaining work. Link to the relevant chapter instead of duplicating a
-long explanation across all three files.
+Nutze `decisions.md` für dauerhafte Entscheidungen und ihre Gründe. Nutze `backlog.md`
+für tatsächlich verbleibende Arbeit. Verlinke das relevante Kapitel, statt eine lange
+Erklärung über alle drei Dateien hinweg zu duplizieren.
 
-Use [handoff-template.md](handoff-template.md) for a handover. Save context in
-the actual shared working copy or authorized repository. Saying something in
-a chat does not update a project file.
+Nutze [handoff-template.md](handoff-template.md) für eine Übergabe. Speichere den Kontext
+in der tatsächlichen gemeinsamen Arbeitskopie oder im freigegebenen Repository.
+Eine Aussage im Chat aktualisiert keine Projektdatei.
 
-## Limits
+## Grenzen
 
-These files give new sessions a checkable starting point. They do not read or
-update themselves, and they can become stale. Every session therefore starts
-with an access check, revision check, and focused reading. This reduces repeated
-orientation work without presenting unavailable information as remembered fact.
+Diese Dateien geben neuen Sitzungen einen überprüfbaren Ausgangspunkt. Sie lesen oder
+aktualisieren sich nicht selbst und können veralten. Jede Sitzung beginnt daher mit
+einer Zugriffs- und Revisionsprüfung sowie gezieltem Lesen. Das reduziert wiederholte
+Orientierungsarbeit, ohne nicht verfügbare Informationen als erinnerte Fakten darzustellen.

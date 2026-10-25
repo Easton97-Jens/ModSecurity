@@ -1,21 +1,21 @@
-# Evidence and claim-integrity assessment
+# Bewertung der Integrität von Nachweisen und Aussagen
 
-## Trigger
+## Anlass
 
-Use when the user asks whether existing documentation, test reports, coverage, scanner results, or runtime claims are trustworthy. The task is to evaluate evidence, not to assume a new full scan is required.
+Nutze dieses Profil, wenn der Nutzer fragt, ob bestehende Dokumentation, Testberichte, Abdeckung, Scannerergebnisse oder Laufzeitaussagen vertrauenswürdig sind. Aufgabe ist die Bewertung von Nachweisen, nicht die Annahme, dass ein neuer vollständiger Scan erforderlich ist.
 
-## Read
+## Zu lesen
 
-[Evidence integrity check](../security/checks/evidence-integrity.md), [provenance](../provenance.md), [known source discrepancies](../fact-check.md), and the relevant [component guides](../security/components/README.md).
+[Prüfung der Nachweisintegrität](../security/checks/evidence-integrity.md), [Quellenherkunft](../provenance.md), [bekannte Quellwidersprüche](../fact-check.md) und die relevanten [Komponentenleitfäden](../security/components/README.md).
 
-## Reconcile
+## Abgleichen
 
-Bind claims to working/upstream revisions, submodule pins when relevant, actual binaries, effective rules/settings, feature macros, dependency/tool versions, case IDs, command/working directory, timestamps/run identity when available, and raw observations.
+Ordne Aussagen Arbeits- und Upstream-Revisionen, gegebenenfalls Submodulbindungen, tatsächlichen Binärdateien, wirksamen Regeln und Einstellungen, Funktionsmakros, Abhängigkeits- und Werkzeugversionen, Fallkennungen, Befehl und Arbeitsverzeichnis, Zeitstempeln beziehungsweise Laufkennungen, soweit verfügbar, sowie unverarbeiteten Beobachtungen zu.
 
-Look for stale or mixed results, missing case execution, source/build-to-runtime promotion, swallowed failures, unsupported interpretation of exit codes, and generated reports with no traceable input.
+Suche nach veralteten oder vermischten Ergebnissen, nicht ausgeführten Fällen, als Laufzeitnachweise ausgegebenen Quellen- oder Build-Nachweisen, verschluckten Fehlern, unbelegter Interpretation von Exit-Codes und generierten Berichten ohne nachvollziehbare Eingabe.
 
-An absent artifact does not prove a product defect. An existing artifact does not prove fresh execution. Distinguish unavailable evidence, contradicted claims, and evidence sufficient only for a narrower conclusion.
+Ein fehlendes Artefakt beweist keinen Produktfehler. Ein vorhandenes Artefakt beweist keine frische Ausführung. Unterscheide nicht verfügbare Nachweise, widerlegte Aussagen und Nachweise, die nur für eine engere Schlussfolgerung ausreichen.
 
-## Output
+## Ergebnis
 
-For each material claim, record the original wording, supporting evidence, verified boundary, discrepancy/gap, and corrected conclusion. Do not rewrite historical results as if they were new runs.
+Halte für jede wesentliche Aussage den ursprünglichen Wortlaut, stützende Nachweise, die verifizierte Grenze, Abweichung beziehungsweise Lücke und korrigierte Schlussfolgerung fest. Schreibe historische Ergebnisse nicht so um, als seien sie neue Durchläufe.

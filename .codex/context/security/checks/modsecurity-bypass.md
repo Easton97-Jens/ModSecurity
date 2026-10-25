@@ -1,13 +1,13 @@
-# Rule and control bypass questions
+# Fragen zur Umgehung von Regeln und Kontrollen
 
-Use when the task asks whether a specific intended control can be avoided. Define that control, effective rules, engine state, and trusted/caller-controlled inputs first.
+Verwenden, wenn die Aufgabe fragt, ob eine bestimmte beabsichtigte Kontrolle umgangen werden kann. Definiere zuerst diese Kontrolle, wirksame Regeln, Engine-Zustand und vertrauenswürdige beziehungsweise vom Aufrufer kontrollierte Eingaben.
 
-- Do variables and transformations represent the bytes relevant to the intended decision?
-- Do chain behavior, negation, exclusions, `ctl`, rule removal, or phase selection change the reachable control?
-- What happens for empty/split/truncated input, parser errors, body limits, and optional processors?
-- Does the expectation distinguish DetectionOnly behavior from disruptive action execution?
-- Can a successful method return be mistaken for a completed phase or an allow decision?
+- Stellen Variablen und Transformationen die Bytes dar, die für die beabsichtigte Entscheidung relevant sind?
+- Verändern Kettenverhalten, Negation, Ausschlüsse, `ctl`, Regelentfernung oder Phasenauswahl die erreichbare Kontrolle?
+- Was geschieht bei leerer, aufgeteilter oder gekürzter Eingabe, Parserfehlern, Körpergrenzen und optionalen Prozessoren?
+- Unterscheidet die Erwartung das Verhalten von DetectionOnly von der Ausführung unterbrechender Aktionen?
+- Kann eine erfolgreiche Methodenrückgabe mit einer abgeschlossenen Phase oder einer Zulassungsentscheidung verwechselt werden?
 
-Configured exclusions, detection-only operation, or caller misuse are not automatically library vulnerabilities. Establish reachability, intended policy, counterevidence, and a legitimate control before claiming a bypass.
+Konfigurierte Ausschlüsse, reiner Erkennungsbetrieb oder falsche Nutzung durch den Aufrufer sind nicht automatisch Bibliothekssicherheitslücken. Kläre Erreichbarkeit, beabsichtigte Richtlinie, Gegenbelege und einen zulässigen Kontrollfall, bevor du eine Umgehung behauptest.
 
-Keep rule evaluation, match, intervention request, caller action, and client outcome separate. Entry points: [engine](../components/engine.md), [rules/parser](../components/rules-parser.md), [body processors](../components/body-processors.md), and [finding validation](finding-validation.md).
+Halte Regelauswertung, Treffer, Interventionsanforderung, Aufruferhandlung und Client-Ergebnis getrennt. Einstiegspunkte: [Engine](../components/engine.md), [Regeln und Parser](../components/rules-parser.md), [Verarbeitung der Nachrichtenkörper](../components/body-processors.md) und [Befundvalidierung](finding-validation.md).

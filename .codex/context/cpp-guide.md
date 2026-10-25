@@ -1,156 +1,156 @@
-# Understanding C++ and C in the ModSecurity source code
+# C++ und C im ModSecurity-Quellcode verstehen
 
-## Basis and purpose
+## Grundlage und Zweck
 
-This guide explains the language features and API boundaries actually used in the repository, based on `owasp-modsecurity/ModSecurity` at commit **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`**, branch `v3/master`. It is a guide to reading and modifying the code, not a complete C++ course or evidence of a successful build. All linked implementations are pinned to the same source revision.
+Dieser Leitfaden erklärt die tatsächlich im Repository verwendeten Sprachmerkmale und API-Grenzen auf Grundlage von `owasp-modsecurity/ModSecurity` am Commit **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`**, Branch `v3/master`. Er dient dem Lesen und Ändern des Codes; er ist weder ein vollständiger C++-Kurs noch ein Nachweis für einen erfolgreichen Build. Alle verlinkten Implementierungen sind auf denselben Quellstand festgelegt.
 
-For the library's processing sequence, read [architecture.md](architecture.md) first. This guide then focuses on interpreting function signatures, data ownership, return values, and existing code patterns correctly.
+Lies für den Verarbeitungsablauf der Bibliothek zuerst [architecture.md](architecture.md). Dieser Leitfaden konzentriert sich anschließend darauf, Funktionssignaturen, Datenbesitz, Rückgabewerte und vorhandene Codemuster richtig zu verstehen.
 
-## 1. Which language is used where
+## 1. Welche Sprache wo verwendet wird
 
-| Area | Evidenced use | Implication for the work |
+| Bereich | Belegte Verwendung | Bedeutung für die Arbeit |
 | --- | --- | --- |
-| C++17 | `configure.ac` requires `AX_CXX_COMPILE_STDCXX(17, noext, mandatory)`; the Windows CMake build sets `CMAKE_CXX_STANDARD 17`. | C++17 is the evidenced baseline for language features and compiler errors. [Autotools][cxx17], [Windows][cxx17-win] |
-| C++ classes and `.cc` files | `ModSecurity`, `RulesSet`, and `Transaction` are declared in public headers and implemented in `src/`. | Headers show the calling contract; implementations show the actual behavior. [Engine header][engine-api], [ruleset header][rules-api], [transaction header][transaction-api] |
-| C interface | `msc_*` functions are defined with `extern "C"`; C callers receive opaque types. | C callers access the C++ objects through functions. [Opaque types][c-types], [C wrappers][c-construct] |
-| SecRules configuration | `modsecurity.conf-recommended` contains `SecRuleEngine`, `SecRule`, and action lists, among other things. | This is the engine's input language; a rule change is not automatically a C++ change. [Configuration][recommended] |
-| Scanner and parser | `src/parser/Makefile.am` lists `seclang-parser.yy` and `seclang-scanner.ll` as sources and generates the corresponding files. | A language change starts with the grammar or scanner and the resulting objects. [Parser build][parser-build], [driver][driver-rules] |
+| C++17 | `configure.ac` verlangt `AX_CXX_COMPILE_STDCXX(17, noext, mandatory)`; der Windows-CMake-Build setzt `CMAKE_CXX_STANDARD 17`. | C++17 ist die belegte Grundlage für Sprachmerkmale und Compilerfehler. [Autotools][cxx17], [Windows][cxx17-win] |
+| C++-Klassen und `.cc`-Dateien | `ModSecurity`, `RulesSet` und `Transaction` werden in öffentlichen Headern deklariert und in `src/` implementiert. | Header zeigen den Aufrufvertrag; Implementierungen zeigen das tatsächliche Verhalten. [Engine-Header][engine-api], [Ruleset-Header][rules-api], [Transaktions-Header][transaction-api] |
+| C-Schnittstelle | `msc_*`-Funktionen werden mit `extern "C"` definiert; C-Aufrufer erhalten opake Typen. | C-Aufrufer greifen über Funktionen auf die C++-Objekte zu. [Opake Typen][c-types], [C-Wrapper][c-construct] |
+| SecRules-Konfiguration | `modsecurity.conf-recommended` enthält unter anderem `SecRuleEngine`, `SecRule` und Aktionslisten. | Dies ist die Eingabesprache der Engine; eine Regeländerung ist nicht automatisch eine C++-Änderung. [Konfiguration][recommended] |
+| Scanner und Parser | `src/parser/Makefile.am` führt `seclang-parser.yy` und `seclang-scanner.ll` als Quellen auf und erzeugt die entsprechenden Dateien. | Eine Sprachänderung beginnt bei der Grammatik oder dem Scanner und den daraus entstehenden Objekten. [Parser-Build][parser-build], [Driver][driver-rules] |
 
-The C++ API uses the namespace **`modsecurity`**, as in `modsecurity::RulesSet`. The `::` qualifies the type with its namespace. One README section contains older identifiers such as `ModSecurity::Rules`; the current headers and runnable example sources use `modsecurity::RulesSet`. Do not copy those README examples as current signatures without checking them. Sources: [current declarations][rules-api], [current example][example-setup], [inconsistent README example][readme-example].
+Die C++-API verwendet den Namensraum **`modsecurity`**, etwa in `modsecurity::RulesSet`. `::` qualifiziert den Typ mit seinem Namensraum. Ein README-Abschnitt enthält ältere Bezeichner wie `ModSecurity::Rules`; die aktuellen Header und ausführbaren Beispielquellen verwenden `modsecurity::RulesSet`. Übernimm diese README-Beispiele nicht ungeprüft als aktuelle Signaturen. Quellen: [aktuelle Deklarationen][rules-api], [aktuelles Beispiel][example-setup], [abweichendes README-Beispiel][readme-example].
 
-## 2. Headers, implementations, and the public interface
+## 2. Header, Implementierungen und öffentliche Schnittstelle
 
-A header declaration describes the name, parameter types, and return type. The corresponding method body describes what actually happens during a call. For `RulesSet::loadFromUri(const char *uri)`, the declaration is in `headers/modsecurity/rules_set.h`; the body in `src/rules_set.cc` uses `Parser::Driver`, propagates parse errors, and merges the loaded data. A comment can provide a starting point but does not replace this comparison. Sources: [declaration][rules-api], [loading implementation][load].
+Eine Header-Deklaration beschreibt Namen, Parametertypen und Rückgabetyp. Der zugehörige Methodenkörper beschreibt, was bei einem Aufruf tatsächlich geschieht. Bei `RulesSet::loadFromUri(const char *uri)` steht die Deklaration in `headers/modsecurity/rules_set.h`; der Funktionskörper in `src/rules_set.cc` verwendet `Parser::Driver`, gibt Parsefehler weiter und vereinigt die geladenen Daten. Ein Kommentar kann einen Einstieg liefern, ersetzt diesen Vergleich aber nicht. Quellen: [Deklaration][rules-api], [Ladeimplementierung][load].
 
-Many headers under `headers/modsecurity/` are installed according to `src/Makefile.am`. Changes there can therefore affect library consumers. The ABI is the binary interface used by already compiled consumers; in some places, the code explicitly retains old signatures for ABI reasons, as in `AnchoredSetVariable::resolveRegularExpression()`. **Working rule for new changes:** do not treat signatures, class layout, and ownership in these headers as purely local implementation details. Sources: [installed headers][installed-headers], [ABI comment][abi].
+Viele Header unter `headers/modsecurity/` werden laut `src/Makefile.am` installiert. Änderungen dort können daher Nutzer der Bibliothek betreffen. Die ABI ist die binäre Schnittstelle, die bereits kompilierte Nutzer verwenden; an einigen Stellen bewahrt der Code aus ABI-Gründen ausdrücklich alte Signaturen, etwa bei `AnchoredSetVariable::resolveRegularExpression()`. **Arbeitsregel für neue Änderungen:** Behandle Signaturen, Klassenlayout und Besitzverhältnisse in diesen Headern nicht als rein lokale Implementierungsdetails. Quellen: [installierte Header][installed-headers], [ABI-Kommentar][abi].
 
-## 3. Classes, constructors, and lifetime
+## 3. Klassen, Konstruktoren und Lebensdauer
 
-`ModSecurity` and `Transaction` have constructors and destructors. A constructor establishes the initial state; a destructor releases managed resources. Both classes explicitly delete copy operations with `= delete`. For example, this prevents a normal copy from duplicating a transaction with the same resource pointers. Sources: [ModSecurity][engine-api], [Transaction][transaction-api].
+`ModSecurity` und `Transaction` besitzen Konstruktoren und Destruktoren. Ein Konstruktor stellt den Anfangszustand her; ein Destruktor gibt verwaltete Ressourcen frei. Beide Klassen löschen Kopieroperationen ausdrücklich mit `= delete`. Dadurch wird beispielsweise verhindert, dass eine normale Kopie eine Transaktion mit denselben Ressourcenzeigern dupliziert. Quellen: [ModSecurity][engine-api], [Transaction][transaction-api].
 
-An existing example of automatic object lifetime is `test/common/modsecurity_test_context.h`: the context contains `ModSecurity` and `RulesSet` as direct members; `create_transaction()` creates a transaction with pointers to those members. The method returns a newly constructed object directly. Read this code in conjunction with the required C++17 version; a deleted copy constructor is not a reason to add a copy operation to resolve an error without first investigating its cause. Sources: [test context][test-context], [C++17 requirement][cxx17].
+Ein vorhandenes Beispiel für automatische Objektlebensdauer ist `test/common/modsecurity_test_context.h`: Der Kontext enthält `ModSecurity` und `RulesSet` als direkte Member; `create_transaction()` erzeugt eine Transaktion mit Zeigern auf diese Member. Die Methode gibt ein neu konstruiertes Objekt direkt zurück. Lies diesen Code im Zusammenhang mit der verlangten C++17-Version; ein gelöschter Kopierkonstruktor ist kein Grund, zur Fehlerbehebung eine Kopieroperation hinzuzufügen, ohne zuerst die Ursache zu untersuchen. Quellen: [Testkontext][test-context], [C++17-Anforderung][cxx17].
 
-### Who owns each resource?
+### Wem gehört welche Ressource?
 
-The following table distinguishes actual ownership management from references alone. The lifetime requirements for borrowed pointers are inferred from constructors, destructors, and callers.
+Die folgende Tabelle unterscheidet tatsächliche Besitzverwaltung von bloßen Verweisen. Die Anforderungen an die Lebensdauer geliehener Zeiger werden aus Konstruktoren, Destruktoren und Aufrufern abgeleitet.
 
-| Resource | Creation or handoff | Release or lifetime |
+| Ressource | Erzeugung oder Übergabe | Freigabe oder Lebensdauer |
 | --- | --- | --- |
-| Engine collections | `ModSecurity` creates collection backends with `new`. | `ModSecurity::~ModSecurity()` deletes them. [Source][engine-life] |
-| `Transaction::m_ms`, `m_rules` | The caller supplies the engine and ruleset; the constructor stores the pointers. | The transaction does not delete them. Both must remain valid while they are used. [Source][transaction-life] |
-| Transaction JSON/XML processors | The constructor creates them depending on build macros. | The destructor deletes them under the same macros. [Source][transaction-life] |
-| Transaction collection `TX` | `Collections` creates `InMemoryPerProcess("TX")`. | `Collections::~Collections()` deletes it; the other collection pointers are supplied externally. [Source][collections] |
-| Rules in `Rules` | `std::vector<std::shared_ptr<Rule>>`. | The smart pointers manage the rule objects they hold. [Source][rules-storage] |
-| New parser rule object | `Driver::addSecRule(std::unique_ptr<RuleWithActions>)`. | Ownership moves into `std::shared_ptr` for phase storage or a chain child. [Driver][driver-rules], [chain fields][chain-fields] |
-| Operator in a `RuleWithOperator` | The constructor takes an `Operator *`. | `RuleWithOperator::~RuleWithOperator()` deletes it and the variable objects it has taken over. [Source][operator-life] |
-| Transformation and action objects | `RuleWithActions` holds several pointers and pointer containers. | The destructor deletes the objects managed there. [Source][actions-life] |
+| Engine-Collections | `ModSecurity` erzeugt Collection-Backends mit `new`. | `ModSecurity::~ModSecurity()` löscht sie. [Quelle][engine-life] |
+| `Transaction::m_ms`, `m_rules` | Der Aufrufer liefert Engine und Ruleset; der Konstruktor speichert die Zeiger. | Die Transaktion löscht sie nicht. Beide müssen während ihrer Verwendung gültig bleiben. [Quelle][transaction-life] |
+| JSON-/XML-Prozessoren der Transaktion | Der Konstruktor erzeugt sie abhängig von Build-Makros. | Der Destruktor löscht sie unter denselben Makros. [Quelle][transaction-life] |
+| Transaktions-Collection `TX` | `Collections` erzeugt `InMemoryPerProcess("TX")`. | `Collections::~Collections()` löscht sie; die übrigen Collection-Zeiger werden von außen übergeben. [Quelle][collections] |
+| Regeln in `Rules` | `std::vector<std::shared_ptr<Rule>>`. | Die Smart Pointer verwalten die von ihnen gehaltenen Regelobjekte. [Quelle][rules-storage] |
+| Neues Regelobjekt des Parsers | `Driver::addSecRule(std::unique_ptr<RuleWithActions>)`. | Der Besitz geht für die Speicherung in einer Phase oder als Kettenkind in `std::shared_ptr` über. [Driver][driver-rules], [Kettenfelder][chain-fields] |
+| Operator in einem `RuleWithOperator` | Der Konstruktor übernimmt einen `Operator *`. | `RuleWithOperator::~RuleWithOperator()` löscht ihn und die übernommenen Variablenobjekte. [Quelle][operator-life] |
+| Transformations- und Aktionsobjekte | `RuleWithActions` hält mehrere Zeiger und Zeigercontainer. | Der Destruktor löscht die dort verwalteten Objekte. [Quelle][actions-life] |
 
-`std::unique_ptr` expresses exclusive ownership; `std::shared_ptr` allows shared ownership. A raw pointer alone does not say who must release the object. The repository uses all three forms. Mechanically converting every raw pointer would therefore miss the actual ownership boundaries. First read construction, storage, handoff, and release together. The table provides evidenced examples; this recommendation is a working practice derived from them.
+`std::unique_ptr` drückt exklusiven Besitz aus; `std::shared_ptr` erlaubt gemeinsamen Besitz. Ein roher Zeiger allein sagt nicht, wer das Objekt freigeben muss. Das Repository verwendet alle drei Formen. Eine mechanische Umstellung sämtlicher roher Zeiger würde daher die tatsächlichen Besitzgrenzen verfehlen. Lies zuerst Erzeugung, Speicherung, Übergabe und Freigabe im Zusammenhang. Die Tabelle liefert belegte Beispiele; diese Empfehlung ist eine daraus abgeleitete Arbeitsweise.
 
-### `const` does not mean "never needs to be freed"
+### `const` bedeutet nicht „muss nie freigegeben werden“
 
-`AnchoredSetVariable::resolve()` allocates copies with `new VariableValue(...)` and places pointers to them in a `std::vector<const VariableValue *>`. Rule processing explicitly deletes these elements after evaluation. Here, `const` restricts modification of the object through that pointer; it does not describe resource ownership. `resolveFirst()` has a different contract and returns a `std::unique_ptr<std::string>`. Sources: [allocation in resolve()][resolve], [use and delete][evaluate], [resolveFirst()][resolve-first].
+`AnchoredSetVariable::resolve()` allokiert Kopien mit `new VariableValue(...)` und legt Zeiger darauf in einem `std::vector<const VariableValue *>` ab. Die Regelverarbeitung löscht diese Elemente nach der Auswertung ausdrücklich. Hier beschränkt `const` die Änderung des Objekts über diesen Zeiger; es beschreibt nicht den Ressourcenbesitz. `resolveFirst()` hat einen anderen Vertrag und liefert einen `std::unique_ptr<std::string>`. Quellen: [Allokation in resolve()][resolve], [Verwendung und Löschen][evaluate], [resolveFirst()][resolve-first].
 
-`const std::string&` is a reference to an existing string. For example, `VariableValue::getValue()` and `getKey()` return references to members. Such a reference cannot be used after the `VariableValue` is deleted. Keep this lifetime in mind when changing the evaluation loop. Sources: [getters and members][variable-value], [deletion sites][evaluate].
+`const std::string&` ist eine Referenz auf eine vorhandene Zeichenkette. Beispielsweise liefern `VariableValue::getValue()` und `getKey()` Referenzen auf Member zurück. Eine solche Referenz darf nach dem Löschen des `VariableValue` nicht mehr verwendet werden. Beachte diese Lebensdauer bei Änderungen an der Auswertungsschleife. Quellen: [Getter und Member][variable-value], [Löschstellen][evaluate].
 
-## 4. Strings, bytes, and lengths
+## 4. Zeichenketten, Bytes und Längen
 
-The API distinguishes several forms of text input. `processURI()` accepts null-terminated C strings. The header overload without lengths computes sizes using `strlen()`. The overload with `key_n` and `value_n` instead passes exactly those lengths to `std::string::assign()`. C callers see the same distinction between `msc_add_request_header()` and `msc_add_n_request_header()`, with corresponding functions for response headers. Sources: [URI processing][uri], [header overloads][header-lengths], [C declarations][c-trans-api].
+Die API unterscheidet mehrere Formen von Texteingaben. `processURI()` nimmt nullterminierte C-Zeichenketten entgegen. Die Header-Überladung ohne Längen berechnet die Größen mit `strlen()`. Die Überladung mit `key_n` und `value_n` übergibt dagegen genau diese Längen an `std::string::assign()`. Für C-Aufrufer besteht dieselbe Unterscheidung zwischen `msc_add_request_header()` und `msc_add_n_request_header()` sowie den entsprechenden Funktionen für Antwortheader. Quellen: [URI-Verarbeitung][uri], [Header-Überladungen][header-lengths], [C-Deklarationen][c-trans-api].
 
-| Input form | Behavior in the code | Consequence for a caller |
+| Eingabeform | Verhalten im Code | Konsequenz für einen Aufrufer |
 | --- | --- | --- |
-| `const char *` for URI, method, and HTTP version | Used as a C string. | Ensure valid null termination and lifetime for the call. [Source][uri] |
-| Header pointer without a length | Uses `strlen()`. | Do not use it for an arbitrary network slice that is not null-terminated. [Source][header-lengths] |
-| Header pointer with `size_t` lengths | Creates string values with explicit lengths. | Supply the actual valid buffer bounds. [Source][header-lengths] |
-| Body pointer with a length | `appendRequestBody()` writes `len` bytes, or the remaining capacity under the limit, into the stream. | The supplied byte count governs the input; check the return value and the intervention separately. [Source][request-append] |
+| `const char *` für URI, Methode und HTTP-Version | Wird als C-Zeichenkette verwendet. | Gültige Nullterminierung und Lebensdauer für den Aufruf sicherstellen. [Quelle][uri] |
+| Header-Zeiger ohne Länge | Verwendet `strlen()`. | Nicht für einen beliebigen, nicht nullterminierten Ausschnitt aus Netzwerkdaten verwenden. [Quelle][header-lengths] |
+| Header-Zeiger mit `size_t`-Längen | Erzeugt Zeichenkettenwerte mit expliziten Längen. | Die tatsächlich gültigen Puffergrenzen übergeben. [Quelle][header-lengths] |
+| Body-Zeiger mit Länge | `appendRequestBody()` schreibt `len` Bytes oder die verbleibende Kapazität innerhalb der Begrenzung in den Stream. | Die übergebene Byteanzahl bestimmt die Eingabe; Rückgabewert und Intervention getrennt prüfen. [Quelle][request-append] |
 
-`reinterpret_cast<const char *>(buf)` in the append path changes the pointer's type for the stream call; it does not perform URL, Unicode, or character-set decoding. URI decoding occurs explicitly through `utils::uri_decode()` in `processURI()`. Explain changes to input interpretation in terms of the relevant processing, rather than a cast alone. Sources: [append path][request-append], [URI decoding][uri].
+`reinterpret_cast<const char *>(buf)` im Append-Pfad ändert den Zeigertyp für den Stream-Aufruf; es führt keine URL-, Unicode- oder Zeichensatzdekodierung durch. Die URI-Dekodierung erfolgt ausdrücklich durch `utils::uri_decode()` in `processURI()`. Erkläre Änderungen der Eingabeinterpretation anhand der jeweiligen Verarbeitung und nicht allein anhand eines Casts. Quellen: [Append-Pfad][request-append], [URI-Dekodierung][uri].
 
-`processURI()` keeps both raw and derived URI data and computes offsets. `VariableValue` can contain origin details that later contribute to match references. A seemingly simple switch from a raw string to a decoded one can therefore affect comparison values, variable names, and diagnostic positions at the same time. This is a question to investigate based on the data flow, not a claim about a particular defect. Sources: [URI][uri], [VariableValue][variable-value], [match processing][evaluate].
+`processURI()` hält sowohl rohe als auch abgeleitete URI-Daten vor und berechnet Offsets. `VariableValue` kann Herkunftsangaben enthalten, die später in Trefferreferenzen eingehen. Ein scheinbar einfacher Wechsel von einer rohen zu einer dekodierten Zeichenkette kann daher gleichzeitig Vergleichswerte, Variablennamen und Diagnosepositionen beeinflussen. Dies ist eine anhand des Datenflusses zu untersuchende Frage, keine Behauptung über einen konkreten Fehler. Quellen: [URI][uri], [VariableValue][variable-value], [Trefferverarbeitung][evaluate].
 
-## 5. Inheritance and virtual calls
+## 5. Vererbung und virtuelle Aufrufe
 
-`Rule` defines virtual `evaluate()` methods and a virtual destructor. `RuleWithActions` extends this type; `RuleWithOperator` adds the operator and target variables. This allows `RulesSet::evaluate()` to invoke the concrete evaluation through a general rule pointer. The code also uses `dynamic_cast`, for example to check whether a rule has action metadata. Sources: [Rule base class][rule-base], [RuleWithActions][chain-fields], [concrete operator][operator-life], [phase loop][rules-evaluate].
+`Rule` definiert virtuelle `evaluate()`-Methoden und einen virtuellen Destruktor. `RuleWithActions` erweitert diesen Typ; `RuleWithOperator` ergänzt Operator und Zielvariablen. So kann `RulesSet::evaluate()` die konkrete Auswertung über einen allgemeinen Regelzeiger aufrufen. Der Code verwendet außerdem `dynamic_cast`, beispielsweise um zu prüfen, ob eine Regel Aktionsmetadaten besitzt. Quellen: [Basisklasse Rule][rule-base], [RuleWithActions][chain-fields], [konkreter Operator][operator-life], [Phasenschleife][rules-evaluate].
 
-A new rule type therefore involves several separate questions: How does the parser create the object? Which phase receives it? Which virtual evaluation runs? Who owns the objects involved? A new name in the grammar alone does not answer these questions. The existing call sites are the starting point for such a change. Sources: [driver][driver-rules], [phase loop][rules-evaluate], [operator evaluation][evaluate].
+Ein neuer Regeltyp wirft deshalb mehrere getrennte Fragen auf: Wie erzeugt der Parser das Objekt? Welcher Phase wird es zugeordnet? Welche virtuelle Auswertung läuft? Wem gehören die beteiligten Objekte? Ein neuer Name in der Grammatik allein beantwortet diese Fragen nicht. Die vorhandenen Aufrufstellen sind der Einstiegspunkt für eine solche Änderung. Quellen: [Driver][driver-rules], [Phasenschleife][rules-evaluate], [Operatorauswertung][evaluate].
 
-## 6. Do not assign one meaning to all return values
+## 6. Rückgabewerten nicht pauschal dieselbe Bedeutung zuweisen
 
-The repository has no single universal contract for `int` return values. Read the meaning for each function individually. In particular, a successful API call does not establish that the request is allowed or that a particular rule phase actually ran.
+Das Repository hat keinen einheitlichen universellen Vertrag für `int`-Rückgabewerte. Lies die Bedeutung für jede Funktion einzeln nach. Insbesondere belegt ein erfolgreicher API-Aufruf weder, dass die Anfrage erlaubt ist, noch, dass eine bestimmte Regelphase tatsächlich ausgeführt wurde.
 
-| Function/path | Evidenced result | Common misreading |
+| Funktion/Pfad | Belegtes Ergebnis | Häufige Fehlinterpretation |
 | --- | --- | --- |
-| `RulesSet::loadFromUri()`, `load()` | `-1` for the errors handled there; otherwise the number of rules taken in. [Source][load] | Treating `0` as an error in every case or confusing the count with a decision to allow a request. |
-| `processRequestHeaders()` | Returns `true`/`1` even when the engine is disabled. [Source][request-phase] | Inferring from `1` that rules were executed. |
-| `appendRequestBody()` | The partial branch returns `false`; a reject branch may set an intervention and still return `true`. [Source][request-append] | Checking only the return value and overlooking the intervention. |
-| `Transaction::intervention()` | Returns the disruptive state; when it returns `false`, the function body does not write to the output structure. [Source][intervention] | Interpreting the return value and structure independently of each other. |
-| `msc_rules_add_file()` | Passes through the loading result; on a negative result, it provides an error message allocated with `strdup`. [Source][c-rules] | Treating an error buffer as a static string. |
+| `RulesSet::loadFromUri()`, `load()` | `-1` bei den dort behandelten Fehlern; andernfalls die Anzahl der übernommenen Regeln. [Quelle][load] | `0` in jedem Fall als Fehler behandeln oder die Anzahl mit einer Entscheidung verwechseln, eine Anfrage zu erlauben. |
+| `processRequestHeaders()` | Gibt auch bei deaktivierter Engine `true`/`1` zurück. [Quelle][request-phase] | Aus `1` schließen, dass Regeln ausgeführt wurden. |
+| `appendRequestBody()` | Der Zweig für Teilverarbeitung gibt `false` zurück; ein Ablehnungszweig kann eine Intervention setzen und trotzdem `true` zurückgeben. [Quelle][request-append] | Nur den Rückgabewert prüfen und die Intervention übersehen. |
+| `Transaction::intervention()` | Liefert den eingreifenden Zustand; bei `false` schreibt der Funktionskörper nicht in die Ausgabestruktur. [Quelle][intervention] | Rückgabewert und Struktur unabhängig voneinander interpretieren. |
+| `msc_rules_add_file()` | Reicht das Ladeergebnis durch; bei einem negativen Ergebnis liefert die Funktion eine mit `strdup` allokierte Fehlermeldung. [Quelle][c-rules] | Einen Fehlerpuffer wie eine statische Zeichenkette behandeln. |
 
-Read constructor wrappers carefully as well: in the inspected code, `msc_init()`, `msc_create_rules_set()`, and `msc_new_transaction()` simply use `new`. The transaction comment describes a possible `NULL` return value; however, the wrapper contains neither `new (std::nothrow)` nor a `catch` block. Do not document a general guarantee that all C++ errors are automatically translated into a C error code here. Sources: [engine creation][c-engine], [ruleset creation][c-rules], [transaction comment and wrapper][c-construct].
+Lies auch Konstruktor-Wrapper sorgfältig: Im untersuchten Code verwenden `msc_init()`, `msc_create_rules_set()` und `msc_new_transaction()` schlicht `new`. Der Transaktionskommentar beschreibt einen möglichen Rückgabewert `NULL`; der Wrapper enthält jedoch weder `new (std::nothrow)` noch einen `catch`-Block. Dokumentiere hier keine allgemeine Garantie, dass alle C++-Fehler automatisch in einen C-Fehlercode übersetzt werden. Quellen: [Engine-Erzeugung][c-engine], [Ruleset-Erzeugung][c-rules], [Transaktionskommentar und Wrapper][c-construct].
 
-## 7. Mapping the C++ API to the C API
+## 7. Zuordnung der C++-API zur C-API
 
-The C wrappers mostly delegate to the C++ objects. For C, the object structures are hidden; the `msc_*` functions provide access through pointers. `extern "C"` specifies C language linkage for these functions; it does not mean their implementation is written in C. Sources: [C types][c-types], [wrappers][c-engine], [transaction wrappers][c-construct].
+Die C-Wrapper delegieren überwiegend an die C++-Objekte. Für C bleiben die Objektstrukturen verborgen; die `msc_*`-Funktionen ermöglichen den Zugriff über Zeiger. `extern "C"` legt für diese Funktionen die C-Sprachbindung fest; es bedeutet nicht, dass ihre Implementierung in C geschrieben ist. Quellen: [C-Typen][c-types], [Wrapper][c-engine], [Transaktions-Wrapper][c-construct].
 
-| Task | C++ entry point | C entry point |
+| Aufgabe | C++-Einstiegspunkt | C-Einstiegspunkt |
 | --- | --- | --- |
-| Create and destroy the engine | `ModSecurity`, destructor | `msc_init()`, `msc_cleanup()` |
-| Identify the connector | `setConnectorInformation()` | `msc_set_connector_info()` |
-| Create and destroy a ruleset | `RulesSet`, destructor | `msc_create_rules_set()`, `msc_rules_cleanup()` |
-| Load a rule file | `loadFromUri()` | `msc_rules_add_file()` |
-| Load rules from text | `load()` | `msc_rules_add()` |
-| Create a transaction | `Transaction(ms, rules, logCbData)` | `msc_new_transaction()` |
-| Supply a custom transaction ID | `Transaction(ms, rules, id, logCbData)` | `msc_new_transaction_with_id()` |
-| Supply connection and URI data | `processConnection()`, `processURI()` | `msc_process_connection()`, `msc_process_uri()` |
-| Append body data | `appendRequestBody()`, `appendResponseBody()` | `msc_append_request_body()`, `msc_append_response_body()` |
-| Execute rule phases | `processRequestHeaders()`, `processRequestBody()`, `processResponseHeaders()`, `processResponseBody()` | Corresponding `msc_process_*` functions using C naming |
-| Retrieve an intervention | `intervention()` | `msc_intervention()` |
-| Complete logging | `processLogging()` | `msc_process_logging()` |
-| Destroy a transaction | Destructor | `msc_transaction_cleanup()` |
+| Engine erzeugen und zerstören | `ModSecurity`, Destruktor | `msc_init()`, `msc_cleanup()` |
+| Connector kennzeichnen | `setConnectorInformation()` | `msc_set_connector_info()` |
+| Ruleset erzeugen und zerstören | `RulesSet`, Destruktor | `msc_create_rules_set()`, `msc_rules_cleanup()` |
+| Regeldatei laden | `loadFromUri()` | `msc_rules_add_file()` |
+| Regeln aus Text laden | `load()` | `msc_rules_add()` |
+| Transaktion erzeugen | `Transaction(ms, rules, logCbData)` | `msc_new_transaction()` |
+| Eigene Transaktions-ID übergeben | `Transaction(ms, rules, id, logCbData)` | `msc_new_transaction_with_id()` |
+| Verbindungs- und URI-Daten übergeben | `processConnection()`, `processURI()` | `msc_process_connection()`, `msc_process_uri()` |
+| Body-Daten anhängen | `appendRequestBody()`, `appendResponseBody()` | `msc_append_request_body()`, `msc_append_response_body()` |
+| Regelphasen ausführen | `processRequestHeaders()`, `processRequestBody()`, `processResponseHeaders()`, `processResponseBody()` | Entsprechende `msc_process_*`-Funktionen mit C-Namensgebung |
+| Intervention abfragen | `intervention()` | `msc_intervention()` |
+| Logging abschließen | `processLogging()` | `msc_process_logging()` |
+| Transaktion zerstören | Destruktor | `msc_transaction_cleanup()` |
 
-Sources for the mapping: [engine declarations][engine-api], [ruleset declarations][rules-api], [C++ transaction][transaction-api], [C transaction][c-trans-api]. The table selects central calls; the headers contain additional functions. It does not claim complete functional equivalence between the C and C++ interfaces.
+Quellen für die Zuordnung: [Engine-Deklarationen][engine-api], [Ruleset-Deklarationen][rules-api], [C++-Transaktion][transaction-api], [C-Transaktion][c-trans-api]. Die Tabelle wählt zentrale Aufrufe aus; die Header enthalten weitere Funktionen. Sie behauptet keine vollständige funktionale Gleichwertigkeit der C- und C++-Schnittstellen.
 
-### Use the corresponding cleanup functions
+### Die jeweils zugehörigen Freigabefunktionen verwenden
 
-`msc_rules_error_cleanup()` uses `free()` for the error text allocated by the rule wrappers. `msc_intervention_cleanup()` frees an intervention's buffers and resets its fields. The engine, ruleset, and transaction instead use their respective object cleanup functions, which execute `delete` internally. Do not substitute `free()` for `delete` or vice versa based on the visible pointer type. Sources: [rule errors and cleanup][c-rules], [intervention cleanup][c-cleanup], [engine cleanup][c-engine].
+`msc_rules_error_cleanup()` verwendet `free()` für den von den Regel-Wrappern allokierten Fehlertext. `msc_intervention_cleanup()` gibt die Puffer einer Intervention frei und setzt ihre Felder zurück. Engine, Ruleset und Transaktion verwenden dagegen ihre jeweiligen Objekt-Freigabefunktionen, die intern `delete` ausführen. Ersetze `free()` nicht allein aufgrund des sichtbaren Zeigertyps durch `delete` oder umgekehrt. Quellen: [Regelfehler und Freigabe][c-rules], [Interventionsfreigabe][c-cleanup], [Engine-Freigabe][c-engine].
 
-Another counterexample to the assumption that `const char *` always means a borrowed buffer: in the inspected code, `Transaction::getResponseBody()` returns a buffer allocated with `strdup()`, whereas `msc_who_am_i()` returns a `c_str()` pointer into the engine's string. These two return values have different storage origins. The response getter is also described in its comment as an unused skeleton; it must not be used as evidence of comprehensive response rewriting or arbitrary binary-data processing. Sources: [response getter][response-getter], [who_am_i][c-engine].
+Ein weiteres Gegenbeispiel zur Annahme, `const char *` bedeute immer einen geliehenen Puffer: Im untersuchten Code gibt `Transaction::getResponseBody()` einen mit `strdup()` allokierten Puffer zurück, während `msc_who_am_i()` einen `c_str()`-Zeiger in die Zeichenkette der Engine liefert. Diese beiden Rückgabewerte haben unterschiedliche Speicherursprünge. Der Antwort-Getter wird in seinem Kommentar außerdem als ungenutztes Grundgerüst beschrieben; er darf nicht als Beleg für umfassendes Umschreiben von Antworten oder die Verarbeitung beliebiger Binärdaten dienen. Quellen: [Antwort-Getter][response-getter], [who_am_i][c-engine].
 
-## 8. Callbacks: type and lifetime belong together
+## 8. Callbacks: Typ und Lebensdauer gehören zusammen
 
-`ModSecLogCb` has the form `void (*)(void *, const void *)`. The engine passes user data and either text or a `RuleMessage`. The C++ overload `setServerLogCb(cb, properties)` determines the representation. The overload without properties selects `TextLogProperty`; `msc_set_log_cb()` uses exactly that variant. Interpret a `void *` pointer only according to the property actually selected. Sources: [callback type and properties][callback-api], [property selection and C wrapper][callback-setup].
+`ModSecLogCb` hat die Form `void (*)(void *, const void *)`. Die Engine übergibt Benutzerdaten und entweder Text oder eine `RuleMessage`. Die C++-Überladung `setServerLogCb(cb, properties)` bestimmt die Darstellung. Die Überladung ohne Eigenschaften wählt `TextLogProperty`; `msc_set_log_cb()` verwendet genau diese Variante. Interpretiere einen `void *`-Zeiger nur entsprechend der tatsächlich ausgewählten Eigenschaft. Quellen: [Callback-Typ und Eigenschaften][callback-api], [Eigenschaftsauswahl und C-Wrapper][callback-setup].
 
-In the text path, `ModSecurity::serverLog()` creates a local string and passes its `c_str()` during the callback. In the object path, it passes the address of a `RuleMessage`; rule processing explicitly documents its limited lifetime and copies messages for later audit use. **Derived caller rule:** copy data inside the callback if they are needed after it returns; do not retain these pointers without checking their lifetime. Sources: [callback execution][callback-call], [RuleMessage lifetime][message-life].
+Im Textpfad erzeugt `ModSecurity::serverLog()` eine lokale Zeichenkette und übergibt während des Callbacks deren `c_str()`. Im Objektpfad übergibt die Methode die Adresse einer `RuleMessage`; die Regelverarbeitung dokumentiert deren begrenzte Lebensdauer ausdrücklich und kopiert Meldungen für die spätere Audit-Verwendung. **Abgeleitete Regel für Aufrufer:** Kopiere Daten innerhalb des Callbacks, wenn sie nach dessen Rückkehr noch benötigt werden; bewahre diese Zeiger nicht auf, ohne ihre Lebensdauer zu prüfen. Quellen: [Callback-Ausführung][callback-call], [Lebensdauer von RuleMessage][message-life].
 
-`logCbData` is supplied when the transaction is created. The test context uses the address of its `std::stringstream`; the callback converts it back to the appropriate type and writes the message into it. This concrete example shows why the callback function, context type, and context lifetime must agree. Sources: [test context][test-context], [transaction constructor][transaction-life].
+`logCbData` wird bei der Erzeugung der Transaktion übergeben. Der Testkontext verwendet die Adresse seines `std::stringstream`; der Callback wandelt sie in den passenden Typ zurück und schreibt die Meldung hinein. Dieses konkrete Beispiel zeigt, warum Callback-Funktion, Kontexttyp und Kontextlebensdauer zusammenpassen müssen. Quellen: [Testkontext][test-context], [Transaktionskonstruktor][transaction-life].
 
-## 9. Preprocessor and build variants
+## 9. Präprozessor und Build-Varianten
 
-Macros determine which implementations are included in the code. Examples are `WITH_LMDB` for selecting collection backends, `WITH_LIBXML2` and `WITH_YAJL` for body processors, and `NO_LOGS` for debug macros. Reading a source path successfully does not prove that it is included in a particular binary. For platform-specific or feature-specific questions, examine the build configuration and actual compiler definitions. Sources: [engine selection][engine-life], [processor selection][transaction-life], [debug macros][c-types].
+Makros bestimmen, welche Implementierungen im Code enthalten sind. Beispiele sind `WITH_LMDB` für die Auswahl der Collection-Backends, `WITH_LIBXML2` und `WITH_YAJL` für Body-Prozessoren sowie `NO_LOGS` für Debug-Makros. Das erfolgreiche Lesen eines Quellpfads beweist nicht, dass dieser in einer bestimmten Binärdatei enthalten ist. Prüfe bei plattform- oder funktionsbezogenen Fragen die Build-Konfiguration und die tatsächlichen Compilerdefinitionen. Quellen: [Engine-Auswahl][engine-life], [Prozessorauswahl][transaction-life], [Debug-Makros][c-types].
 
-The SecRules grammar is also more than a list of intended features. It includes explicitly unsupported actions, such as `ACTION_APPEND` with `ACTION_NOT_SUPPORTED("Append", ...)`. Finding a token or name in the repository is therefore insufficient evidence that the feature is available. Source: [grammar case][unsupported-action].
+Auch die SecRules-Grammatik ist mehr als eine Liste vorgesehener Funktionen. Sie enthält ausdrücklich nicht unterstützte Aktionen, etwa `ACTION_APPEND` mit `ACTION_NOT_SUPPORTED("Append", ...)`. Ein Token oder Name im Repository ist deshalb kein ausreichender Beleg dafür, dass die Funktion verfügbar ist. Quelle: [Grammatikfall][unsupported-action].
 
-## 10. Using existing examples effectively
+## 10. Vorhandene Beispiele sinnvoll nutzen
 
-| Source | Useful for | Points to keep in mind |
+| Quelle | Hilfreich für | Zu beachten |
 | --- | --- | --- |
-| `examples/using_bodies_in_chunks/simple_request.cc` | API order, chunk input, intervention checks, and cleanup order. | A demonstration program whose helper prints output; it does not establish the HTTP effect of a production connector. [Source][example-flow] |
-| `test/common/modsecurity_test_context.h` | Engine and ruleset as members, transaction construction, and a text callback. | The returned transaction refers to the context. [Source][test-context] |
-| `examples/simple_example_using_c/test.c` | C names, rule-file loading, and error text. | The shown cleanup path does not include `msc_transaction_cleanup(transaction)`; do not copy it as a complete resource-management pattern. [Source][c-example] |
-| README C++ excerpt | A historical introduction to the API concept. | Check names and argument lists against the current headers; they do not all match here. [Source][readme-example] |
+| `examples/using_bodies_in_chunks/simple_request.cc` | API-Reihenfolge, Chunk-Eingabe, Interventionsprüfungen und Freigabereihenfolge. | Ein Demonstrationsprogramm, dessen Hilfsfunktion Ausgaben erzeugt; es belegt nicht die HTTP-Wirkung eines produktiven Connectors. [Quelle][example-flow] |
+| `test/common/modsecurity_test_context.h` | Engine und Ruleset als Member, Transaktionserzeugung und einen Text-Callback. | Die zurückgegebene Transaktion verweist auf den Kontext. [Quelle][test-context] |
+| `examples/simple_example_using_c/test.c` | C-Namen, Laden einer Regeldatei und Fehlertext. | Der gezeigte Freigabepfad enthält kein `msc_transaction_cleanup(transaction)`; übernimm ihn nicht als vollständiges Muster für die Ressourcenverwaltung. [Quelle][c-example] |
+| C++-Auszug der README | Eine historische Einführung in das API-Konzept. | Namen und Argumentlisten mit den aktuellen Headern vergleichen; sie stimmen hier nicht vollständig überein. [Quelle][readme-example] |
 
-## 11. Reading sequence before a concrete change
+## 11. Lesereihenfolge vor einer konkreten Änderung
 
-The following sequence is a recommendation for this working repository:
+Die folgende Reihenfolge ist eine Empfehlung für dieses Arbeitsrepository:
 
-1. Find the public signature and its actual callers; compare names and parameter types.
-2. Read the concrete implementation, including early returns, build macros, and error branches.
-3. For every affected pointer, trace creation, ownership transfer, and release.
-4. Follow the data flow to the rule phase, intervention, or log output, keeping the two phase numbering systems in [architecture.md](architecture.md) in mind.
-5. Read the relevant existing tests and build instructions, and record the scope actually verified.
-6. Record unresolved points as unresolved. Finding a symbol name, comment, or example does not replace evidence that the behavior works.
+1. Finde die öffentliche Signatur und ihre tatsächlichen Aufrufer; vergleiche Namen und Parametertypen.
+2. Lies die konkrete Implementierung einschließlich vorzeitiger Rückkehr, Build-Makros und Fehlerzweige.
+3. Verfolge für jeden betroffenen Zeiger Erzeugung, Besitzübertragung und Freigabe.
+4. Folge dem Datenfluss bis zur Regelphase, Intervention oder Logausgabe und beachte dabei die beiden Phasennummerierungen in [architecture.md](architecture.md).
+5. Lies die relevanten vorhandenen Tests und Build-Anweisungen und halte den tatsächlich geprüften Umfang fest.
+6. Halte ungeklärte Punkte als ungeklärt fest. Das Auffinden eines Symbolnamens, Kommentars oder Beispiels ersetzt keinen Beleg dafür, dass das Verhalten funktioniert.
 
-This recommendation follows from the evidenced differences between headers, implementations, and examples above. It does not assert unexamined language rules, unproven thread safety, or automatically successful tests.
+Diese Empfehlung folgt aus den oben belegten Unterschieden zwischen Headern, Implementierungen und Beispielen. Sie behauptet weder ungeprüfte Sprachregeln noch unbelegte Thread-Sicherheit oder automatisch erfolgreiche Tests.
 
 [cxx17]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L49-L63
 [cxx17-win]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build/win32/CMakeLists.txt#L102-L103

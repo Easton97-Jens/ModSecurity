@@ -1,21 +1,21 @@
-# Optional security assessment across core components
+# Optionale Sicherheitsbewertung über die Kernkomponenten hinweg
 
-## Trigger
+## Anlass
 
-Use only when the user requests broad/deep security coverage across the core library. It does not activate automatically for a shared-code change.
+Nutze dieses Profil nur, wenn der Nutzer eine breite oder vertiefte Sicherheitsabdeckung der Kernbibliothek verlangt. Es wird durch eine Änderung an gemeinsamem Code nicht automatisch aktiviert.
 
-Apply [component security assessment](component-security-assessment.md) to engine, rules/parser, body processors, logging/storage, API boundary, and build/dependencies from the [component index](../security/components/README.md).
+Wende die [Komponentensicherheitsbewertung](component-security-assessment.md) auf Engine, Regeln und Parser, Verarbeitung der Nachrichtenkörper, Protokollierung und Speicherung, API-Grenze sowie Build und Abhängigkeiten aus dem [Komponentenindex](../security/components/README.md) an.
 
-## Coverage and shared causes
+## Abdeckung und gemeinsame Ursachen
 
-Keep each component's entry points, input authority, configuration, candidate IDs, validation, and gaps visible. Follow cross-component paths such as parser-to-rule execution or body-to-variable-to-action processing where the actual source requires it.
+Halte für jede Komponente Einstiegspunkte, Kontrolle über Eingaben, Konfiguration, Kandidatenkennungen, Validierung und Lücken sichtbar. Verfolge komponentenübergreifende Pfade wie Parser zur Regelausführung oder Nachrichtenkörper über Variablen zur Aktionsverarbeitung, wenn der tatsächliche Quellcode dies erfordert.
 
-Shared code may support shared evidence only when the report explains the common path and conditions. Preserve independently reachable instances and differing build/backend/caller assumptions.
+Gemeinsamer Code kann gemeinsame Nachweise nur dann stützen, wenn der Bericht den gemeinsamen Pfad und seine Bedingungen erklärt. Erhalte unabhängig erreichbare Vorkommen und unterschiedliche Annahmen zu Build, Backend und Aufrufer.
 
-Review external dependencies or connectors only when explicitly in scope. A gitlink, public API, or mention of a connector does not establish review of that external code.
+Prüfe externe Abhängigkeiten oder Connectoren nur, wenn sie ausdrücklich zum Umfang gehören. Ein Gitlink, eine öffentliche API oder die Erwähnung eines Connectors belegt keine Prüfung dieses externen Codes.
 
-## Execution and output
+## Ausführung und Ergebnis
 
-Use bounded checks and independent task-owned outputs. Missing prerequisites remain coverage gaps; do not weaken assertions to reach a passing status.
+Nutze begrenzte Prüfungen und unabhängige, zur Aufgabe gehörende Ausgaben. Fehlende Voraussetzungen bleiben Abdeckungslücken; schwäche keine Prüfaussagen ab, um einen bestandenen Status zu erreichen.
 
-Produce a component coverage table, cross-component candidate summary, command/evidence record, limitations, and proposed next steps. No fixed scan count, universal completeness claim, or production approval follows from this profile.
+Erstelle eine Tabelle zur Komponentenabdeckung, eine Zusammenfassung komponentenübergreifender Kandidaten, eine Befehls- und Nachweisaufzeichnung, Grenzen und vorgeschlagene nächste Schritte. Aus diesem Profil folgen weder eine feste Scanzahl noch eine allgemeine Vollständigkeitsbehauptung oder Produktionsfreigabe.

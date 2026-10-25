@@ -1,23 +1,23 @@
-# Build, CI, and supply-chain assessment
+# Bewertung von Build, CI und Lieferkette
 
-## Trigger and scope
+## Anlass und Umfang
 
-Use when the user asks to assess build reproducibility, optional-feature identity, dependencies, CI, or artifact provenance. Scope the actual platforms, workflows, toolchains, and source revisions before choosing commands.
+Nutze dieses Profil, wenn der Nutzer Build-Reproduzierbarkeit, Identität optionaler Funktionen, Abhängigkeiten, CI oder Artefaktherkunft bewerten lassen möchte. Grenze vor der Auswahl von Befehlen die tatsächlichen Plattformen, Workflows, Werkzeugketten und Quellstände ab.
 
-## Read
+## Zu lesen
 
-[Build and tests](../build-and-test.md), [build/dependency component](../security/components/build-dependencies.md), [supply chain](../security/checks/supply-chain.md), [configuration/input injection](../security/checks/config-injection.md), [disclosure](../security/checks/logging-disclosure.md), and [evidence integrity](../security/checks/evidence-integrity.md). Use [advisory research](../security/checks/advisory-research.md) only when selected.
+[Build und Tests](../build-and-test.md), [Komponente Build und Abhängigkeiten](../security/components/build-dependencies.md), [Lieferkette](../security/checks/supply-chain.md), [Konfigurations- und Eingabeinjektion](../security/checks/config-injection.md), [Offenlegung](../security/checks/logging-disclosure.md) und [Nachweisintegrität](../security/checks/evidence-integrity.md). Nutze die [Recherche zu Sicherheitshinweisen](../security/checks/advisory-research.md) nur, wenn sie ausgewählt wurde.
 
-## Questions
+## Fragen
 
-- Which source, gitlinks, generated files, headers, library, and test binaries belong to the result?
-- Which dependencies and feature switches were actually detected, and which targets consequently exist?
-- Do workflow events, permissions, inputs, caches, artifacts, actions/images, and downloads preserve the intended trust boundary?
-- Does an executed local check correspond to the claimed remote job and revision, or only a subset?
-- Are missing tests, skipped suites, caught failures, and stale artifacts visible?
+- Welche Quellen, Gitlinks, generierten Dateien, Header, Bibliothek und Testprogramme gehören zum Ergebnis?
+- Welche Abhängigkeiten und Funktionsschalter wurden tatsächlich erkannt, und welche Ziele existieren infolgedessen?
+- Erhalten Workflow-Ereignisse, Berechtigungen, Eingaben, Caches, Artefakte, Actions beziehungsweise Images und Downloads die vorgesehene Vertrauensgrenze?
+- Entspricht eine ausgeführte lokale Prüfung dem behaupteten externen Job und seiner Revision oder nur einem Teil davon?
+- Sind fehlende Tests, übersprungene Testsammlungen, abgefangene Fehler und veraltete Artefakte sichtbar?
 
-Inspect actual repository definitions; do not invent a matrix, package pin, Python requirement, scanner, or Quality Gate. Read-only remote CI inspection does not authorize triggering delivery, changing credentials, or upgrading dependencies.
+Untersuche die tatsächlichen Repository-Definitionen; erfinde weder Matrix, Paketbindung, Python-Anforderung, Scanner noch Qualitätskriterium. Eine rein lesende Prüfung externer CI erlaubt weder das Auslösen einer Bereitstellung noch Änderungen an Zugangsdaten oder Aktualisierungen von Abhängigkeiten.
 
-## Output
+## Ergebnis
 
-Report the source/tool/dependency inventory, selected targets, actual command results, optional-feature identity, relevant workflow observations, and unresolved gaps. Keep Unix, Windows, normal, diagnostic, and remote-job results separate.
+Berichte das Quellen-, Werkzeug- und Abhängigkeitsinventar, ausgewählte Ziele, tatsächliche Befehlsergebnisse, die Identität optionaler Funktionen, relevante Workflow-Beobachtungen und offene Lücken. Halte Ergebnisse für Unix, Windows, normale Builds, Diagnose-Builds und externe Jobs getrennt.

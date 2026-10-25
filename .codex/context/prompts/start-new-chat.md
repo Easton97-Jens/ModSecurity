@@ -1,38 +1,40 @@
-# New chat startup prompt
+# Startprompt für einen neuen Chat
 
-This is a template. First ensure that the chat has access to the correct
-repository and current branch or files. Replace the last line with your task.
+Dies ist eine Vorlage. Stelle zuerst sicher, dass der Chat Zugriff auf das richtige
+Repository und den aktuellen Branch oder die aktuellen Dateien hat. Ersetze die letzte
+Zeile durch deine Aufgabe. Die Sprache des Gesprächs wählst du selbst.
 
 ```text
-Work on Easton97-Jens/ModSecurity in the selected current branch.
-If this context is still in a pull request, select codex/kontext-v3.
+Arbeite an Easton97-Jens/ModSecurity im Branch codex/kontext-v3-de.
+Dieser Branch enthält die deutsche Variante des Projektkontexts.
 
-First read AGENTS.md, .codex/context/index.md, .codex/context/repository-context.md,
-.codex/context/current-state.md, .codex/context/decisions.md, and
+Lies zuerst AGENTS.md, .codex/context/index.md, .codex/context/repository-context.md,
+.codex/context/current-state.md, .codex/context/decisions.md und
 .codex/context/upstream-lock.json.
-Check the actual branch, commit, and worktree where your tools allow it.
-For a checkout, run the available local context checks described in .codex/bin/README.md.
-Load only the relevant technical guides, policies, and task profile from the index.
+Prüfe tatsächlichen Branch, Commit und Arbeitsbaum, soweit deine Werkzeuge dies erlauben.
+Führe bei einem Checkout die verfügbaren lokalen Kontextprüfungen gemäß .codex/bin/README.md aus.
+Lade nur die relevanten technischen Leitfäden, Richtlinien und das passende Aufgabenprofil aus dem Index.
 
-Ground ModSecurity claims in the actual code at the stated official v3/master
-revision. Read the implementations and tests relevant to the task.
-For technical findings, provide the path, symbol, and commit-pinned evidence.
-Distinguish verified facts, inferences, proposals, and unverified points.
-Do not invent earlier decisions, API signatures, or test results.
-Maintain repository files, documentation, prompts, and handovers in English.
+Stütze ModSecurity-Aussagen auf den tatsächlichen Code der angegebenen offiziellen
+v3/master-Revision. Lies die zur Aufgabe gehörenden Implementierungen und Tests.
+Nenne bei technischen Erkenntnissen Pfad, Symbol und an einen Commit gebundene Nachweise.
+Unterscheide überprüfte Fakten, Schlussfolgerungen, Vorschläge und ungeprüfte Punkte.
+Erfinde keine früheren Entscheidungen, API-Signaturen oder Testergebnisse.
+Pflege Kontextdateien, Dokumentation, Prompts und Übergaben dieser Variante auf Deutsch.
+Erhalte technische Bezeichner, Befehle, Pfade und Originaldiagnosen unverändert.
 
-Start with a brief summary of:
-- the source baseline and current working state;
-- verified previous work relevant to my task;
-- actual open questions or blockers;
-- the next step that follows from that evidence.
+Beginne mit einer kurzen Zusammenfassung von:
+- Quellcode-Grundlage und aktuellem Arbeitsstand;
+- überprüfter früherer Arbeit, die für meine Aufgabe relevant ist;
+- tatsächlich offenen Fragen oder Hindernissen;
+- dem nächsten Schritt, der sich aus diesen Nachweisen ergibt.
 
-If a file or previous finding is inaccessible, identify the gap precisely.
-Ask when a missing decision would materially change the task.
-Otherwise continue within the authorized scope.
+Wenn eine Datei oder frühere Erkenntnis nicht zugänglich ist, benenne die Lücke genau.
+Frage nach, wenn eine fehlende Entscheidung die Aufgabe wesentlich verändern würde.
+Arbeite andernfalls innerhalb des freigegebenen Umfangs weiter.
 
-At the end, update the current working state and relevant decisions so the
-next session can continue from the saved results.
+Aktualisiere zum Abschluss den aktuellen Arbeitsstand und relevante Entscheidungen,
+damit die nächste Sitzung anhand der gespeicherten Ergebnisse fortfahren kann.
 
-My specific task: [Enter the task here.]
+Meine konkrete Aufgabe: [Aufgabe hier eintragen.]
 ```

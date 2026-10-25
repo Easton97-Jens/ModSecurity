@@ -1,89 +1,88 @@
-# Documentation and traceability
+# Dokumentation und Nachvollziehbarkeit
 
-These files preserve useful context across chats. They record what is known,
-what changed, and how the result was checked. They do not make an assistant
-remember an inaccessible conversation or prove that every file was reviewed.
+Diese Dateien bewahren hilfreichen Kontext über Chats hinweg. Sie halten fest, was bekannt ist,
+was sich geändert hat und wie das Ergebnis geprüft wurde. Sie geben einem Assistenten kein
+Gedächtnis für nicht zugängliche Gespräche und beweisen nicht, dass jede Datei geprüft wurde.
 
-## Language and source fidelity
+## Sprache und Quellentreue
 
-Maintain all added documentation, instructions, prompts, and checker messages
-in English. Preserve source symbols, paths, commands, configuration keys,
-Git IDs, URLs, and quoted diagnostics exactly. A German companion is not
-required by this repository's working convention.
+Pflege alle ergänzten Dokumente, Anweisungen, Prompts und Meldungen der Prüfprogramme
+in dieser Variante auf Deutsch. Erhalte Quellsymbole, Pfade, Befehle, Konfigurationsschlüssel,
+Git-IDs, URLs und zitierte Diagnosemeldungen exakt. Die englische Fassung liegt separat in
+`codex/kontext-v3`; der Nutzer hat die deutsche Fassung ausdrücklich für `codex/kontext-v3-de`
+beauftragt. Die Dateisprache schreibt keine Chatsprache vor.
 
-For technical claims, cite the implementation or contract actually read using
-the source path, relevant symbol, and full source commit. A commit-pinned GitHub
-link with a suitable line range is useful when it supports the statement.
-Use [provenance.md](provenance.md) and [upstream-lock.json](upstream-lock.json)
-to identify the documentation baseline.
+Zitiere für technische Aussagen die tatsächlich gelesene Implementierung oder den Vertrag
+mit Quellpfad, relevantem Symbol und vollständigem Quell-Commit. Ein an einen Commit
+gebundener GitHub-Link mit passendem Zeilenbereich ist hilfreich, wenn er die Aussage stützt.
+Nutze [provenance.md](provenance.md) und [upstream-lock.json](upstream-lock.json),
+um die Dokumentationsgrundlage zu bezeichnen.
 
-Distinguish four kinds of statement:
+Unterscheide vier Arten von Aussagen:
 
-| Kind | What the reader needs |
+| Art | Was Lesende benötigen |
 | --- | --- |
-| Source fact | The implementation, declaration, build condition, or test definition at an identified revision |
-| Executed result | The actual command, source revision, relevant environment/options, result, and limitations |
-| Inference | The supporting observations and the reasoning; label it as an inference |
-| Proposal or uncertainty | The intended change or unanswered question; do not describe it as implemented or verified |
+| Quellenfakt | Implementierung, Deklaration, Build-Bedingung oder Testdefinition eines bezeichneten Stands |
+| Ausgeführtes Ergebnis | Tatsächlicher Befehl, Quellrevision, relevante Umgebung/Optionen, Ergebnis und Grenzen |
+| Schlussfolgerung | Stützende Beobachtungen und Begründung; als Schlussfolgerung kennzeichnen |
+| Vorschlag oder Unsicherheit | Beabsichtigte Änderung oder offene Frage; nicht als umgesetzt oder überprüft beschreiben |
 
-A test definition establishes an expected case. An executed test establishes
-its observed result under that run's conditions. A README, class name, scanner
-result, or generated report cannot substitute for evidence of a broader claim.
-Record useful documentation/code discrepancies in [fact-check.md](fact-check.md).
+Eine Testdefinition legt einen erwarteten Fall fest. Ein ausgeführter Test zeigt das
+beobachtete Ergebnis unter den Bedingungen dieses Laufs. README, Klassenname,
+Scanner-Ergebnis oder generierter Bericht ersetzen keinen Nachweis für eine weitergehende Aussage.
+Halte hilfreiche Abweichungen zwischen Dokumentation und Code in [fact-check.md](fact-check.md) fest.
 
-## Where information belongs
+## Wohin Informationen gehören
 
-| Information | Primary location |
+| Information | Primärer Ort |
 | --- | --- |
-| Project purpose and the library/connector boundary | [project-context.md](project-context.md) |
-| Runtime structure and code navigation | [architecture.md](architecture.md), [repository-map.md](repository-map.md), and the relevant technical chapter |
-| Actual working state, verification, and next step | [current-state.md](current-state.md) |
-| A durable decision and its reason | [decisions.md](decisions.md) |
-| Real unfinished work or an unresolved question | [backlog.md](backlog.md) |
-| Substantial session-specific history and evidence | [audit sessions](../audit/sessions/), using [handoff-template.md](handoff-template.md) |
-| Source baseline and intentional updates | [provenance.md](provenance.md), [upstream-sync.md](upstream-sync.md) |
+| Projektzweck und Grenze zwischen Bibliothek und Connector | [project-context.md](project-context.md) |
+| Laufzeitaufbau und Navigation im Code | [architecture.md](architecture.md), [repository-map.md](repository-map.md) und das relevante technische Kapitel |
+| Tatsächlicher Arbeitsstand, Prüfungen und nächster Schritt | [current-state.md](current-state.md) |
+| Dauerhafte Entscheidung und ihr Grund | [decisions.md](decisions.md) |
+| Tatsächlich offene Arbeit oder ungeklärte Frage | [backlog.md](backlog.md) |
+| Umfangreichere sitzungsspezifische Historie und Nachweise | [Sitzungsaufzeichnungen](../audit/sessions/), anhand von [handoff-template.md](handoff-template.md) |
+| Quellgrundlage und bewusste Aktualisierungen | [provenance.md](provenance.md), [upstream-sync.md](upstream-sync.md) |
 
-Maintain one authoritative explanation for each topic and link to it from
-supporting policies. Keep current state concise. Preserve significant historical
-observations with their original dates and revisions instead of rewriting them
-to appear current. Remove or mark superseded plans when later instructions
-change the task.
+Pflege je Thema eine maßgebliche Erklärung und verlinke sie aus ergänzenden Richtlinien.
+Halte den aktuellen Stand knapp. Erhalte wesentliche historische Beobachtungen mit ihren
+ursprünglichen Daten und Revisionen, statt sie als aktuell umzuschreiben. Entferne oder
+kennzeichne überholte Pläne, wenn spätere Anweisungen die Aufgabe verändern.
 
-## What to record after a change
+## Was nach einer Änderung festgehalten wird
 
-For a meaningful change, retain enough information to explain:
+Bewahre bei einer wesentlichen Änderung genügend Informationen, um Folgendes zu erklären:
 
-- the request and affected scope;
-- the old and new behavior or documentation;
-- the actual files changed and material decisions;
-- commands actually executed, outcomes, and checks not run;
-- unresolved issues and a concrete next step;
-- commit, remote branch, PR, or integration facts when actually observed.
+- Auftrag und betroffener Umfang;
+- bisheriges und neues Verhalten oder bisherige und neue Dokumentation;
+- tatsächlich geänderte Dateien und wesentliche Entscheidungen;
+- tatsächlich ausgeführte Befehle, Ergebnisse und nicht ausgeführte Prüfungen;
+- offene Punkte und ein konkreter nächster Schritt;
+- Commit-, Remote-Branch-, PR- oder Integrationsfakten, soweit tatsächlich beobachtet.
 
-A short session entry or updated current-state section is usually sufficient.
-Do not introduce a second reporting system or mandatory bilingual change
-record. Never invent a commit, PR number, review result, CI status, merge, test
-outcome, performance figure, or security guarantee.
+Ein kurzer Sitzungseintrag oder ein aktualisierter Abschnitt zum aktuellen Stand genügt meist.
+Führe kein zweites Berichtssystem und keine verpflichtende zweisprachige Änderungsaufzeichnung ein.
+Erfinde niemals Commit, PR-Nummer, Review-Ergebnis, CI-Status, Merge, Testergebnis,
+Leistungswert oder Sicherheitsgarantie.
 
-Keep credentials, private request bodies, personal data, and sensitive logs out
-of versioned context. Prefer a minimal sanitized reproduction and bounded
-diagnostics. Do not record full environment dumps as evidence.
+Halte Zugangsdaten, private Anfrageinhalte, personenbezogene Daten und sensible Protokolle
+aus dem versionierten Kontext heraus. Bevorzuge eine minimale bereinigte Reproduktion
+und begrenzte Diagnosen. Speichere keine vollständigen Umgebungsabbilder als Nachweis.
 
-## Generated data and consistency checks
+## Generierte Daten und Konsistenzprüfungen
 
-If a file is generated, identify its actual source and generator before
-changing it. Regenerate it through that process when required; do not treat
-hand-editing its output as a substitute. The source inventory update is covered
-by [upstream-sync.md](upstream-sync.md).
+Ermittle vor Änderungen an generierten Dateien deren tatsächliche Quelle und Generator.
+Erzeuge sie bei Bedarf mit diesem Verfahren neu; manuelles Bearbeiten der Ausgabe
+ersetzt es nicht. Die Aktualisierung des Quelleninventars beschreibt [upstream-sync.md](upstream-sync.md).
 
-From the repository root, the local context checks are:
+Die lokalen Kontextprüfungen vom Repository-Hauptverzeichnis aus lauten:
 
 ```sh
 python3 .codex/bin/verify-context.py
 python3 .codex/bin/validate-structure.py
 ```
 
-Read their reported scope and limitations. Structural consistency and valid
-source links do not establish the semantic correctness of every paragraph or a
-successful ModSecurity build. If a required tool or object is unavailable,
-record the limitation and perform the useful checks that remain possible.
+Lies ihren gemeldeten Umfang und ihre Grenzen. Strukturelle Konsistenz und gültige
+Quellverweise belegen weder die inhaltliche Richtigkeit jedes Absatzes noch einen
+erfolgreichen ModSecurity-Build. Ist ein benötigtes Werkzeug oder Objekt nicht verfügbar,
+halte die Einschränkung fest und führe die weiterhin möglichen sinnvollen Prüfungen aus.

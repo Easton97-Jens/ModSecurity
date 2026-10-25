@@ -1,13 +1,13 @@
-# Concurrency and shared-state questions
+# Fragen zu Nebenläufigkeit und gemeinsamem Zustand
 
-Use for a selected path with shared mutable state, concurrent callers, callbacks, backend access, or lifecycle overlap. First establish whether that usage is supported by the actual API and caller; do not assume global thread safety or that one transaction may be used concurrently.
+Für einen ausgewählten Pfad mit gemeinsamem veränderlichem Zustand, nebenläufigen Aufrufern, Callbacks, Backend-Zugriff oder überlappenden Lebenszyklen verwenden. Kläre zuerst, ob die tatsächliche API und der Aufrufer diese Nutzung unterstützen; setze weder allgemeine Threadsicherheit voraus noch, dass eine Transaktion gleichzeitig verwendet werden darf.
 
-- Which object owns each mutable value, and which operations can overlap?
-- What synchronization and lifetime boundaries apply to engine collections, rules, callbacks, logs, and transaction cleanup?
-- Can error handling or callback re-entry observe partially updated state?
-- Would an adversary control the timing in the real deployment, or does the case require unsupported caller behavior?
-- Does the suspected effect survive a legitimate concurrent control and the strongest existing guard?
+- Welchem Objekt gehört jeder veränderliche Wert, und welche Operationen können sich überlappen?
+- Welche Synchronisations- und Lebensdauergrenzen gelten für Engine-Kollektionen, Regeln, Callbacks, Protokolle und Transaktionsfreigabe?
+- Können Fehlerbehandlung oder erneuter Eintritt über einen Callback teilweise aktualisierten Zustand beobachten?
+- Könnte ein Angreifer in der tatsächlichen Bereitstellung den zeitlichen Ablauf steuern, oder erfordert der Fall nicht unterstütztes Aufruferverhalten?
+- Bleibt die vermutete Wirkung bei einem zulässigen nebenläufigen Kontrollfall und der stärksten vorhandenen Schutzprüfung bestehen?
 
-Use bounded, controlled diagnostics only when selected and available. Record scheduling assumptions, repetition count, tool/build identity, actual observation, and any inconclusive result.
+Nutze begrenzte, kontrollierte Diagnosen nur, wenn sie ausgewählt und verfügbar sind. Halte Annahmen zum zeitlichen Ablauf, Wiederholungsanzahl, Werkzeug- und Build-Identität, tatsächliche Beobachtung und jedes nicht eindeutige Ergebnis fest.
 
-Entry points: [engine](../components/engine.md), [logging/storage](../components/logging-storage.md), and [memory lifecycle](memory-lifecycle.md).
+Einstiegspunkte: [Engine](../components/engine.md), [Protokollierung und Speicherung](../components/logging-storage.md) und [Speicherlebenszyklus](memory-lifecycle.md).

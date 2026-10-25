@@ -1,24 +1,24 @@
-# Git policy for the ModSecurity core fork
+# Git-Richtlinie für den ModSecurity-Kern-Fork
 
-This policy supports reviewable work in the existing fork. It does not replace
-the user's task instructions or authorization already established in the
-conversation. Use [master-integration.md](master-integration.md) for merging
-into the target branch.
+Diese Richtlinie unterstützt überprüfbare Arbeit im bestehenden Fork. Sie ersetzt
+weder den Nutzerauftrag noch bereits im Gespräch erteilte Freigaben.
+Nutze [master-integration.md](master-integration.md) für einen beauftragten Merge
+in den Zielbranch. Für die deutsche Übersetzung ist kein Pull Request oder Merge beauftragt.
 
-## Repository and branch identity
+## Identität von Repository und Branch
 
-| Role | Repository | Branch used by this context task |
+| Rolle | Repository | Branch dieser Kontextaufgabe |
 | --- | --- | --- |
-| Official source | `owasp-modsecurity/ModSecurity` | `v3/master` |
-| User's working fork | `Easton97-Jens/ModSecurity` | `codex/kontext-v3` |
-| Integration target in the fork | `Easton97-Jens/ModSecurity` | `v3/master` |
+| Offizielle Quelle | `owasp-modsecurity/ModSecurity` | `v3/master` |
+| Arbeitsfork des Nutzers, deutsche Variante | `Easton97-Jens/ModSecurity` | `codex/kontext-v3-de` |
+| Englische Übersetzungsgrundlage | `Easton97-Jens/ModSecurity` | `codex/kontext-v3` |
+| Zielbranch für eine gegebenenfalls später beauftragte Integration im Fork | `Easton97-Jens/ModSecurity` | `v3/master` |
 
-The source baseline is separately recorded in
-[upstream-lock.json](upstream-lock.json). A branch name is not a fixed source
-revision. See [using-this-fork.md](using-this-fork.md) and
-[provenance.md](provenance.md) for context.
+Der Quellcode-Ausgangsstand ist separat in [upstream-lock.json](upstream-lock.json)
+festgehalten. Ein Branch-Name ist kein unveränderlicher Quellstand.
+[using-this-fork.md](using-this-fork.md) und [provenance.md](provenance.md) erläutern den Kontext.
 
-Before editing or delivering, inspect the relevant repository state:
+Prüfe vor Änderungen oder Bereitstellung den relevanten Repository-Zustand:
 
 ```sh
 git status --short
@@ -27,49 +27,48 @@ git rev-parse HEAD
 git remote -v
 ```
 
-Use the established working branch for this task. For later independent work,
-choose a suitable task branch or isolated worktree when it helps preserve other
-work. Do not make a new worktree or branch a mandatory ritual. Do not switch,
-reset, or recreate the user's active branch merely because a generic guide
-suggests a different starting point.
+Nutze den festgelegten Arbeitsbranch für diese Aufgabe. Wähle für spätere unabhängige
+Arbeit einen passenden Aufgabenbranch oder isolierten Arbeitsbaum, wenn dies andere
+Arbeit schützt. Mache einen neuen Arbeitsbaum oder Branch nicht zu einem verpflichtenden
+Ritual. Wechsle, setze zurück oder erstelle den aktiven Nutzerbranch nicht neu,
+nur weil eine allgemeine Anleitung einen anderen Ausgangspunkt vorschlägt.
 
-## Preserve work and scope
+## Arbeit und Umfang bewahren
 
-Inspect unstaged and staged changes before staging or committing. Preserve
-pre-existing tracked and untracked work. Stage explicit task-owned paths, for
-example `git add -- <task-files>` with the actual intended paths supplied.
-Do not use broad staging in a mixed working tree.
+Prüfe Änderungen innerhalb und außerhalb des Git-Index vor dem Staging oder Commit.
+Erhalte vorhandene versionierte und unversionierte Arbeit. Nimm ausdrücklich benannte,
+zur Aufgabe gehörende Pfade auf, beispielsweise `git add -- <task-files>` mit den
+tatsächlich vorgesehenen Pfaden. Vermeide pauschales Staging in einem gemischten Arbeitsbaum.
 
-Do not perform destructive cleanup, discard changes, rewrite published history,
-force-push, or delete branches as routine housekeeping. Those actions need to
-be part of a clearly authorized task and must respect repository protections.
-Resolve ordinary conflicts within an authorized change when the intended
-result is clear; ask when a conflict exposes an unresolved product decision.
+Destruktives Aufräumen, das Verwerfen von Änderungen, Umschreiben veröffentlichter Historie,
+Force-Pushes und Löschen von Branches sind keine Routine. Solche Aktionen müssen Teil
+einer klar freigegebenen Aufgabe sein und Repository-Schutzregeln beachten.
+Löse gewöhnliche Konflikte innerhalb einer freigegebenen Änderung, wenn das gewünschte
+Ergebnis klar ist; frage nach, wenn ein Konflikt eine offene Produktentscheidung aufzeigt.
 
-Submodule source, history, and gitlinks remain bounded by
-[architecture-and-boundaries.md](architecture-and-boundaries.md). A core commit
-does not authorize publishing a change to a dependency repository.
+Quellcode, Historie und Gitlinks von Submodulen bleiben durch
+[architecture-and-boundaries.md](architecture-and-boundaries.md) abgegrenzt.
+Ein Commit im Kernrepository erlaubt nicht, Änderungen im Repository einer Abhängigkeit zu veröffentlichen.
 
-## Remote delivery
+## Bereitstellung im Remote-Repository
 
-When commit, push, or PR work is in scope, retain that authorization across the
-task. Verify the actual repository identity, fetch and effective push
-destinations, selected branch, and PR base before a remote write. Do not assume
-that a remote named `origin` points to this fork or that one named `upstream`
-has the intended meaning.
+Wenn Commit, Push oder PR-Arbeit zum Auftrag gehören, behalte diese Freigabe über die
+Aufgabe hinweg bei. Prüfe vor einem Remote-Schreibzugriff die tatsächliche Repository-Identität,
+Fetch- und wirksamen Push-Ziele, den ausgewählten Branch und gegebenenfalls die PR-Basis.
+Setze nicht voraus, dass ein Remote namens `origin` auf diesen Fork zeigt oder ein
+Remote namens `upstream` die erwartete Bedeutung hat.
 
-A destination mismatch requires investigation. Do not silently choose a
-different repository, create a replacement repository, or rewrite remotes to
-hide the mismatch. Complete the reviewable local work while any genuinely
-missing destination decision is resolved.
+Eine Zielabweichung muss untersucht werden. Wähle nicht stillschweigend ein anderes
+Repository, erstelle kein Ersatzrepository und ändere keine Remotes, um die Abweichung
+zu verdecken. Schließe die überprüfbare lokale Arbeit ab, während eine tatsächlich
+fehlende Zielentscheidung geklärt wird.
 
-Keep commits coherent and their messages factual. After an authorized push,
-check that the intended remote branch and PR head identify the delivered
-commit. A local commit or a successful command invocation alone is insufficient
-evidence of the final remote state.
+Halte Commits zusammenhängend und ihre Nachrichten sachlich. Prüfe nach einem
+freigegebenen Push, dass der vorgesehene Remote-Branch und, falls vorhanden und beauftragt,
+der PR-Head den ausgelieferten Commit bezeichnen. Ein lokaler Commit oder ein erfolgreich
+aufgerufener Befehl allein beweist den erreichten Remote-Zustand nicht.
 
-Creating a PR does not by itself authorize merging it. Do not bypass branch
-protections, push directly to `v3/master` as a shortcut, or claim a merge before
-it is observed. Record actual delivery facts in
-[current-state.md](current-state.md) or the relevant
-[session record](../audit/sessions/).
+Ein erstellter PR erlaubt für sich genommen keinen Merge. Umgehe keine Branch-Schutzregeln,
+pushe nicht zur Abkürzung direkt nach `v3/master` und behaupte keinen Merge, bevor er
+beobachtet wurde. Halte tatsächliche Bereitstellungsfakten in
+[current-state.md](current-state.md) oder der relevanten [Sitzungsaufzeichnung](../audit/sessions/) fest.

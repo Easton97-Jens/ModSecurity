@@ -1,27 +1,27 @@
-# Optional security review policy
+# Richtlinie für optionale Sicherheitsprüfungen
 
-## When to use this material
+## Wann diese Unterlagen gelten
 
-This is a working convention for an explicitly requested security assessment, or for bounded security questions that are relevant to an authorized change. It does not require a security scan for every task, prescribe an installed scanner, or record a completed assessment. Ordinary documentation work does not activate the full security workflow.
+Dies ist eine Arbeitskonvention für eine ausdrücklich angeforderte Sicherheitsbewertung oder für begrenzte Sicherheitsfragen, die für eine freigegebene Änderung relevant sind. Sie verlangt nicht für jede Aufgabe einen Sicherheitsscan, setzt keinen installierten Scanner voraus und dokumentiert keine abgeschlossene Bewertung. Gewöhnliche Dokumentationsarbeit aktiviert nicht den vollständigen Sicherheitsablauf.
 
-Select a [profile](profiles/README.md), identify the actual code and configuration in scope, and use only the relevant [component guides](security/components/README.md) and check modules. An assessment task does not by itself authorize product fixes, dependency upgrades, deployment, or changes to external repositories. An existing implementation request retains its own authorized scope.
+Wähle ein [Profil](profiles/README.md), ermittle den tatsächlich betroffenen Code und die Konfiguration und nutze nur die relevanten [Komponentenleitfäden](security/components/README.md) und Prüfmodule. Ein Bewertungsauftrag erlaubt für sich genommen weder Produktkorrekturen noch Aktualisierungen von Abhängigkeiten, Bereitstellungen oder Änderungen an externen Repositories. Ein bestehender Implementierungsauftrag behält seinen eigenen freigegebenen Umfang.
 
-## Establish the question before the conclusion
+## Die Frage vor der Schlussfolgerung klären
 
-Record the intended invariant, the input controlled by a caller or attacker, its required privileges, the affected asset, the trust boundary, and the observable consequence. Read the implementation and its callers before deciding whether an input is untrusted or a control is missing. A suspicious pattern, advisory, or scanner message is a candidate, not a validated vulnerability.
+Halte die beabsichtigte Invariante, die von einem Aufrufer oder Angreifer kontrollierte Eingabe, die dafür erforderlichen Berechtigungen, das betroffene Schutzgut, die Vertrauensgrenze und die beobachtbare Folge fest. Lies die Implementierung und ihre Aufrufer, bevor du entscheidest, ob eine Eingabe nicht vertrauenswürdig ist oder eine Kontrolle fehlt. Ein verdächtiges Muster, ein Sicherheitshinweis oder eine Scannermeldung ist ein Kandidat, keine bestätigte Sicherheitslücke.
 
-For selected behavior, compare a relevant negative case with a legitimate control. Keep source reasoning, executed results, limitations, and proposed hardening separate. Use [finding validation](security/checks/finding-validation.md) for a candidate that warrants deeper investigation.
+Vergleiche für ausgewähltes Verhalten einen relevanten Negativfall mit einem zulässigen Kontrollfall. Trenne Quellcodebegründung, ausgeführte Ergebnisse, Grenzen und vorgeschlagene Härtung. Nutze die [Befundvalidierung](security/checks/finding-validation.md) für einen Kandidaten, der eine vertiefte Untersuchung rechtfertigt.
 
-## Library scope
+## Umfang der Bibliothek
 
-libmodsecurity accepts data through its public API; web server connectors are separate projects. Library rule matching, an intervention request, connector enforcement, and a client-visible outcome are distinct evidence boundaries. Sources: [upstream scope](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L21-L46), [transaction API](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h#L335-L419), [intervention implementation](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1350-L1389).
+libmodsecurity nimmt Daten über seine öffentliche API entgegen; Webserver-Connectoren sind eigenständige Projekte. Regeltreffer in der Bibliothek, eine Interventionsanforderung, die Durchsetzung durch den Connector und ein clientseitig sichtbares Ergebnis sind unterschiedliche Nachweisgrenzen. Quellen: [Upstream-Umfang](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L21-L46), [Transaktions-API](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/transaction.h#L335-L419), [Implementierung der Intervention](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/transaction.cc#L1350-L1389).
 
-Do not import connector-specific host routes, transport modes, private IPC protocols, release gates, or Phase-4 migration targets into the core library's current behavior. [Protocol and hardening](protocol-and-hardening.md) explains the integration boundary.
+Übertrage keine connector-spezifischen Host-Routen, Transportmodi, privaten IPC-Protokolle, Freigabekriterien für Releases oder Migrationsziele für Phase 4 auf das aktuelle Verhalten der Kernbibliothek. [Protokollgrenzen und Härtung](protocol-and-hardening.md) erläutert die Integrationsgrenze.
 
-## Evidence and result handling
+## Umgang mit Nachweisen und Ergebnissen
 
-Bind every observation to the source revision, component, effective configuration, optional features, toolchain, and actual command or source path. Record unperformed checks as `not_run` and unavailable prerequisites as `blocked`, with reasons. A failed prerequisite is not an executed failure of the target test. Use `not_applicable` only with a technical scope explanation.
+Ordne jede Beobachtung dem Quellstand, der Komponente, der wirksamen Konfiguration, optionalen Funktionen, der Werkzeugkette und dem tatsächlichen Befehl oder Quellpfad zu. Halte nicht ausgeführte Prüfungen als `not_run` und nicht verfügbare Voraussetzungen als `blocked` fest, jeweils mit Begründung. Eine fehlgeschlagene Voraussetzung ist kein ausgeführter Fehler des eigentlichen Tests. Verwende `not_applicable` nur mit einer technischen Begründung zum Umfang.
 
-Retain bounded, redacted evidence. Do not commit credentials, private keys, sensitive request bodies, unfiltered environments, or private customer logs. For a validated issue, state impact, reachability, counterevidence, confidence, and remaining limitations; do not invent a severity, CVE, exploit, or universal safety guarantee.
+Bewahre begrenzte, bereinigte Nachweise auf. Versioniere keine Zugangsdaten, privaten Schlüssel, sensiblen Anfragekörper, ungefilterten Umgebungen oder privaten Kundenprotokolle. Benenne bei einem bestätigten Problem Auswirkungen, Erreichbarkeit, Gegenbelege, Vertrauen in den Befund und verbleibende Grenzen; erfinde weder Schweregrad, CVE, Exploit noch eine allgemeine Sicherheitsgarantie.
 
-Conclude with the achieved review coverage and unresolved work. No generic score, completed review, or clean scanner output constitutes production approval.
+Schließe mit der tatsächlich erreichten Prüfungsabdeckung und offener Arbeit ab. Weder eine allgemeine Punktzahl noch eine abgeschlossene Prüfung oder eine unauffällige Scannerausgabe stellt eine Produktionsfreigabe dar.

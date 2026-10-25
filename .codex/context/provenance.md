@@ -1,40 +1,40 @@
-# Provenance, source baseline and evidence
+# Herkunft, Quellgrundlage und Nachweise
 
-## 1. Recorded source baseline
+## 1. Festgehaltener Quellstand
 
-| Field | Verified value |
+| Feld | Überprüfter Wert |
 | --- | --- |
-| Official repository | `https://github.com/owasp-modsecurity/ModSecurity` |
-| Development branch examined | `v3/master` |
-| Pinned commit | `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
-| Git tree | `d626de814f96ceea7fd717d6176b30a17a86f08e` |
-| Commit time according to Git | `2026-10-24T18:06:05+02:00` |
-| Inspection | 25 October 2026, date interpreted in Europe/Berlin |
-| Main repository inventory | 850 entries: 846 blobs and 4 gitlinks |
+| Offizielles Repository | `https://github.com/owasp-modsecurity/ModSecurity` |
+| Untersuchter Entwicklungsbranch | `v3/master` |
+| Festgehaltener Commit | `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
+| Git-Baum | `d626de814f96ceea7fd717d6176b30a17a86f08e` |
+| Commit-Zeit laut Git | `2026-10-24T18:06:05+02:00` |
+| Untersuchung | 25. Oktober 2026, Datum in Europe/Berlin |
+| Inventar des Hauptrepositorys | 850 Einträge: 846 Blobs und 4 Gitlinks |
 
-The [commit](https://github.com/owasp-modsecurity/ModSecurity/commit/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729)
-and its [source tree](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729)
-are the baseline. The values were read using `git show`, `git rev-parse` and
-`git ls-tree -r`. The complete machine-readable inventory is in
-[source-index.tsv](../audit/source-index.tsv), and the metadata is in
+Der [Commit](https://github.com/owasp-modsecurity/ModSecurity/commit/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729)
+und sein [Quellbaum](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729)
+bilden die Grundlage. Die Werte wurden mit `git show`, `git rev-parse` und
+`git ls-tree -r` gelesen. Das vollständige maschinenlesbare Inventar liegt in
+[source-index.tsv](../audit/source-index.tsv), die Metadaten in
 [upstream-lock.json](upstream-lock.json).
 
-“850 entries” refers to the Git tree, not to 850 individually explained
-functions or a comprehensive code review. A blob can also be an image file,
-for example. A gitlink refers to a commit in a separate repository.
+„850 Einträge“ bezieht sich auf den Git-Baum, nicht auf 850 einzeln erklärte
+Funktionen oder ein umfassendes Code-Review. Ein Blob kann beispielsweise auch
+eine Bilddatei sein. Ein Gitlink verweist auf einen Commit in einem separaten Repository.
 
-## 2. Relationship to the specified user fork
+## 2. Beziehung zum angegebenen Nutzerfork
 
-At the first comparison on the inspection date, `Easton97-Jens/ModSecurity`, also on branch `v3/master`,
-pointed to `2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641`. This commit is an ancestor
-of the official baseline above. The comparison showed **22 additional
-upstream commits and 0 commits present only on the compared fork branch**.
-This describes those two branch tips at that time,
-not every branch or the future state of the fork.
+Beim ersten Vergleich am Untersuchungstag zeigte `Easton97-Jens/ModSecurity`,
+ebenfalls im Branch `v3/master`, auf `2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641`.
+Dieser Commit ist ein Vorfahr der oben genannten offiziellen Grundlage. Der Vergleich
+zeigte **22 zusätzliche Upstream-Commits und 0 Commits, die nur im verglichenen Fork-Branch
+vorhanden waren**. Dies beschreibt diese beiden Branch-Spitzen zu diesem Zeitpunkt,
+nicht alle Branches oder den künftigen Zustand des Forks.
 
-Evidence: [fork commit](https://github.com/Easton97-Jens/ModSecurity/commit/2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641),
-[comparison of the two commits](https://github.com/owasp-modsecurity/ModSecurity/compare/2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641...effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729).
-After fetching the v3 history, the following checks were also run locally:
+Nachweise: [Fork-Commit](https://github.com/Easton97-Jens/ModSecurity/commit/2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641),
+[Vergleich der beiden Commits](https://github.com/owasp-modsecurity/ModSecurity/compare/2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641...effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729).
+Nach dem Abrufen der v3-Historie wurden zusätzlich diese Prüfungen lokal ausgeführt:
 
 ```sh
 git merge-base --is-ancestor \
@@ -46,100 +46,104 @@ git rev-list --count \
   effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729..2e08f23dd50e7c0aa7c969b244b9d3a6dce4d641
 ```
 
-Results in that order: exit code `0`, count `22`, count `0`.
-**Fresh comparison before the pull request:** The fork's `v3/master` branch
-had meanwhile also reached
-`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`. Comparing it with the first
-context commit, `fbf883634454ba39e4c49aa2f87483b9c4610902`, showed one additional
-documentation commit and 25 changed files. The branch tips were
-also read using `git ls-remote`. No assumption is made here about who
-updated the target branch.
+Ergebnisse in dieser Reihenfolge: Exit-Code `0`, Anzahl `22`, Anzahl `0`.
+**Erneuter Vergleich vor dem damaligen Pull Request:** Der Branch `v3/master` des Forks
+hatte inzwischen ebenfalls `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` erreicht.
+Der Vergleich mit dem ersten Kontext-Commit `fbf883634454ba39e4c49aa2f87483b9c4610902`
+zeigte einen zusätzlichen Dokumentations-Commit und 25 geänderte Dateien.
+Die Branch-Spitzen wurden auch mit `git ls-remote` gelesen. Hier wird nicht angenommen,
+wer den Zielbranch aktualisiert hat.
 
-The pull request against this updated fork baseline therefore contains only
-the context additions. The original 22-commit difference is historical
-provenance information, not an additional product-code diff in this pull
-request. Both observations are preserved separately in the lockfile.
+Der damalige Pull Request gegen diese aktualisierte Fork-Grundlage enthielt daher
+nur Kontextergänzungen. Der ursprüngliche Unterschied von 22 Commits ist historische
+Herkunftsinformation und kein zusätzlicher Produktcode-Diff dieses Pull Requests.
+Beide Beobachtungen bleiben getrennt in der Lockdatei erhalten.
 
-## 3. Submodules are separate sources
+Die deutsche Variante übersetzt den englischen Kontext aus `codex/kontext-v3`, Commit
+`a35e8c3a1116a763f286f965f718f36d5f8876cc`, in `codex/kontext-v3-de`.
+Der Auftrag umfasst das Hochladen dieses Branches im selben Fork ohne neuen Pull Request.
+Er ändert die oben festgehaltene Produktgrundlage nicht.
 
-The four direct gitlinks in the main commit are:
+## 3. Submodule sind getrennte Quellen
 
-| Path | Pinned submodule commit |
+Die vier direkten Gitlinks im Haupt-Commit sind:
+
+| Pfad | Festgehaltener Submodul-Commit |
 | --- | --- |
 | `bindings/python` | `bc625d5bb0bac6a64bcce8dc9902208612399348` |
 | `others/libinjection` | `211782219663f889f471650150df12b623c5766e` |
 | `others/mbedtls` | `0fe989b6b514192783c469039edd325fd0989806` |
 | `test/test-cases/secrules-language-tests` | `f73c73027ef49ccf99c7911744929a71d15ff419` |
 
-Source for the mappings and URLs: [.gitmodules](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitmodules).
-Source for the commit IDs: gitlinks in the
-[pinned source tree](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729),
-reproducible with `git ls-tree -r` and recorded in the inventory.
+Quelle für Zuordnungen und URLs: [.gitmodules](https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitmodules).
+Quelle für Commit-IDs: Gitlinks im
+[festgehaltenen Quellbaum](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729),
+reproduzierbar mit `git ls-tree -r` und im Inventar festgehalten.
 
-The internal implementations of these submodules were not fully examined
-for this documentation. Statements about their use are based on callers
-and build definitions in the main repository. A change within a submodule
-requires its actual commit to be read and checked separately.
-This also applies to nested submodules.
+Die internen Implementierungen dieser Submodule wurden für diese Dokumentation nicht
+vollständig untersucht. Aussagen über ihre Verwendung beruhen auf Aufrufern und
+Build-Definitionen im Hauptrepository. Eine Änderung innerhalb eines Submoduls erfordert,
+dessen tatsächlichen Commit separat zu lesen und zu prüfen. Dies gilt auch für
+verschachtelte Submodule.
 
-## 4. Which source answers which question?
+## 4. Welche Quelle beantwortet welche Frage?
 
-| Question | Preferred evidence |
+| Frage | Bevorzugter Nachweis |
 | --- | --- |
-| Public signature | Declaration in the relevant header and function definition |
-| Actual behavior | Implementation, callers, state and error paths |
-| Accepted rule syntax | Scanner, parser grammar and specific parser actions |
-| Enabled or disabled feature | Build definitions, preprocessor switches and runtime path |
-| Expected behavior | Existing tests and traceable requirements |
-| Successful in this environment? | An actual recorded build or test run |
-| Historical context | Git commit and diff, clearly distinguished from current code |
+| Öffentliche Signatur | Deklaration im relevanten Header und Funktionsdefinition |
+| Tatsächliches Verhalten | Implementierung, Aufrufer, Zustands- und Fehlerpfade |
+| Akzeptierte Regelsyntax | Scanner, Parser-Grammatik und konkrete Parser-Aktionen |
+| Aktivierte oder deaktivierte Funktion | Build-Definitionen, Präprozessorschalter und Laufzeitpfad |
+| Erwartetes Verhalten | Vorhandene Tests und nachvollziehbare Anforderungen |
+| In dieser Umgebung erfolgreich? | Ein tatsächlich aufgezeichneter Build- oder Testlauf |
+| Historischer Kontext | Git-Commit und Diff, klar von aktuellem Code unterschieden |
 
-The README, comments and Doxygen help with orientation, but may differ from
-the implementation. [fact-check.md](fact-check.md) lists concrete examples.
-A registered test and a successful test run provide different evidence.
+README, Kommentare und Doxygen helfen bei der Orientierung, können aber von der
+Implementierung abweichen. [fact-check.md](fact-check.md) nennt konkrete Beispiele.
+Ein registrierter Test und ein erfolgreicher Testlauf liefern unterschiedliche Nachweise.
 
-## 5. Our additions and external product documentation
+## 5. Eigene Ergänzungen und externe Produktdokumentation
 
-`AGENTS.md`, `CODEX_START.md` and `.codex/` were added for this task.
-The workflows, handoff templates and context verifier are conventions
-for this working repository. They are not presented as existing upstream
-features or instructions from the ModSecurity maintainers.
+`AGENTS.md`, `CODEX_START.md` und `.codex/` wurden für diese Aufgabe ergänzt.
+Arbeitsabläufe, Übergabevorlagen und Kontextprüfer sind Konventionen dieses
+Arbeitsrepositorys. Sie werden nicht als vorhandene Upstream-Funktionen oder
+Anweisungen der ModSecurity-Verantwortlichen dargestellt.
 
-The `.codex` organization is adapted from the owner-selected connector repository
-at the revision recorded in [template-adaptation.md](template-adaptation.md). Its
-policies are structural references, not evidence for libmodsecurity behavior.
-The local manifest schemas and validators are explicitly added working conventions.
+Die `.codex`-Organisation wurde aus dem vom Eigentümer gewählten Connector-Repository
+an dem in [template-adaptation.md](template-adaptation.md) festgehaltenen Stand angepasst.
+Dessen Richtlinien liefern eine Strukturvorlage, keine Nachweise für libmodsecurity-Verhalten.
+Die lokalen Manifestschemata und Prüfprogramme sind ausdrücklich ergänzte Arbeitskonventionen.
 
-The official OpenAI [AGENTS.md guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-and [hooks reference](https://learn.chatgpt.com/docs/hooks) were read on 2026-10-25
-for Codex instruction discovery and supported integration behavior. Their scope
-is Codex; they do not establish OpenAI endorsement of RTK.
+Die offizielle OpenAI-[Anleitung zu AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+und [Hook-Referenz](https://learn.chatgpt.com/docs/hooks) wurden am 25.10.2026 für das
+Auffinden von Codex-Anweisungen und unterstütztes Integrationsverhalten gelesen.
+Sie betreffen Codex und belegen keine Empfehlung von RTK durch OpenAI.
 
-The optional [RTK guide](rtk.md) separately uses `rtk-ai/rtk` tag `v1.0.1`, commit
-`4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`. Its documentation and selected command,
-tracking, and Codex initialization implementations were inspected. This is a
-reference revision, not an installed dependency or a comprehensive RTK review.
-The example commands were not executed with RTK in this environment.
-**Neither external source is authority for ModSecurity behavior.**
+Der optionale [RTK-Leitfaden](rtk.md) verwendet separat `rtk-ai/rtk`, Tag `v1.0.1`,
+Commit `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`. Dessen Dokumentation und ausgewählte
+Implementierungen für Befehle, Erfassung und Codex-Initialisierung wurden untersucht.
+Dies ist ein Referenzstand, keine installierte Abhängigkeit oder umfassende RTK-Prüfung.
+Die Beispielbefehle wurden in dieser Umgebung nicht mit RTK ausgeführt.
+**Keine dieser externen Quellen ist maßgeblich für das Verhalten von ModSecurity.**
 
-This documentation approach requires no particular model version,
-API key or adoption of personal settings. The files must actually be
-accessible to the chat or coding assistant using them.
+Dieser Dokumentationsansatz erfordert keine bestimmte Modellversion, keinen
+API-Schlüssel und keine Übernahme persönlicher Einstellungen. Die Dateien müssen
+für den verwendenden Chat oder Programmierassistenten tatsächlich zugänglich sein.
 
-## 6. Limits of the consistency check
+## 6. Grenzen der Konsistenzprüfung
 
-`verify-context.py` checks Git objects, the inventory, local link targets and
-commit-pinned source paths, including line ranges. Current technical chapters
-must match the pinned baseline commit. Historical session and decision
-evidence may reference its own full commit ID and is checked against
-that commit's locally available Git objects.
+`verify-context.py` prüft Git-Objekte, Inventar, lokale Verweisziele und an einen
+Commit gebundene Quellpfade einschließlich Zeilenbereichen. Aktuelle technische
+Kapitel müssen zur festgehaltenen Grundlage passen. Historische Sitzungs- und
+Entscheidungsnachweise dürfen ihre eigene vollständige Commit-ID verwenden und
+werden gegen die lokal verfügbaren Git-Objekte dieses Commits geprüft.
 
-The verifier does not fetch anything from the network or run build programs.
-A missing required Git object is reported as an error. The check requires
-a Git version with `--no-lazy-fetch`. It does not check whether external
-websites are reachable or whether every sentence is semantically supported
-by its link. That last task remains a code and documentation review.
+Das Prüfprogramm lädt nichts aus dem Netzwerk und führt keine Build-Programme aus.
+Ein fehlendes erforderliches Git-Objekt wird als Fehler gemeldet. Die Prüfung erfordert
+eine Git-Version mit `--no-lazy-fetch`. Sie prüft nicht die Erreichbarkeit externer
+Websites oder ob jeder Satz durch seinen Link inhaltlich gestützt wird. Letzteres
+bleibt Aufgabe eines Code- und Dokumentationsreviews.
 
-The starting state and all checks actually performed are recorded in
-[current-state.md](current-state.md). [upstream-sync.md](upstream-sync.md)
-describes maintenance when adopting a new upstream version.
+Ausgangsstand und tatsächlich ausgeführte Prüfungen sind in
+[current-state.md](current-state.md) festgehalten. [upstream-sync.md](upstream-sync.md)
+beschreibt die Pflege beim Übernehmen einer neuen Upstream-Version.

@@ -1,20 +1,21 @@
-# Optional instruction reuse
+# Optionale Wiederverwendung von Anweisungen
 
-This directory mirrors the template repository's explicit inheritance area.
-There are **no active child repositories inheriting these policies** in this
-setup. Upstream submodule contents have not been modified.
+Dieses Verzeichnis entspricht dem ausdrücklichen Vererbungsbereich der Vorlage.
+In dieser Einrichtung gibt es **keine aktiven untergeordneten Repositories, die diese
+Richtlinien erben**. Inhalte der Upstream-Submodule wurden nicht geändert.
 
-[../inheritance-manifest.toml](../inheritance-manifest.toml) is the digest catalog
-for the local primary policies. The catalog supports reviewable reuse; it does
-not cause Codex or ChatGPT to load instructions across repositories.
+[../inheritance-manifest.toml](../inheritance-manifest.toml) ist der Prüfsummenkatalog
+für die lokalen primären Richtlinien. Der Katalog unterstützt überprüfbare Wiederverwendung;
+er veranlasst Codex oder ChatGPT nicht, Anweisungen über Repository-Grenzen hinweg zu laden.
 
 [child-inheritance-manifest.toml.example](child-inheritance-manifest.toml.example)
-is a disabled example for a future, explicitly scoped child repository. Before
-using it, read that repository's own instructions, verify its actual relative
-paths, select only applicable policies, and replace each digest with the reviewed
-catalog value. Record conflicts and the selected parent commit. Do not place this
-example in an upstream dependency as part of routine setup.
+ist ein deaktiviertes Beispiel für ein späteres, ausdrücklich abgegrenztes untergeordnetes
+Repository. Lies vor seiner Verwendung dessen eigene Anweisungen, prüfe die tatsächlichen
+relativen Pfade, wähle nur anwendbare Richtlinien und ersetze jede Prüfsumme durch den
+überprüften Katalogwert. Halte Konflikte und den gewählten übergeordneten Commit fest.
+Lege dieses Beispiel nicht als gewöhnlichen Einrichtungsschritt in einer Upstream-Abhängigkeit ab.
 
-The current validator checks only this repository's active local catalog. It does
-not validate or activate hypothetical child manifests. Supporting a real child
-repository would require a separate reviewed schema and validator change.
+Der aktuelle Prüfer kontrolliert nur den aktiven lokalen Katalog dieses Repositorys.
+Er prüft oder aktiviert keine hypothetischen untergeordneten Manifeste. Die Unterstützung
+eines tatsächlichen untergeordneten Repositorys würde eine separate, überprüfte Änderung
+am Schema und am Prüfprogramm erfordern.

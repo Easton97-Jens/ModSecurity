@@ -1,21 +1,21 @@
-# Optional strict execution-completeness overlay
+# Optionale Ergänzung zur strikten Vollständigkeit der Ausführung
 
-## Trigger
+## Anlass
 
-Use only when the user explicitly requires every applicable mandatory target in a declared assessment to reach an executed result. This overlay does not authorize crossing permissions, weakening controls, or silently expanding scope.
+Nutze dieses Profil nur, wenn der Nutzer ausdrücklich verlangt, dass jedes anwendbare verpflichtende Ziel einer erklärten Bewertung ein ausgeführtes Ergebnis erreicht. Diese Ergänzung erlaubt weder das Überschreiten von Berechtigungen noch das Abschwächen von Kontrollen oder eine stillschweigende Ausweitung des Umfangs.
 
-## Target accounting
+## Ziele erfassen
 
-Define target IDs and applicability before execution. A target is covered by an actual `passed`/`failed` result, or excluded by a technically justified `not_applicable` decision. Missing tools, access, time, or environment leave an unresolved coverage gap.
+Lege Zielkennungen und Anwendbarkeit vor der Ausführung fest. Ein Ziel ist durch ein tatsächliches Ergebnis `passed`/`failed` abgedeckt oder durch eine technisch begründete Entscheidung `not_applicable` ausgeschlossen. Fehlende Werkzeuge, Zugriff, Zeit oder Umgebung lassen eine ungelöste Abdeckungslücke zurück.
 
-A prerequisite attempt has its own result. If it fails before the target starts, do not count the target as executed or remove it from the completeness denominator. Preserve `blocked`/`not_run` descriptions where useful while keeping the gap explicit.
+Ein Versuch, eine Voraussetzung herzustellen, hat ein eigenes Ergebnis. Scheitert er vor Beginn des Ziels, zähle das Ziel nicht als ausgeführt und entferne es nicht aus der Grundgesamtheit für die Vollständigkeitsberechnung. Erhalte die Beschreibungen `blocked`/`not_run`, soweit hilfreich, und halte die Lücke ausdrücklich sichtbar.
 
-## Work through gaps
+## Lücken bearbeiten
 
-Investigate the first relevant prerequisite failure, use existing supported setup paths, establish missing task-local prerequisites when authorized, rerun the original target after meaningful corrections, and continue independent targets. Retain earlier attempts and the stage reached.
+Untersuche den ersten relevanten Fehler einer Voraussetzung, nutze vorhandene unterstützte Einrichtungswege, stelle fehlende aufgabenlokale Voraussetzungen bei vorhandener Freigabe her, führe das ursprüngliche Ziel nach sinnvollen Korrekturen erneut aus und setze unabhängige Ziele fort. Erhalte frühere Versuche und die jeweils erreichte Stufe.
 
-Do not change assertions, delete cases, bypass isolation, or invent success to satisfy the ledger. Stop repeated attempts when they cannot resolve the concrete blocker within the available authority/environment; report that limitation.
+Ändere keine Prüfaussagen, lösche keine Fälle, umgehe keine Isolation und erfinde keinen Erfolg, um die Aufstellung zu erfüllen. Beende wiederholte Versuche, wenn sie das konkrete Hindernis innerhalb der verfügbaren Befugnisse und Umgebung nicht lösen können; berichte diese Grenze.
 
-## Completion
+## Abschluss
 
-Remaining applicable unresolved targets make strict execution incomplete, even if the report itself is finished. An executed failing product test can still be accounted for completely. Keep execution completeness, product success, and security conclusions separate.
+Verbleibende anwendbare, ungelöste Ziele machen die strikte Ausführung unvollständig, selbst wenn der Bericht selbst fertig ist. Ein ausgeführter fehlgeschlagener Produkttest kann dennoch vollständig erfasst sein. Halte Vollständigkeit der Ausführung, Produkterfolg und Sicherheitsschlussfolgerungen getrennt.

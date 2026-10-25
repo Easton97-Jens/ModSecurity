@@ -1,158 +1,187 @@
-# Decisions
+# Entscheidungen
 
-These decisions describe the working foundation created on 2026-10-25.
-No history from earlier conversations is assumed. Future entries should state
-the date, decision, reason, affected revision, and consequences.
+Diese Entscheidungen beschreiben die am 25.10.2026 geschaffene Arbeitsgrundlage.
+Eine Historie aus früheren Gesprächen wird nicht vorausgesetzt. Künftige Einträge
+sollen Datum, Entscheidung, Grund, betroffenen Stand und Folgen nennen.
+Historische Sprach- und Bereitstellungsentscheidungen bleiben erkennbar; D012
+beschreibt die ausdrücklich angeforderte deutsche Variante.
 
-## D001 — Use the official v3/master source as the technical baseline
+## D001 — Den offiziellen v3/master-Quellcode als technische Grundlage verwenden
 
-**Decision:** The initial documentation describes official commit
+**Entscheidung:** Die anfängliche Dokumentation beschreibt den offiziellen Commit
 `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`.
 
-**Reason:** The owner requires facts grounded in the official ModSecurity v3
-source. The fork was 22 commits behind at the first comparison. A later check,
-before opening the pull request, found that its target branch already matched
-the documented upstream baseline. Both observations are recorded in
+**Grund:** Der Eigentümer verlangt Fakten aus dem offiziellen ModSecurity-v3-Quellcode.
+Beim ersten Vergleich lag der Fork 22 Commits zurück. Eine spätere Prüfung vor dem
+Öffnen des Pull Requests stellte fest, dass sein Zielbranch bereits mit der
+dokumentierten Upstream-Grundlage übereinstimmte. Beide Beobachtungen stehen in
 [provenance.md](provenance.md).
 
-**Consequence:** A later source update requires explanations and references to be
-reviewed again. Source comparison and documentation changes must be distinguished
-from an actual update of the fork's target branch.
+**Folge:** Bei einer späteren Quellenaktualisierung müssen Erklärungen und Verweise
+erneut geprüft werden. Quellenvergleich und Dokumentationsänderungen sind von einer
+tatsächlichen Aktualisierung des Zielbranches im Fork zu unterscheiden.
 
-## D002 — Keep startup instructions concise and subject knowledge separate
+## D002 — Startanweisungen knapp halten und Fachwissen auslagern
 
-**Decision:** `AGENTS.md` defines the working rules and reading order. Detailed
-explanations live in `.codex/` and are read according to the task.
+**Entscheidung:** `AGENTS.md` definiert Arbeitsregeln und Lesereihenfolge.
+Ausführliche Erklärungen liegen in `.codex/` und werden passend zur Aufgabe gelesen.
 
-**Reason:** Reusable context needs clear navigation. One long startup instruction
-would mix operating rules with technical detail. The [index](index.md) routes
-readers to the appropriate chapters.
+**Grund:** Wiederverwendbarer Kontext benötigt klare Navigation. Eine einzige lange
+Startanweisung würde Arbeitsregeln und technische Details vermischen.
+Der [Index](index.md) führt zu den passenden Kapiteln.
 
-**Consequence:** New sessions read the current state and reopen code for detailed
-questions. Automatic loading of every document or remembering every previous
-conversation is not promised.
+**Folge:** Neue Sitzungen lesen den aktuellen Stand und öffnen für Detailfragen erneut
+den Code. Automatisches Laden aller Dokumente oder Erinnern jedes früheren Gesprächs
+wird nicht versprochen.
 
-## D003 — Maintain all added material in English
+## D003 — Die ursprünglichen Ergänzungen auf Englisch pflegen
 
-**Decision:** Documentation, assistant instructions, prompts, handovers, and
-checker messages are maintained in English, following the owner's explicit
-clarification. Actual API names, paths, commands, branch identifiers, and quoted
-source diagnostics retain their original spelling.
+**Entscheidung:** Dokumentation, Assistentenanweisungen, Prompts, Übergaben und Meldungen
+der Prüfprogramme werden gemäß der damaligen ausdrücklichen Präzisierung des Eigentümers
+auf Englisch gepflegt. Tatsächliche API-Namen, Pfade, Befehle, Branch-Bezeichner und
+zitierte Quelldiagnosen behalten ihre ursprüngliche Schreibweise.
 
-**Reason:** The owner requested that the complete addition be in English.
-Preserving source identifiers keeps explanations directly searchable in code.
+**Grund:** Der Eigentümer verlangte die gesamte Ergänzung auf Englisch.
+Unveränderte Quellbezeichner halten Erklärungen direkt im Code durchsuchbar.
 
-## D004 — Distinguish source evidence from recommendations
+**Geltung:** Diese Entscheidung beschreibt die englische Grundlage. Für den später
+beauftragten Branch `codex/kontext-v3-de` gilt die Sprachentscheidung D012.
 
-**Decision:** ModSecurity explanations cite concrete source locations at the
-pinned commit. Suggested workflows and learning paths are identified as project
-conventions. Known conflicts are recorded in [fact-check.md](fact-check.md).
+## D004 — Quellnachweise von Empfehlungen unterscheiden
 
-**Reason:** The owner explicitly requires that information not be invented or
-asserted without verification. A plausible README summary alone is insufficient.
+**Entscheidung:** ModSecurity-Erklärungen zitieren konkrete Quellstellen am
+festgehaltenen Commit. Vorgeschlagene Abläufe und Lernwege sind als Projektkonventionen
+gekennzeichnet. Bekannte Widersprüche stehen in [fact-check.md](fact-check.md).
 
-## D005 — Preserve the original source for this documentation task
+**Grund:** Der Eigentümer verlangt ausdrücklich, dass Informationen nicht erfunden
+oder ohne Prüfung behauptet werden. Eine plausible README-Zusammenfassung allein genügt nicht.
 
-**Decision:** This task adds `AGENTS.md`, `CODEX_START.md`, and `.codex/`. Existing
-implementation, build definitions, tests, and original documentation remain
-unchanged relative to the pinned baseline.
+## D005 — Den Originalquellcode bei der Dokumentationsaufgabe erhalten
 
-**Reason:** The task is a reusable, understandable working foundation. Product
-behavior changes would require their own requirements and verification.
+**Entscheidung:** Die Aufgabe ergänzt `AGENTS.md`, `CODEX_START.md` und `.codex/`.
+Vorhandene Implementierung, Build-Definitionen, Tests und Originaldokumentation bleiben
+gegenüber der festgehaltenen Grundlage unverändert.
 
-**Consequence:** Strict context verification checks that boundary. Documenting
-an upstream discrepancy does not automatically fix it in the product.
+**Grund:** Gefragt ist eine wiederverwendbare, verständliche Arbeitsgrundlage.
+Änderungen am Produktverhalten erfordern eigene Anforderungen und Prüfungen.
 
-## D006 — Do not invent verification success
+**Folge:** Die strenge Kontextprüfung kontrolliert diese Grenze. Eine dokumentierte
+Upstream-Abweichung wird dadurch nicht automatisch im Produkt behoben.
 
-**Decision:** Source/document checks and ModSecurity builds/tests are reported
-separately. Only commands actually run are recorded as executed. Unperformed
-checks remain visible.
+## D006 — Keine erfolgreichen Prüfungen erfinden
 
-**Reason:** Reading source establishes specific code facts, not successful
-execution on a later target platform.
+**Entscheidung:** Quellen-/Dokumentprüfungen und ModSecurity-Builds/-Tests werden
+getrennt berichtet. Nur tatsächlich ausgeführte Befehle werden als ausgeführt festgehalten.
+Nicht durchgeführte Prüfungen bleiben sichtbar.
 
-## D007 — Use the existing fork
+**Grund:** Das Lesen von Quellcode belegt konkrete Code-Fakten, keine erfolgreiche
+Ausführung auf einer späteren Zielplattform.
 
-**Decision:** Following the owner's explicit clarification, the files belong in
-`Easton97-Jens/ModSecurity`. The working branch is `codex/kontext-v3`, with a pull
-request targeting that fork's `v3/master`.
+## D007 — Den bestehenden Fork verwenden
 
-**Reason:** The owner wants the existing fork as the working location. A fresh
-comparison before the pull request found that its `v3/master` already matched
-the documented official baseline. The pull request therefore contains only the
-context additions; the earlier lag is retained as a historical observation.
+**Entscheidung:** Nach ausdrücklicher Präzisierung des Eigentümers gehören die Dateien
+in `Easton97-Jens/ModSecurity`. Der damalige Arbeitsbranch ist `codex/kontext-v3`,
+mit einem Pull Request gegen `v3/master` dieses Forks.
 
-**Consequence:** Read and work on the context branch before integration into
-`v3/master`. Merging is a separate action. Actual branch and pull-request state
-is recorded in [current-state.md](current-state.md).
+**Grund:** Der Eigentümer möchte den vorhandenen Fork als Arbeitsort. Ein erneuter
+Vergleich vor dem Pull Request zeigte, dass dessen `v3/master` bereits zur dokumentierten
+offiziellen Grundlage passte. Der Pull Request enthält deshalb nur Kontextergänzungen;
+der frühere Rückstand bleibt als historische Beobachtung erhalten.
 
-## D008 — Adapt the selected connector context layout
+**Folge:** Vor einer Integration nach `v3/master` wird auf dem Kontextbranch gelesen
+und gearbeitet. Mergen ist eine gesonderte Aktion. Tatsächliche Branch- und PR-Stände
+stehen in [current-state.md](current-state.md). D012 ergänzt den später beauftragten
+deutschen Branch ohne neuen Pull Request.
 
-**Date:** 2026-10-25.
+## D008 — Den gewählten Connector-Kontextaufbau anpassen
 
-**Decision:** Follow the structure inspected at connector-template commit
-`42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3`, with `context/`, routed policies and
-profiles, security checks, `bin/`, `audit/`, and explicit manifests. Place detailed
-core guides and durable session context in that layout.
+**Datum:** 25.10.2026.
 
-**Reason:** The owner explicitly selected the existing connector setup as the
-structural model. Core component areas replace connector host deltas. No
-Framework/MRTS topology, machine paths, mandatory unavailable wrappers, historical
-connector outcomes, or bilingual requirement is imported.
+**Entscheidung:** Folge der am Connector-Vorlagen-Commit
+`42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` untersuchten Struktur mit `context/`,
+zugeordneten Richtlinien und Profilen, Sicherheitsprüfungen, `bin/`, `audit/` und
+ausdrücklichen Manifesten. Ordne ausführliche Kernleitfäden und dauerhaften Sitzungskontext dort ein.
 
-**Consequence:** The [adaptation record](template-adaptation.md) identifies the
-scope and changes. The local catalog checks primary-policy digests; it does not
-activate policy inheritance in submodules. ModSecurity product facts continue to
-come exclusively from the pinned official core source.
+**Grund:** Der Eigentümer wählte die bestehende Connector-Einrichtung ausdrücklich
+als Strukturvorlage. Kernkomponenten ersetzen Connector-Host-Unterschiede. Keine
+Framework-/MRTS-Topologie, Maschinenpfade, verpflichtenden nicht verfügbaren Wrapper,
+historischen Connector-Ergebnisse oder Zweisprachigkeitsvorgaben werden übernommen.
 
-## D009 — Make the root agreement reusable across repositories
+**Folge:** Der [Anpassungsnachweis](template-adaptation.md) bezeichnet Umfang und Änderungen.
+Der lokale Katalog prüft Prüfsummen der primären Richtlinien; er aktiviert keine
+Richtlinienvererbung in Submodulen. ModSecurity-Produktfakten stammen weiterhin
+ausschließlich aus der festgehaltenen offiziellen Kernquelle.
 
-**Date:** 2026-10-25.
+## D009 — Die Arbeitsvereinbarung für beliebige Repositories wiederverwendbar machen
 
-**Decision:** Keep `AGENTS.md` independent of a particular project, account,
-branch, implementation language, build system, or installed helper. Discover
-available project context conditionally. Place this fork's concrete constraints
-and startup procedure in [repository-context.md](repository-context.md), routed
-from the index. The `.codex` guides and validators remain specific to this core.
+**Datum:** 25.10.2026.
 
-**Reason:** The owner clarified that the agreement must be valid for all
-repositories. A reusable root must also be usable without this `.codex` layout,
-Python helpers, or a Git checkout.
+**Entscheidung:** Halte `AGENTS.md` unabhängig von einem bestimmten Projekt, Konto,
+Branch, einer Implementierungssprache, einem Build-System oder installierten Hilfsprogramm.
+Ermittle vorhandenen Projektkontext bedingt. Lege konkrete Vorgaben und den Startablauf
+dieses Forks in [repository-context.md](repository-context.md) ab, auf den der Index verweist.
+Die `.codex`-Leitfäden und Prüfprogramme bleiben auf diesen Kern zugeschnitten.
 
-**Consequence:** The same root file can be reused unchanged elsewhere. This change
-does not distribute it to other repositories or install global instructions.
-It preserves project-specific source authority and verification through the local
-context instead of embedding those assumptions in the portable agreement.
+**Grund:** Der Eigentümer stellte klar, dass die Vereinbarung für alle Repositories
+gelten soll. Eine wiederverwendbare Hauptanweisung muss auch ohne diesen `.codex`-Aufbau,
+Python-Hilfsprogramme oder Git-Checkout verwendbar sein.
 
-## D010 — Leave chat language to each person
+**Folge:** Dieselbe Hauptdatei kann andernorts unverändert wiederverwendet werden.
+Diese Änderung verteilt sie nicht an andere Repositories und installiert keine globalen
+Anweisungen. Projektspezifische Quellenautorität und Prüfungen bleiben im lokalen Kontext
+erhalten, statt diese Annahmen in der portablen Vereinbarung festzuschreiben.
 
-**Date:** 2026-10-25.
+## D010 — Die Chatsprache jeder Person überlassen
 
-**Decision:** Maintained repository files remain English. The repository agreement,
-local context, and startup prompts prescribe no chat language. Each person chooses
-the language of their conversation.
+**Datum:** 25.10.2026.
 
-**Reason:** The owner explicitly clarified that chat language is an individual
-choice. A language requested in one conversation must not become a repository-wide
-default. D003 continues to govern maintained files.
+**Entscheidung:** In der ursprünglichen Variante bleiben gepflegte Repository-Dateien
+Englisch. Arbeitsvereinbarung, lokaler Kontext und Startprompts schreiben keine Chatsprache
+vor. Jede Person entscheidet selbst über die Sprache ihres Gesprächs.
 
-## D011 — Use optional RTK summaries with official Codex integration guidance
+**Grund:** Der Eigentümer stellte ausdrücklich klar, dass die Chatsprache eine individuelle
+Wahl ist. Eine Sprache, die in einem Gespräch gewünscht wird, darf nicht zum Standard
+für das gesamte Repository werden. D003 galt für die ursprünglichen gepflegten Dateien;
+D012 legt ausschließlich die Dateisprache der deutschen Variante fest.
 
-**Date:** 2026-10-25.
+## D011 — Optionale RTK-Zusammenfassungen mit offizieller Codex-Anleitung verwenden
 
-**Decision:** Prefer supported RTK commands for routine summaries when the tool is
-available, with native-tool fallback. Keep the root rule portable and route the
-source-checked examples and setup boundaries through [rtk.md](rtk.md). Codex
-mechanisms follow official OpenAI documentation; RTK commands follow the inspected
-RTK `v1.0.1` source at `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`.
+**Datum:** 25.10.2026.
 
-**Reason:** The owner requested RTK to reduce token usage and explicitly required
-compliance with official Codex documentation. Reading fewer routine output bytes
-is useful, but a filtered summary cannot replace exact evidence.
+**Entscheidung:** Bevorzuge unterstützte RTK-Befehle für routinemäßige Zusammenfassungen,
+wenn das Werkzeug verfügbar ist, mit Rückgriff auf native Werkzeuge. Halte die Hauptregel
+portabel und verweise für quellengeprüfte Beispiele und Einrichtungsgrenzen auf
+[rtk.md](rtk.md). Codex-Mechanismen folgen offizieller OpenAI-Dokumentation; RTK-Befehle
+folgen dem untersuchten RTK-Quellstand `v1.0.1` an
+`4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`.
 
-**Consequence:** Source inspection, complete diffs, diagnostics, machine-readable
-data, and final validation use suitable unfiltered output. ModSecurity build/test
-commands and context-validator implementations stay unchanged. This task adds
-guidance without installing RTK, running its initializer, enabling hooks/proxies,
-or changing personal Codex settings. No actual token or billing saving is claimed.
+**Grund:** Der Eigentümer wünschte RTK zur Reduzierung des Tokenverbrauchs und verlangte
+ausdrücklich die Einhaltung offizieller Codex-Dokumentation. Weniger routinemäßige
+Ausgabebytes zu lesen ist hilfreich; gefilterte Zusammenfassungen ersetzen jedoch keine genauen Nachweise.
+
+**Folge:** Quellenuntersuchung, vollständige Diffs, Diagnosen, maschinenlesbare Daten
+und abschließende Validierung verwenden geeignete ungefilterte Ausgaben.
+ModSecurity-Build-/Testbefehle und die Implementierung der Kontextprüfer blieben bei
+dieser RTK-Ergänzung unverändert. Die Aufgabe ergänzt Hinweise, ohne RTK zu installieren,
+seinen Initialisierer auszuführen, Hooks/Proxys zu aktivieren oder persönliche
+Codex-Einstellungen zu ändern. Tatsächliche Token- oder Abrechnungseinsparungen werden nicht behauptet.
+
+## D012 — Eine vollständige deutsche Variante in einem eigenen Branch bereitstellen
+
+**Datum:** 25.10.2026.
+
+**Entscheidung:** Übersetze die Kontextdateien aus `codex/kontext-v3`, Commit
+`a35e8c3a1116a763f286f965f718f36d5f8876cc`, und lade sie im bestehenden Fork
+`Easton97-Jens/ModSecurity` unter `codex/kontext-v3-de` hoch. Erstelle dafür keinen
+Pull Request. Die englische Fassung wird nicht verändert.
+
+**Grund:** Der Eigentümer präzisierte ausdrücklich, dass die tatsächlichen Branch-Dateien
+und nicht bloß der PR-Text übersetzt werden sollen.
+
+**Folge:** Die ergänzten Anweisungen, Leitfäden, Tabellen, Prompts, Übergaben und eigenen
+Prüfmeldungen dieser Variante sind Deutsch. Dateinamen, technische Bezeichner, Quellcode,
+CLI-Optionen, Quellen-URLs, Git-IDs und maschinenlesbare Schlüssel bleiben erhalten.
+Aktuelle Navigationsbefehle und Branch-Angaben verwenden den deutschen Branch; historische
+Angaben zur englischen Arbeit bleiben als solche erkennbar. Das Quelleninventar und die
+Produktdateien werden nicht übersetzt. Richtlinien-Prüfsummen werden nach Prüfung erneuert.
+Die Chatsprache bleibt gemäß D010 frei wählbar. Upload ist beauftragt, PR und Merge sind es nicht.

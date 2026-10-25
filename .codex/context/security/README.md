@@ -1,28 +1,28 @@
-# Optional core security review guides
+# Optionale Leitfäden zur Sicherheitsprüfung der Kernbibliothek
 
-These documents are reusable review instructions, not findings or completed scans. Use them only for the task selected by the user. They introduce no default security-scan requirement.
+Diese Dokumente sind wiederverwendbare Prüfanweisungen, keine Befunde oder abgeschlossenen Scans. Nutze sie nur für die vom Nutzer ausgewählte Aufgabe. Sie führen keine standardmäßige Pflicht zu Sicherheitsscans ein.
 
-The organization is adapted from the [connector reference's security index](https://github.com/Easton97-Jens/ModSecurity-conector/blob/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex/context/security/README.md#L1-L23). That repository supplies the design pattern; core-library behavior must be established from this repository's own pinned sources.
+Die Gliederung ist aus dem [Sicherheitsindex der Connector-Referenz](https://github.com/Easton97-Jens/ModSecurity-conector/blob/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex/context/security/README.md#L1-L23) angepasst. Dieses Repository liefert das Gestaltungsmuster; das Verhalten der Kernbibliothek muss aus den eigenen festgelegten Quellen dieses Repositorys ermittelt werden.
 
-## Reading order
+## Lesereihenfolge
 
-1. Choose an [assessment profile](../profiles/README.md) and record its scope.
-2. For a requested deep review, read the [shared core assessment procedure](core-deep-assessment.md).
-3. Select the relevant [component guides](components/README.md).
-4. Load only the check modules linked by the selected components and questions.
-5. Use the [security policy](../security-policy.md) and [protocol/build boundary guide](../protocol-and-hardening.md) to keep evidence and scope explicit.
+1. Wähle ein [Bewertungsprofil](../profiles/README.md) und halte seinen Umfang fest.
+2. Lies für eine angefragte vertiefte Prüfung den [gemeinsamen Bewertungsablauf für den Kern](core-deep-assessment.md).
+3. Wähle die relevanten [Komponentenleitfäden](components/README.md).
+4. Lade nur die Prüfmodule, auf die die ausgewählten Komponenten und Fragen verweisen.
+5. Nutze die [Sicherheitsrichtlinie](../security-policy.md) und den [Leitfaden zu Protokoll- und Build-Grenzen](../protocol-and-hardening.md), um Nachweise und Umfang ausdrücklich festzuhalten.
 
-## Shared guidance
+## Gemeinsame Hinweise
 
-| Guide | Use |
+| Leitfaden | Verwendung |
 | --- | --- |
-| [Core deep assessment](core-deep-assessment.md) | Plan a source-backed investigation and validate candidates. |
-| [Analysis services](analysis-services-policy.md) | Reconcile actually available external analysis when requested. |
-| [Quality scoring](quality-scoring-policy.md) | Define an optional evidence-based score before scored work. |
-| [Components](components/README.md) | Identify library boundaries and relevant checks. |
+| [Vertiefte Bewertung des Kerns](core-deep-assessment.md) | Eine quellcodegestützte Untersuchung planen und Kandidaten validieren. |
+| [Analysedienste](analysis-services-policy.md) | Tatsächlich verfügbare externe Analyse auf Anfrage abgleichen. |
+| [Qualitätsbewertung](quality-scoring-policy.md) | Eine optionale nachweisgestützte Punktbewertung vor der bewerteten Arbeit festlegen. |
+| [Komponenten](components/README.md) | Bibliotheksgrenzen und relevante Prüfungen bestimmen. |
 
-## Evidence boundary
+## Nachweisgrenze
 
-A result belongs to its component, source revision, caller, configuration, dependency/backend choices, and executed cases. Share evidence across components only when the report identifies the common implementation and explains why the same result covers each claim. A library build, test definition, generated report, or rule match does not establish a live connector outcome.
+Ein Ergebnis gehört zu seiner Komponente, seinem Quellstand, Aufrufer, seiner Konfiguration, den gewählten Abhängigkeiten beziehungsweise Backends und ausgeführten Fällen. Nutze Nachweise nur dann komponentenübergreifend, wenn der Bericht die gemeinsame Implementierung benennt und erklärt, warum dasselbe Ergebnis jede Aussage abdeckt. Ein Bibliotheks-Build, eine Testdefinition, ein generierter Bericht oder ein Regeltreffer belegt kein Ergebnis eines laufenden Connectors.
 
-The component set is a navigation aid, not proof that every file or possible input has been reviewed. Missing evidence remains visible.
+Die Komponentenauswahl dient der Navigation und beweist nicht, dass jede Datei oder mögliche Eingabe geprüft wurde. Fehlende Nachweise bleiben sichtbar.

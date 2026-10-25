@@ -1,83 +1,84 @@
-# Delivery and continuous integration
+# Bereitstellung und kontinuierliche Integration
 
-## Scope and authority
+## Umfang und Freigaben
 
-This working policy separates preparation, remote delivery, and verified
-results. Follow the user's current target repository and branch. Existing
-authorization carries forward; a local-only task does not automatically become
-a commit, push, pull request, merge, release, or deployment.
+Diese Arbeitsrichtlinie unterscheidet Vorbereitung, Bereitstellung im Remote-Repository
+und überprüfte Ergebnisse. Folge dem aktuellen Zielrepository und Branch des Nutzers.
+Vorhandene Freigaben gelten weiter; eine rein lokale Aufgabe wird nicht automatisch
+zu Commit, Push, Pull Request, Merge, Release oder Deployment.
+Die deutsche Kontextvariante ist zum Hochladen nach `codex/kontext-v3-de` freigegeben;
+ein Pull Request soll dafür nicht erstellt werden.
 
-Prepare and review the requested changes fully before asking for any genuinely
-missing final authorization. Do not require repeated confirmation for actions
-already included in the task. Conversely, a successful check does not grant
-authority for a new external destination or branch.
+Bereite die gewünschten Änderungen vollständig vor und prüfe sie, bevor du nach einer
+tatsächlich fehlenden abschließenden Freigabe fragst. Verlange keine wiederholte Bestätigung
+für bereits beauftragte Aktionen. Umgekehrt erlaubt eine erfolgreiche Prüfung keinen
+Schreibzugriff auf ein neues externes Ziel oder einen anderen Branch.
 
-## Prepare a reviewable change
+## Eine überprüfbare Änderung vorbereiten
 
-Before an authorized commit or upload:
+Vor einem freigegebenen Commit oder Upload:
 
-1. Verify the intended repository, branch, current HEAD, and remote identity.
-2. Review the complete task diff, including added files and submodule pointers.
-3. Run `git diff --check` and the applicable checks from
-   [testing-and-evidence.md](testing-and-evidence.md). Record failures and limits.
-4. Stage only the intended files. Exclude credentials, local caches, generated
-   runtime logs, and other unrelated or temporary artifacts.
-5. Update the English context and handover with the actual state and next step.
-6. Confirm that any task-owned background work has completed or been stopped.
+1. Prüfe vorgesehenes Repository, Branch, aktuellen HEAD und Remote-Identität.
+2. Prüfe den vollständigen aufgabenbezogenen Diff einschließlich neuer Dateien und Submodulverweise.
+3. Führe `git diff --check` und anwendbare Prüfungen aus
+   [testing-and-evidence.md](testing-and-evidence.md) aus. Halte Fehlschläge und Grenzen fest.
+4. Nimm nur vorgesehene Dateien in den Index auf. Schließe Zugangsdaten, lokale Caches,
+   generierte Laufzeitprotokolle und andere sachfremde oder temporäre Artefakte aus.
+5. Aktualisiere den deutschen Kontext und die Übergabe mit tatsächlichem Stand und nächstem Schritt.
+6. Prüfe, ob aufgabenbezogene Hintergrundarbeit abgeschlossen oder beendet wurde.
 
-Use a focused commit when committing is within scope. Preserve unrelated
-working-tree changes and other contributors' work. Do not force-push, rewrite
-shared history, merge, or publish a release as an incidental delivery step.
+Erstelle einen gezielten Commit, wenn dies zum Auftrag gehört. Erhalte sachfremde
+Änderungen im Arbeitsbaum und Beiträge anderer. Führe keinen Force-Push, keine
+Umschreibung gemeinsamer Historie, keinen Merge und keine Release-Veröffentlichung
+als beiläufigen Bereitstellungsschritt aus.
 
-## What the pinned workflow files establish
+## Was die festgehaltenen Workflow-Dateien belegen
 
-The upstream files below define CI procedures at the pinned source revision.
-They do not establish that Actions are enabled in this fork, that a run passed,
-or that a particular job is required by current branch protection.
+Die folgenden Upstream-Dateien definieren CI-Abläufe am festgehaltenen Quellstand.
+Sie beweisen nicht, dass Actions in diesem Fork aktiviert sind, ein Lauf erfolgreich war
+oder ein bestimmter Job durch die aktuelle Branch-Schutzkonfiguration vorgeschrieben ist.
 
-| Workflow | Source-backed role |
+| Workflow | Durch die Quelle belegte Rolle |
 | --- | --- |
-| `.github/workflows/ci.yml` | Push/PR workflows include Linux build/test configurations and a separate Windows path. |
-| `.github/workflows/ci_new.yml` | Push/PR workflows include Linux, macOS, Windows, and cppcheck jobs. |
-| `.github/workflows/release-windows.yml` | Defines Windows build/package jobs and a publication job gated on a pushed tag; it also supports manual dispatch. |
+| `.github/workflows/ci.yml` | Push-/PR-Workflows umfassen Linux-Build-/Testkonfigurationen und einen separaten Windows-Weg. |
+| `.github/workflows/ci_new.yml` | Push-/PR-Workflows umfassen Linux-, macOS-, Windows- und cppcheck-Jobs. |
+| `.github/workflows/release-windows.yml` | Definiert Windows-Build-/Paketierungsjobs und einen Veröffentlichungsjob, der an einen gepushten Tag gebunden ist; unterstützt auch manuelles Auslösen. |
 
-Sources: [CI definitions][ci], [additional CI definitions][ci-new],
-[Windows release triggers][release-trigger], [publication condition][release-publish].
+Quellen: [CI-Definitionen][ci], [weitere CI-Definitionen][ci-new],
+[Auslöser des Windows-Releases][release-trigger], [Veröffentlichungsbedingung][release-publish].
 
-Use [build-and-test.md](build-and-test.md) for local build details. Do not copy
-workflow package installation, machine-wide changes, or release commands into
-a documentation task. A push may trigger configured workflows; account for
-that real destination behavior when preparing an authorized delivery.
+Nutze [build-and-test.md](build-and-test.md) für lokale Build-Details. Übernimm keine
+Paketinstallationen aus Workflows, systemweiten Änderungen oder Release-Befehle in eine
+Dokumentationsaufgabe. Ein Push kann konfigurierte Workflows auslösen; berücksichtige
+das tatsächliche Verhalten des Ziels bei einer freigegebenen Bereitstellung.
 
-## Bind remote results to the delivered revision
+## Remote-Ergebnisse der ausgelieferten Revision zuordnen
 
-After an authorized push, verify the remote branch points to the intended
-commit. When a PR is in scope, verify its target branch and head SHA as well.
-Describe the problem, resulting behavior, actual validation, and material
-limitations in its text.
+Prüfe nach einem freigegebenen Push, ob der Remote-Branch auf den vorgesehenen Commit zeigt.
+Wenn ein PR zum Auftrag gehört, prüfe zusätzlich Zielbranch und Head-SHA. Beschreibe
+im PR-Text Problem, resultierendes Verhalten, tatsächliche Validierung und wesentliche Grenzen.
 
-Read applicable check results for that exact head. An older successful run,
-a workflow file, or a successful upload is not a successful current-head check.
-Report pending, failed, cancelled, skipped, inaccessible, and unknown results
-accurately. Resolve required review feedback within scope and inspect the new
-head after a follow-up push.
+Lies die anwendbaren Prüfergebnisse für genau diesen Head. Ein älterer erfolgreicher Lauf,
+eine Workflow-Datei oder ein erfolgreicher Upload ist keine erfolgreiche Prüfung des
+aktuellen Heads. Berichte ausstehende, fehlgeschlagene, abgebrochene, übersprungene,
+nicht zugängliche und unbekannte Ergebnisse korrekt. Bearbeite erforderliche Review-Rückmeldungen
+innerhalb des Umfangs und prüfe nach einem weiteren Push den neuen Head.
 
-SonarQube applies only when the task or actual repository configuration makes
-it relevant; use [sonarqube-policy.md](sonarqube-policy.md). Do not invent a
-server, project identifier, mandatory quality gate, or passing analysis.
+SonarQube ist nur relevant, wenn Aufgabe oder tatsächliche Repository-Konfiguration es
+vorsehen; nutze [sonarqube-policy.md](sonarqube-policy.md). Erfinde keinen Server,
+Projektbezeichner, verpflichtende Qualitätsprüfung oder erfolgreiche Analyse.
 
-## Report the state reached
+## Erreichten Stand berichten
 
-Use precise descriptions such as `local_complete`, `committed`, `pushed`,
-`pr_open`, `checks_pending`, `remediation_required`, `blocked`, or `failed`.
-These are reporting conventions, not claims that a delivery service exists.
+Nutze genaue Bezeichnungen wie `local_complete`, `committed`, `pushed`, `pr_open`,
+`checks_pending`, `remediation_required`, `blocked` oder `failed`.
+Dies sind Berichtskonventionen und keine Behauptung, dass ein Bereitstellungsdienst existiert.
 
-Use `verified_pr` only when a PR exists and all applicable required checks and
-task-owned feedback for its current head have been resolved with evidence.
-State any check whose applicability could not be established. This status
-does not authorize merge or release. For a task limited to local preparation,
-a complete reviewable diff and truthful validation report can be the final
-deliverable.
+Nutze `verified_pr` nur, wenn ein PR besteht und alle anwendbaren Pflichtprüfungen sowie
+aufgabenbezogenen Rückmeldungen für seinen aktuellen Head nachweislich geklärt sind.
+Benenne Prüfungen, deren Anwendbarkeit nicht feststellbar war. Dieser Status erlaubt keinen
+Merge oder Release. Bei einer auf lokale Vorbereitung begrenzten Aufgabe können ein
+vollständiger überprüfbarer Diff und ein wahrheitsgemäßer Prüfbericht das Endergebnis sein.
 
 [ci]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.github/workflows/ci.yml#L1-L163
 [ci-new]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.github/workflows/ci_new.yml

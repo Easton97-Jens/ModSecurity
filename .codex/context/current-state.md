@@ -1,105 +1,147 @@
-# Current working state
+# Aktueller Arbeitsstand
 
-Recorded on **2026-10-25**. Recheck the actual branch, commit, and remote state
-when resuming; branch names and PR status can change.
+Festgehalten am **25.10.2026** (Europe/Berlin). Prüfe bei Wiederaufnahme den tatsächlichen
+Branch, Commit und Remote-Zustand erneut; Branch-Namen und PR-Status können sich ändern.
 
-## Goal and completed content
+## Aktueller Auftrag: deutsche Variante
 
-Add English `AGENTS.md` and comprehensive reusable `.codex` context to the existing
-**Easton97-Jens/ModSecurity** fork. Explain the repository, central functionality,
-C++/C interfaces, configuration, builds, and tests from official v3 source. Follow
-the owner-selected connector repository's context structure, tailored to the core.
+Übersetze die Kontextdateien aus **`Easton97-Jens/ModSecurity:codex/kontext-v3`**,
+Commit `a35e8c3a1116a763f286f965f718f36d5f8876cc`, vollständig ins Deutsche und lade
+sie im selben bestehenden Fork unter **`codex/kontext-v3-de`** hoch.
+**Keinen Pull Request erstellen und nicht mergen.** Der englische Branch bleibt erhalten.
 
-The routed layout, technical guides, working policies, optional assessment
-profiles, component/check guides, manifests, validators, prompts, and handover
-mechanism are prepared. Following the owner's clarification, the root `AGENTS.md`
-is now reusable unchanged across repositories. Concrete ModSecurity constraints
-and startup checks are in [repository-context.md](repository-context.md).
-Maintained files are English. No chat language is prescribed; each person chooses
-their conversation language. The index and startup prompt preserve that distinction.
-The [index](index.md) is the entry point. The [adaptation record](template-adaptation.md)
-explains the template mapping and the reference-specific assumptions that were omitted.
+Die Variante umfasst die wiederverwendbare `AGENTS.md`, `CODEX_START.md` und `.codex/`
+mit technischen Leitfäden, Arbeitsrichtlinien, optionalen Prüfprofilen,
+Komponenten-/Prüfleitfäden, Manifesten, Prüfprogrammen, Prompts und Übergaben.
+Die Dateien dieser Variante werden auf Deutsch gepflegt. Eine Chatsprache wird nicht
+vorgeschrieben; jede Person entscheidet selbst. Konkrete ModSecurity-Vorgaben und
+Startprüfungen stehen in [repository-context.md](repository-context.md); die
+Arbeitsvereinbarung im Hauptverzeichnis bleibt über Repositories hinweg wiederverwendbar.
 
-At the owner's request, [rtk.md](rtk.md) now documents optional RTK output summaries.
-The reusable root prefers supported summaries when RTK is available, with native
-output for exact evidence and final validation. Official OpenAI documentation
-governs Codex integration; pinned RTK source governs its examples. This addition
-does not install RTK, run its initializer, activate hooks/proxies, or change
-personal settings. No runtime token or billing savings have been measured.
+Der [Index](index.md) ist der Einstiegspunkt. Der [Anpassungsnachweis](template-adaptation.md)
+erklärt die Vorlagenzuordnung und ausgelassene referenzspezifische Annahmen.
+Technische Bezeichner, Quellenverweise, Quellcode und maschinenlesbare Schlüssel bleiben
+erhalten. Aktuelle Branch-Verweise und Navigationsbefehle nennen den deutschen Branch;
+historische Angaben zur englischen Fassung bleiben als solche gekennzeichnet.
 
-## Verified source boundaries
+## Inhalt und Ursprung der englischen Grundlage
 
-| Item | Recorded revision or scope |
+Die ursprüngliche Aufgabe ergänzte englische `AGENTS.md`- und ausführliche `.codex`-Dateien
+im bestehenden Fork. Sie erklären Repository, zentrale Funktionen, C++-/C-Schnittstellen,
+Konfiguration, Builds und Tests anhand offizieller v3-Quellen. Der Aufbau folgt dem vom
+Eigentümer gewählten Connector-Repository und ist auf die Kernbibliothek angepasst.
+
+Auf Wunsch des Eigentümers dokumentiert [rtk.md](rtk.md) optionale RTK-Ausgabezusammenfassungen.
+Die wiederverwendbare Hauptanweisung bevorzugt unterstützte Zusammenfassungen bei verfügbarem
+RTK und native Ausgaben für genaue Nachweise und abschließende Prüfungen. Offizielle
+OpenAI-Dokumentation bestimmt die Codex-Integration; festgehaltene RTK-Quellen bestimmen
+die Beispiele. Diese Ergänzung installiert RTK nicht, führt dessen Initialisierer nicht aus,
+aktiviert keine Hooks/Proxys und verändert keine persönlichen Einstellungen.
+Token- oder Abrechnungseinsparungen zur Laufzeit wurden nicht gemessen.
+
+## Überprüfte Quellgrenzen
+
+| Gegenstand | Festgehaltener Stand oder Umfang |
 | --- | --- |
-| Official product source | `owasp-modsecurity/ModSecurity`, `v3/master`, `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
-| Existing fork target, latest observed comparison | `Easton97-Jens/ModSecurity:v3/master`, same `effb6c0...` commit |
-| Structure template | `Easton97-Jens/ModSecurity-conector:master`, `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` |
-| Main-source inventory | 850 entries: 846 blobs and 4 gitlinks |
-| Reference inventory | 72 tracked `.codex` files plus root `AGENTS.md`, `README.md`, `.gitignore`, and `Makefile` |
-| Optional RTK reference | `rtk-ai/rtk` tag `v1.0.1`, commit `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`; separate from ModSecurity source |
-| Codex integration reference | Official OpenAI AGENTS.md and hooks documentation, read on 2026-10-25; see [provenance](provenance.md) |
-| Product changes | None outside `AGENTS.md`, `CODEX_START.md`, and `.codex/` |
+| Offizielle Produktquelle | `owasp-modsecurity/ModSecurity`, `v3/master`, `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` |
+| Fork-Ziel, letzter festgehaltener Vergleich der Grundlagenarbeit | `Easton97-Jens/ModSecurity:v3/master`, derselbe Commit `effb6c0...` |
+| Strukturvorlage | `Easton97-Jens/ModSecurity-conector:master`, `42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3` |
+| Hauptquelleninventar | 850 Einträge: 846 Blobs und 4 Gitlinks |
+| Referenzinventar | 72 versionierte `.codex`-Dateien sowie `AGENTS.md`, `README.md`, `.gitignore` und `Makefile` im Hauptverzeichnis |
+| Optionale RTK-Referenz | `rtk-ai/rtk`, Tag `v1.0.1`, Commit `4ef8730cf3a0dea11c8d64a9b90bc0616fe52100`; von ModSecurity-Quellen getrennt |
+| Referenz der Codex-Integration | Offizielle OpenAI-Dokumentation zu AGENTS.md und Hooks, am 25.10.2026 gelesen; siehe [Quellenherkunft](provenance.md) |
+| Englische Übersetzungsgrundlage | Commit `a35e8c3a1116a763f286f965f718f36d5f8876cc`, Baum `05186c8c673a1a86ff35abe4f414376c22704ab5` |
+| Produktänderungen | Keine außerhalb von `AGENTS.md`, `CODEX_START.md` und `.codex/`; durch strenge Kontextprüfung bestätigt |
 
-The first fork observation was 22 commits behind upstream; the subsequent target
-observation matched the baseline. These are separately retained historical facts,
-not a 22-commit product delta in this context delivery. See [provenance](provenance.md)
-and [upstream-lock.json](upstream-lock.json).
+Die erste Fork-Beobachtung lag 22 Commits hinter Upstream; die spätere Zielbeobachtung
+entsprach der Grundlage. Das sind separat erhaltene historische Fakten und kein
+Produktunterschied von 22 Commits bei der Kontextbereitstellung. Siehe
+[provenance.md](provenance.md) und [upstream-lock.json](upstream-lock.json).
 
-## Verification actually completed
+## Historische Prüfungen der englischen Ausgangsversion
 
-All commands below were run from the repository root with Python 3.12.14 and Git
-supporting `--no-lazy-fetch`. Final document counts are reported by the verifier
-because later handover updates can add Markdown and links.
+Die folgenden Ergebnisse wurden vor der Übersetzung festgehalten. Sie sind keine
+Behauptung, dass diese Prüfungen für die deutsche Fassung erneut ausgeführt wurden.
+Die damaligen Befehle liefen vom Repository-Hauptverzeichnis aus mit Python 3.12.14
+und Git mit Unterstützung für `--no-lazy-fetch`. Dokumentzahlen werden vom Prüfprogramm
+gemeldet, weil spätere Übergaben Markdown-Dateien und Links ergänzen können.
 
-| Check | Observed result |
+| Prüfung | Damals beobachtetes Ergebnis |
 | --- | --- |
-| `python3 .codex/bin/verify-context.py --strict-source` | Exit 0; pinned tree, complete source inventory, local document targets, 487 unique pinned ModSecurity source links and line ranges, and unchanged product-source boundary |
-| `python3 .codex/bin/validate-structure.py` | Exit 0; 95 routed files, required layout, identity, and manifest consistency |
-| `python3 .codex/bin/validate-codex-inheritance.py --check` | Exit 0; 23 local policy digests, no active child inheritance |
-| `git diff --check` | Exit 0; no whitespace errors in the RTK documentation follow-up |
-| RTK source-reference check | Tag resolved to the recorded commit; 19 cited source paths/line ranges checked against the local reference clone; separate from the ModSecurity validator |
-| Pinned template-link verification | Valid local Git objects and line ranges at the reference commit |
-| Independent documentation/source review | Foundation and portability reviews completed; RTK examples/source mapping and official Codex documentation checked. The separate scope of proxy statistics was clarified after review. |
-| Independent helper probes in an isolated copy | Missing/bad/outside-root links, stale digests, duplicate IDs, and invalid paths rejected; historical evidence and fenced examples handled as documented |
-| Helper fixes rechecked | Dated session records need no active route; colliding derived policy IDs are rejected before writes; catalog symlinks are rejected without changing an outside sentinel file |
+| `python3 .codex/bin/verify-context.py --strict-source` | Exit 0; festgehaltener Baum, vollständiges Quelleninventar, lokale Dokumentziele, 487 eindeutige gebundene ModSecurity-Quellverweise und Zeilenbereiche sowie unveränderte Produktquellgrenze |
+| `python3 .codex/bin/validate-structure.py` | Exit 0; 95 zugeordnete Dateien, erforderlicher Aufbau, Identität und Manifestkonsistenz |
+| `python3 .codex/bin/validate-codex-inheritance.py --check` | Exit 0; 23 lokale Richtlinien-Prüfsummen, keine aktive Vererbung an untergeordnete Repositories |
+| `git diff --check` | Exit 0; keine Whitespace-Fehler in der RTK-Dokumentationsergänzung |
+| RTK-Quellverweisprüfung | Tag ergab den gespeicherten Commit; 19 zitierte Quellpfade/Zeilenbereiche gegen den lokalen Referenzklon geprüft, getrennt vom ModSecurity-Prüfer |
+| Prüfung gebundener Vorlagenverweise | Gültige lokale Git-Objekte und Zeilenbereiche am Referenz-Commit |
+| Unabhängiges Dokumentations-/Quellenreview | Grundlagen- und Portabilitätsreviews abgeschlossen; RTK-Beispiele/Quellenzuordnung und offizielle Codex-Dokumentation geprüft. Der getrennte Geltungsbereich von Proxy-Statistiken wurde nach Review präzisiert. |
+| Unabhängige Hilfsprogrammproben in isolierter Kopie | Fehlende/ungültige/außerhalb liegende Links, veraltete Prüfsummen, doppelte IDs und ungültige Pfade abgewiesen; historische Nachweise und Codebeispiele wie dokumentiert behandelt |
+| Nachprüfung der Hilfsprogrammkorrekturen | Datierte Sitzungsaufzeichnungen benötigen keine aktive Zuordnung; kollidierende abgeleitete Richtlinien-IDs werden vor Schreibzugriffen abgewiesen; Katalog-Symlinks werden ohne Änderung einer externen Kontroll-Datei abgewiesen |
 
-No semantic completeness or security guarantee follows from these checks. The
-[foundation handover](../audit/sessions/2026-10-25-context-foundation.md) records
-scope and verification details.
+Daraus folgt keine Garantie semantischer Vollständigkeit oder Sicherheit.
+Die [Grundlagenübergabe](../audit/sessions/2026-10-25-context-foundation.md) hält
+Umfang und damalige Prüfdetails fest.
 
-**Not executed:** C++ compilation, ModSecurity unit/regression execution, Windows
-build, parser regeneration, library installation, connector integration, or a
-security scan. The task changes context and local documentation helpers only.
-Submodule implementations were not initialized or comprehensively reviewed.
-RTK and Codex executables were not available in the task environment; their
-example commands, initializer, hook behavior, and actual savings were not tested
-here. Source/documentation inspection does not establish runtime integration.
+## Prüfstand der deutschen Variante
 
-## Delivery state
+Die deutsche Variante wurde gegen den englischen Ausgangscommit abgeglichen.
+Alle 90 Markdown-Dokumente wurden übersetzt. Insgesamt wurden 98 der 100 Kontextdateien
+geändert; die beiden maschinenlesbaren Quelleninventare sind bytegleich erhalten.
+Die Prüfungen liefen vom Repository-Hauptverzeichnis mit Python 3.12.14 aus.
 
-Working branch: `codex/kontext-v3` in `Easton97-Jens/ModSecurity`.
-The English adaptation is published in the existing fork, with
-[draft pull request #120](https://github.com/Easton97-Jens/ModSecurity/pull/120)
-open against `v3/master`. Including the RTK follow-up, the context consists of
-100 added files and no product-source changes. No merge has been performed.
+| Frische Prüfung | Tatsächliches Ergebnis |
+| --- | --- |
+| `python3 .codex/bin/verify-context.py --strict-source` | Exit 0; 850 Quelleneinträge, 90 Markdown-Dateien, 499 lokale Linkziele, 487 eindeutige gebundene ModSecurity-Verweise; keine Produktquellabweichungen |
+| `python3 .codex/bin/validate-structure.py` | Exit 0; 95 zugeordnete Dateien konsistent |
+| `python3 .codex/bin/validate-codex-inheritance.py --refresh` und anschließend `--check` | Jeweils Exit 0; 23 Prüfsummen bewusst erneuert und geprüft, keine aktive Vererbung |
+| `git diff --check` | Exit 0; keine Whitespace-Fehler |
+| Übersetzungsabgleich | Alle 789 Vorkommen von 509 unterschiedlichen gebundenen ModSecurity-, RTK- und Vorlagenquelllinks erhalten; ausführbare Beispiele unverändert bis auf die beauftragte Branch-Navigation |
+| Python-/Manifestprüfung | Alle drei Prüfprogramme syntaktisch gültig und mit unveränderter AST-Struktur außerhalb von Textliteralen; unabhängig überprüft: nur Docstrings, Hilfe, eigene Diagnosen und generierte Kommentare geändert. TOML-Daten außer Prüfsummen unverändert; JSON-Erklärungen übersetzt und Herkunft der Übersetzung ergänzt. |
+| Unabhängige sprachliche Gegenprüfung | Alle 90 Markdown-Dateien gegen Englisch gelesen. Ein Schreibfehler und die Übersetzung von „signedness change“ wurden korrigiert; keine offenen Befunde. |
 
-The published adaptation commit `bad6cd355fd78ffcfa6393b1c3ada8d734feb098` had tree
-`9a884e6e02525a469bfa531e8aaa767cf915e856`, matching the reviewed local tree. It was
-cloned separately from the fork; all three validators passed and the checkout
-was clean. Later context-only updates record delivery facts, the reusable-root
-clarification, and optional RTK guidance. Validator implementations remain
-unchanged; the 487 unique pinned ModSecurity source links are preserved. Use
-`git rev-parse HEAD` or the PR head for the latest working commit.
+Die Quelleninventare, Gitlinks, technischen Bezeichner und Schnittstellen bleiben erhalten.
+Die Prüfungen belegen Übersetzungs- und Kontextkonsistenz; sie ersetzen keine erneute
+vollständige Untersuchung aller Produktimplementierungen oder einen Laufzeittest.
 
-The PR-triggered workflow query returned no runs for the adaptation commit at
-the time checked. This is not a passing CI result or evidence that no workflow
-can run later. No runtime/build success is claimed.
+**Nicht ausgeführt:** C++-Kompilierung, ModSecurity-Unit-/Regressionstests, Windows-Build,
+Parser-Neugenerierung, Bibliotheksinstallation, Connector-Integration und Sicherheitsscan.
+Die Aufgabe betrifft Kontext und lokale Dokumentationshilfen. Submodulimplementierungen
+wurden nicht initialisiert oder umfassend geprüft. In der englischen Grundlagenarbeit
+waren RTK- und Codex-Programme in der Aufgaben-Umgebung nicht verfügbar; Beispielbefehle,
+Initialisierer, Hook-Verhalten und tatsächliche Einsparungen wurden dort nicht getestet.
+Die deutsche Übersetzung führt diese Integrationen ebenfalls nicht aus. Quellen- und
+Dokumentationslektüre beweist keine Laufzeitintegration.
 
-## Next concrete step
+## Bereitstellungsstand
 
-Open PR #120 for review and use `codex/kontext-v3` in new chats until the
-context change is merged. Recheck the actual remote state when resuming. The
-root agreement can be reused elsewhere, but other repositories and global user
-configuration have not been changed. For a later product task, read the relevant
-guides and actual source, establish the intended behavior and environment, and select
-proportionate verification. The first real C++ build remains future task evidence.
+Der deutsche Arbeitsbranch ist lokal als `codex/kontext-v3-de` angelegt.
+Beim Start der Übersetzung wurde `codex/kontext-v3` im Remote auf
+`a35e8c3a1116a763f286f965f718f36d5f8876cc` bestätigt; der deutsche Remote-Branch
+war noch nicht vorhanden. Das Hochladen erfolgt nach der abschließenden Prüfung.
+Für diese Variante wird kein Pull Request erstellt.
+
+**Historie der englischen Fassung:** Die englische Anpassung wurde im bestehenden Fork
+mit [Entwurfs-PR #120](https://github.com/Easton97-Jens/ModSecurity/pull/120) gegen
+`v3/master` veröffentlicht. Einschließlich RTK-Ergänzung umfasst sie 100 ergänzte Dateien
+und keine Produktquelländerungen. Bei der damaligen Prüfung war kein Merge erfolgt.
+Der Anpassungs-Commit `bad6cd355fd78ffcfa6393b1c3ada8d734feb098` hatte den Baum
+`9a884e6e02525a469bfa531e8aaa767cf915e856`, der dem geprüften lokalen Baum entsprach.
+Er wurde separat aus dem Fork geklont; alle drei Prüfer waren erfolgreich und der
+Checkout sauber. Spätere reine Kontextänderungen hielten Bereitstellungsfakten,
+Portabilität und optionale RTK-Hinweise fest. Die 487 eindeutigen gebundenen
+ModSecurity-Quellverweise blieben dabei erhalten. Die damalige PR-Workflow-Abfrage
+lieferte für den Anpassungs-Commit keine Läufe. Das ist kein positives CI-Ergebnis
+und kein Beleg dafür, dass später keine Workflows laufen können.
+
+Nutze `git rev-parse HEAD` und den tatsächlichen Remote-Branch für den neuesten
+Arbeits-Commit dieser deutschen Variante. Der Head des englischen PR bezeichnet einen anderen Branch.
+
+## Nächster konkreter Schritt
+
+Den abschließend geprüften deutschen Branch im bestehenden Fork hochladen und den Remote-Stand bestätigen.
+Danach können neue Chats `codex/kontext-v3-de` und den [Startprompt](prompts/start-new-chat.md)
+verwenden. Bei Wiederaufnahme immer den tatsächlichen Remote-Stand prüfen.
+Andere Repositories und globale Nutzerkonfiguration wurden nicht geändert.
+Für eine spätere Produktaufgabe relevante Leitfäden und tatsächlichen Quellcode lesen,
+gewünschtes Verhalten und Umgebung bestimmen und angemessene Prüfungen auswählen.
+Der erste tatsächliche C++-Build bleibt ein Nachweis für eine spätere Aufgabe.

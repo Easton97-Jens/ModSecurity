@@ -17,9 +17,9 @@
     "upstream_commits_ahead_of_fork": 0,
     "fork_commits_not_in_upstream": 0,
     "fork_is_ancestor_of_upstream": true,
-    "observation_stage": "Rechecked immediately before opening the context pull request; fork v3/master now matches the documented upstream base."
+    "observation_stage": "Unmittelbar vor dem damaligen Kontext-Pull-Request erneut geprüft; v3/master des Forks entsprach nun der dokumentierten Upstream-Grundlage."
   },
-  "scope": "Main repository source at the pinned commit. Gitlinks record submodule commits; submodule contents are not audited.",
+  "scope": "Quellcode des Hauptrepositorys am festgehaltenen Commit. Gitlinks bezeichnen Submodul-Commits; die Submodulinhalte wurden nicht umfassend geprüft.",
   "tracked_entry_count": 850,
   "tracked_blob_count": 846,
   "submodules": [
@@ -55,12 +55,12 @@
   ],
   "external_product_documentation": [
     {
-      "topic": "Codex AGENTS.md discovery; not a source for ModSecurity behavior",
+      "topic": "Auffinden von AGENTS.md durch Codex; keine Quelle für ModSecurity-Verhalten",
       "url": "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
       "observed_on": "2026-10-25"
     },
     {
-      "topic": "Codex hook support, trust, input rewriting, and environment limitations; not RTK endorsement or ModSecurity evidence",
+      "topic": "Codex-Hook-Unterstützung, Vertrauensfreigaben, Eingabeumschreibung und Umgebungsgrenzen; keine RTK-Empfehlung oder ModSecurity-Nachweise",
       "url": "https://learn.chatgpt.com/docs/hooks",
       "observed_on": "2026-10-25"
     }
@@ -80,7 +80,7 @@
     "commit": "42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3",
     "tree": "36ebcf4af9c2ee00064e167dbc7095a55d49a71c",
     "observed_on": "2026-10-25",
-    "scope": "Tracked .codex files plus root AGENTS.md, README.md, .gitignore and Makefile; organization/workflow reference only, not authority for ModSecurity product behavior.",
+    "scope": "Versionierte .codex-Dateien sowie AGENTS.md, README.md, .gitignore und Makefile im Hauptverzeichnis; nur Organisations-/Ablaufreferenz, keine maßgebliche Quelle für ModSecurity-Produktverhalten.",
     "inventoried_entry_count": 76
   },
   "external_tool_references": [
@@ -90,10 +90,22 @@
       "tag": "v1.0.1",
       "commit": "4ef8730cf3a0dea11c8d64a9b90bc0616fe52100",
       "observed_on": "2026-10-25",
-      "scope": "Selected documentation, CLI, Git summary, test-runner, token-estimation, and Codex initializer code; optional command-output guidance only.",
+      "scope": "Ausgewählte Dokumentation sowie Code für CLI, Git-Zusammenfassungen, Testausführung, Token-Schätzung und Codex-Initialisierung; ausschließlich optionale Hinweise zu Befehlsausgaben.",
       "guide": ".codex/context/rtk.md",
       "installed_or_executed_for_this_task": false,
       "modsecurity_dependency": false
     }
-  ]
+  ],
+  "context_translation": {
+    "language": "de",
+    "repository": "https://github.com/Easton97-Jens/ModSecurity",
+    "source_branch": "codex/kontext-v3",
+    "source_commit": "a35e8c3a1116a763f286f965f718f36d5f8876cc",
+    "source_tree": "05186c8c673a1a86ff35abe4f414376c22704ab5",
+    "target_branch": "codex/kontext-v3-de",
+    "requested_on": "2026-10-25",
+    "observation_timezone": "Europe/Berlin",
+    "pull_request_requested": false,
+    "scope": "Deutsche Variante der ergänzten Anweisungen, Dokumentation und eigenen Prüfmeldungen. Quellcode, technische Bezeichner, Quellenbindungen und Inventare bleiben erhalten; aktuelle Branch-Navigation wird angepasst."
+  }
 }

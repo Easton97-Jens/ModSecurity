@@ -1,64 +1,65 @@
-# Feasibility policy
+# Richtlinie zur Machbarkeit
 
-Assess feasibility in proportion to the task. The purpose is to identify a
-workable next step, not to require permission for every reversible action or a
-formal plan for every small edit.
+Bewerte die Machbarkeit dem Aufgabenumfang entsprechend. Ziel ist ein umsetzbarer
+nächster Schritt, keine Freigabepflicht für jede reversible Handlung und kein
+formaler Plan für jede kleine Änderung.
 
-## Establish what the task needs
+## Die Voraussetzungen der Aufgabe klären
 
-Before substantial implementation, a build, an external operation, or delivery,
-resolve the relevant questions:
+Kläre vor einer umfangreichen Implementierung, einem Build, einem externen Vorgang
+oder einer Bereitstellung die relevanten Fragen:
 
-- Is the desired outcome clear enough to implement and check?
-- Which repository and source revision own the affected behavior?
-- Which source files, interfaces, or existing tests provide evidence?
-- Are the needed tools, dependencies, and configured features available?
-- Can the work fit the actual storage, memory, CPU, and process constraints?
-- Is the action within the user's authorization and available permissions?
-- Is there a meaningful way to validate the requested result?
+- Ist das gewünschte Ergebnis klar genug, um es umzusetzen und zu prüfen?
+- Welches Repository und welcher Quellstand sind für das betroffene Verhalten zuständig?
+- Welche Quelldateien, Schnittstellen oder vorhandenen Tests liefern Nachweise?
+- Sind die benötigten Werkzeuge, Abhängigkeiten und konfigurierten Funktionen verfügbar?
+- Passt die Arbeit zu den tatsächlichen Grenzen für Speicherplatz, Arbeitsspeicher, CPU und Prozesse?
+- Liegt die Handlung innerhalb der Nutzerfreigabe und der verfügbaren Berechtigungen?
+- Gibt es eine aussagekräftige Möglichkeit, das gewünschte Ergebnis zu prüfen?
 
-Use [architecture-and-boundaries.md](architecture-and-boundaries.md) for scope,
-[build-and-test.md](build-and-test.md) for build prerequisites, and
-[git-policy.md](git-policy.md) for delivery destinations.
+Nutze [Architektur und Grenzen](architecture-and-boundaries.md) für den Umfang,
+[Build und Tests](build-and-test.md) für Build-Voraussetzungen und
+[Git-Richtlinie](git-policy.md) für Bereitstellungsziele.
 
-## Describe the actual state
+## Den tatsächlichen Stand beschreiben
 
-These labels can make substantial work easier to track; a short explanation is
-enough when a formal status table would add no value:
+Diese Bezeichnungen können umfangreiche Arbeit übersichtlicher machen. Eine kurze Erklärung
+genügt, wenn eine formale Statustabelle keinen zusätzlichen Nutzen bietet:
 
-| State | Meaning and next action |
+| Status | Bedeutung und nächste Handlung |
 | --- | --- |
-| `feasible_now` | The relevant prerequisites exist; proceed within scope |
-| `feasible_after_local_setup` | Reversible, task-owned setup can supply the prerequisites; perform it when already authorized |
-| `requires_user_decision` | A material choice cannot be resolved from the task or evidence; prepare the concrete options |
-| `blocked_environment` | A needed local capability is unavailable; finish independent work and explain the gap |
-| `blocked_external_dependency` | A necessary external input or service is unavailable |
-| `blocked_permissions` | A required action is outside granted authority or permitted access |
-| `blocked_missing_evidence` | The available evidence cannot establish a necessary claim |
-| `already_fixed` | The identified revision already resolves the reported issue; cite the evidence |
-| `unsupported_with_evidence` | Specific source, build, or execution evidence establishes the stated limitation |
-| `not_applicable` or `out_of_scope` | The item does not belong to the current task; explain why if material |
+| `feasible_now` | Die relevanten Voraussetzungen sind vorhanden; innerhalb des Umfangs fortfahren |
+| `feasible_after_local_setup` | Reversible, zur Aufgabe gehörende Einrichtung kann die Voraussetzungen schaffen; bei vorhandener Freigabe ausführen |
+| `requires_user_decision` | Eine wesentliche Entscheidung lässt sich nicht aus der Aufgabe oder den Nachweisen ableiten; konkrete Optionen vorbereiten |
+| `blocked_environment` | Eine benötigte lokale Fähigkeit ist nicht verfügbar; unabhängige Arbeit abschließen und die Lücke erklären |
+| `blocked_external_dependency` | Eine notwendige externe Eingabe oder ein Dienst ist nicht verfügbar |
+| `blocked_permissions` | Eine erforderliche Handlung liegt außerhalb der erteilten Befugnisse oder des erlaubten Zugriffs |
+| `blocked_missing_evidence` | Die verfügbaren Nachweise können eine notwendige Aussage nicht belegen |
+| `already_fixed` | Der bezeichnete Stand behebt das gemeldete Problem bereits; Nachweis angeben |
+| `unsupported_with_evidence` | Konkrete Quellen-, Build- oder Ausführungsnachweise belegen die genannte Einschränkung |
+| `not_applicable` oder `out_of_scope` | Der Punkt gehört nicht zur aktuellen Aufgabe; bei wesentlicher Bedeutung begründen |
 
-A missing compiler, unavailable dependency, uninitialized submodule, or failed
-network request does not by itself prove that ModSecurity lacks the feature.
-Keep environment limitations separate from product limitations.
+Ein fehlender Compiler, eine nicht verfügbare Abhängigkeit, ein nicht initialisiertes
+Submodul oder eine fehlgeschlagene Netzwerkanfrage beweist für sich genommen nicht,
+dass die Funktion in ModSecurity fehlt. Trenne Grenzen der Umgebung von Grenzen des Produkts.
 
-## Continue useful work
+## Sinnvolle Arbeit fortsetzen
 
-Authorization and preferences already established in the conversation persist
-unless the user changes them. Do not request them again merely because the work
-enters a new file, phase, or chat tool. Reversible inspection, edits, and setup
-that are necessary and within the authorized task can proceed.
+Bereits im Gespräch festgelegte Freigaben und Präferenzen gelten weiter, solange der
+Nutzer sie nicht ändert. Frage sie nicht erneut ab, nur weil die Arbeit eine neue Datei,
+Phase oder ein anderes Chat-Werkzeug erreicht. Notwendige reversible Untersuchungen,
+Änderungen und Einrichtungsschritte innerhalb der freigegebenen Aufgabe dürfen fortgesetzt werden.
 
-Complete independent research, edits, and reviewable preparation when another
-part is blocked. Ask only for a missing decision or permission that actually
-prevents the remaining work. Explain the concrete action and why it needs the
-user's input; do not make the user approve an unprepared proposal.
+Schließe unabhängige Recherche, Änderungen und prüfbare Vorbereitungen ab, wenn ein anderer
+Teil blockiert ist. Frage nur nach einer fehlenden Entscheidung oder Freigabe, die die
+verbleibende Arbeit tatsächlich verhindert. Erkläre die konkrete Handlung und warum sie
+die Mitwirkung des Nutzers benötigt; lasse keinen unvorbereiteten Vorschlag freigeben.
 
-Optional unavailable tools do not block work that can be adequately checked
-with available repository-native methods. Do not install system packages,
-change services, or use paid external resources merely to satisfy a copied
-tool list. Determine whether such setup is necessary and already authorized.
+Nicht verfügbare optionale Werkzeuge blockieren keine Arbeit, die sich mit vorhandenen
+repository-eigenen Methoden angemessen prüfen lässt. Installiere keine Systempakete,
+ändere keine Dienste und nutze keine kostenpflichtigen externen Ressourcen allein zur
+Erfüllung einer kopierten Werkzeugliste. Kläre, ob eine solche Einrichtung notwendig
+und bereits freigegeben ist.
 
-When the evidence or environment changes, revise the assessment. Report the
-actual remaining gap under [definition-of-done.md](definition-of-done.md).
+Ändern sich Nachweise oder Umgebung, aktualisiere die Bewertung. Berichte die tatsächliche
+verbleibende Lücke gemäß den [Abschlusskriterien](definition-of-done.md).

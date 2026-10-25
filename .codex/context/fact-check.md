@@ -1,101 +1,101 @@
-# Fact check: known pitfalls and source discrepancies
+# Faktenprüfung: bekannte Stolperfallen und Quellenabweichungen
 
-## Scope and use
+## Geltungsbereich und Verwendung
 
-Inspected source revision: `owasp-modsecurity/ModSecurity`, `v3/master`, **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`**.
-This overview describes differences between comments, examples, build rules, and implementation. It makes no claims of security vulnerabilities or executed runtime tests.
-The **Check** paragraphs are our own recommendations for new chats. The **Finding** paragraphs are based on the linked sources at this commit.
+Untersuchter Quellstand: `owasp-modsecurity/ModSecurity`, `v3/master`, **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`**.
+Diese Übersicht beschreibt Unterschiede zwischen Kommentaren, Beispielen, Build-Regeln und Implementierung. Sie behauptet weder Sicherheitslücken noch ausgeführte Laufzeittests.
+Die Absätze **Prüfung** enthalten eigene Empfehlungen für neue Chats. Die Absätze **Befund** beruhen auf den verlinkten Quellen an diesem Commit.
 
-## 1. The README excerpt does not fully match the current C++ API
+## 1. Der README-Auszug entspricht nicht vollständig der aktuellen C++-API
 
-**Finding:** The README example uses `ModSecurity::Rules`, a transaction constructor with two arguments, `processConnection()` with only one address, and `intervention()` without an output parameter. The current headers declare `modsecurity::RulesSet`, constructors with `logCbData`, four connection parameters, and `intervention(ModSecurityIntervention *)`. Sources: [README example][readme-api], [RulesSet][rules-api], [transaction constructor and connection][transaction-args], [intervention][intervention-api].
+**Befund:** Das README-Beispiel verwendet `ModSecurity::Rules`, einen Transaktionskonstruktor mit zwei Argumenten, `processConnection()` mit nur einer Adresse und `intervention()` ohne Ausgabeparameter. Die aktuellen Header deklarieren `modsecurity::RulesSet`, Konstruktoren mit `logCbData`, vier Verbindungsparameter und `intervention(ModSecurityIntervention *)`. Quellen: [README-Beispiel][readme-api], [RulesSet][rules-api], [Transaktionskonstruktor und Verbindung][transaction-args], [Intervention][intervention-api].
 
-**Check:** Was the signature checked directly in the header and implementation, or copied only from the README? For C++ examples, consult the actual sources under `examples/` and [cpp-guide.md](cpp-guide.md).
+**Prüfung:** Wurde die Signatur direkt in Header und Implementierung geprüft oder nur aus der README übernommen? Ziehe für C++-Beispiele die tatsächlichen Quellen unter `examples/` und [cpp-guide.md](cpp-guide.md) heran.
 
-## 2. The test programs are under `test/`
+## 2. Die Testprogramme liegen unter `test/`
 
-**Finding:** The README's compilation section says `tests/`. The top-level Makefile actually includes `test` in the build; that directory's Makefile defines `unit_tests` and `regression_tests`. Sources: [README spelling][readme-tests], [build subdirectories][root-make], [unit test target][unit-target], [regression test target][regression-target].
+**Befund:** Der Kompilierungsabschnitt der README nennt `tests/`. Das oberste Makefile nimmt tatsächlich `test` in den Build auf; das Makefile dieses Verzeichnisses definiert `unit_tests` und `regression_tests`. Quellen: [Schreibweise der README][readme-tests], [Build-Unterverzeichnisse][root-make], [Unit-Test-Ziel][unit-target], [Regressionstest-Ziel][regression-target].
 
-**Check:** Are the program name, test file, and working directory correct? The direct example commands in [build-and-test.md](build-and-test.md) start inside `test/`.
+**Prüfung:** Stimmen Programmname, Testdatei und Arbeitsverzeichnis? Die direkten Beispielbefehle in [build-and-test.md](build-and-test.md) beginnen innerhalb von `test/`.
 
-## 3. The evidenced language standard is C++17
+## 3. Der belegte Sprachstandard ist C++17
 
-**Finding:** `configure.ac` requires `AX_CXX_COMPILE_STDCXX(17, noext, mandatory)`. The Windows build also requires C++17. The standard is established by the build definitions, rather than estimated from the project's age or isolated syntax. Sources: [Unix requirement][cpp-standard], [Windows requirement][cpp-standard-win].
+**Befund:** `configure.ac` verlangt `AX_CXX_COMPILE_STDCXX(17, noext, mandatory)`. Auch der Windows-Build verlangt C++17. Der Standard wird durch die Build-Definitionen belegt und nicht aus dem Projektalter oder einzelnen Syntaxmerkmalen geschätzt. Quellen: [Unix-Anforderung][cpp-standard], [Windows-Anforderung][cpp-standard-win].
 
-**Check:** Is a proposed language construct compatible with this revision and the compiler actually in use? For a different commit, read its build definitions again.
+**Prüfung:** Ist ein vorgeschlagenes Sprachkonstrukt mit diesem Quellstand und dem tatsächlich verwendeten Compiler kompatibel? Lies bei einem anderen Commit dessen Build-Definitionen erneut.
 
-## 4. YAJL: the README requirement differs from the Unix build logic
+## 4. YAJL: Die README-Anforderung weicht von der Unix-Build-Logik ab
 
-**Finding:** The README calls YAJL mandatory. The YAJL macro instead uses generic library detection, whose automatic search path continues when the library is missing. Only an explicitly mandatory request causes a configuration error there. `TEST_UTILITIES` is enabled only when `YAJL_FOUND=1`. Sources: [README][readme-dependencies], [YAJL macro][yajl-macro], [detection logic][find-library], [test condition][test-condition].
+**Befund:** Die README bezeichnet YAJL als zwingend erforderlich. Das YAJL-Makro verwendet dagegen eine allgemeine Bibliothekserkennung, deren automatischer Suchpfad bei fehlender Bibliothek fortfährt. Nur eine ausdrücklich verpflichtende Anforderung führt dort zu einem Konfigurationsfehler. `TEST_UTILITIES` wird nur bei `YAJL_FOUND=1` aktiviert. Quellen: [README][readme-dependencies], [YAJL-Makro][yajl-macro], [Erkennungslogik][find-library], [Testbedingung][test-condition].
 
-**Check:** Was YAJL detected, and were the test programs actually built? For an intended test build, `--with-yajl=yes` is the variant chosen in this working documentation. A successful library build alone does not establish that test programs are present.
+**Prüfung:** Wurde YAJL erkannt, und wurden die Testprogramme tatsächlich gebaut? Für einen vorgesehenen Test-Build ist `--with-yajl=yes` die in dieser Arbeitsdokumentation gewählte Variante. Ein erfolgreicher Bibliotheksbuild allein belegt nicht, dass Testprogramme vorhanden sind.
 
-## 5. Exit code 0 can occur without running regressions
+## 5. Exit-Code 0 kann ohne ausgeführte Regressionstests auftreten
 
-**Finding:** With `NO_LOGS`, `regression_tests` prints a message about missing logging support and immediately returns `0`. This path occurs before argument processing and test loading. Source: [NO_LOGS branch][no-logs].
+**Befund:** Mit `NO_LOGS` gibt `regression_tests` eine Meldung über fehlende Logging-Unterstützung aus und kehrt sofort mit `0` zurück. Dieser Pfad liegt vor der Argumentverarbeitung und dem Laden der Tests. Quelle: [NO_LOGS-Zweig][no-logs].
 
-**Check:** Which cases actually ran? Record case counts, skips, disabled cases, and runner messages as well as the exit code. This finding does not imply that other build variants pass their tests.
+**Prüfung:** Welche Fälle liefen tatsächlich? Halte neben dem Exit-Code auch Fallzahlen, übersprungene und deaktivierte Fälle sowie Meldungen des Testprogramms fest. Dieser Befund bedeutet nicht, dass andere Build-Varianten ihre Tests bestehen.
 
-## 6. LMDB is off by default in the Windows CMake build
+## 6. LMDB ist im Windows-CMake-Build standardmäßig deaktiviert
 
-**Finding:** The Windows README lists LMDB among the features enabled by default. However, `build/win32/CMakeLists.txt` sets `WITH_LMDB` to `OFF`; Lua, libxml2, MaxMind, and curl are set to `ON`. Sources: [README feature list][windows-readme], [CMake options][windows-options].
+**Befund:** Die Windows-README führt LMDB unter den standardmäßig aktivierten Funktionen auf. `build/win32/CMakeLists.txt` setzt `WITH_LMDB` jedoch auf `OFF`; Lua, libxml2, MaxMind und curl werden auf `ON` gesetzt. Quellen: [Funktionsliste der README][windows-readme], [CMake-Optionen][windows-options].
 
-**Check:** Which CMake options were actually set? A Conan dependency or the general README list does not establish that the corresponding feature is active in the binary.
+**Prüfung:** Welche CMake-Optionen wurden tatsächlich gesetzt? Eine Conan-Abhängigkeit oder die allgemeine README-Liste belegt nicht, dass die entsprechende Funktion in der Binärdatei aktiv ist.
 
-## 7. Recognized, rejected, and ineffective are different states
+## 7. Erkannt, abgewiesen und wirkungslos sind unterschiedliche Zustände
 
-**Finding:** The grammar treats the following known directives differently. This table describes the respective parser branches; it is not a complete v2/v3 compatibility list.
+**Befund:** Die Grammatik behandelt die folgenden bekannten Direktiven unterschiedlich. Die Tabelle beschreibt die jeweiligen Parserzweige; sie ist keine vollständige v2/v3-Kompatibilitätsliste.
 
-| Directive | Evidenced behavior in the grammar branch |
+| Direktive | Belegtes Verhalten im Grammatikzweig |
 | --- | --- |
-| `SecRequestBodyInMemoryLimit` | Reports missing support and triggers `YYERROR`. [Source][memory-limit] |
-| `SecPcreMatchLimitRecursion` | Has no executing action there; the error message is commented out. The neighboring `SecPcreMatchLimit` does set a property. [Source][recursion-limit] |
-| `SecTmpDir`, `SecDataDir`, `SecStatusEngine` | The shown branches make no corresponding value assignment; error messages are commented out. [Source][compat-directives] |
+| `SecRequestBodyInMemoryLimit` | Meldet fehlende Unterstützung und löst `YYERROR` aus. [Quelle][memory-limit] |
+| `SecPcreMatchLimitRecursion` | Hat dort keine ausführende Aktion; die Fehlermeldung ist auskommentiert. Das benachbarte `SecPcreMatchLimit` setzt dagegen eine Eigenschaft. [Quelle][recursion-limit] |
+| `SecTmpDir`, `SecDataDir`, `SecStatusEngine` | Die gezeigten Zweige nehmen keine entsprechende Wertzuweisung vor; Fehlermeldungen sind auskommentiert. [Quelle][compat-directives] |
 
-**Check:** What happens after the token is recognized? Trace the grammar action, stored property, and runtime access. Neither "every unimplemented effect produces an error" nor "successful parsing means effective behavior" is a reliable conclusion here.
+**Prüfung:** Was passiert nach dem Erkennen des Tokens? Verfolge Grammatikaktion, gespeicherte Eigenschaft und Laufzeitzugriff. Weder „jede nicht implementierte Wirkung erzeugt einen Fehler“ noch „erfolgreiches Parsen bedeutet wirksames Verhalten“ ist hier eine verlässliche Schlussfolgerung.
 
-## 8. An operator file does not establish availability in SecRules
+## 8. Eine Operatordatei belegt keine Verfügbarkeit in SecRules
 
-**Finding:** `Operator::instantiate()` recognizes `gsblookup`, `rsub`, and `validatehash`. However, the SecRules grammar explicitly rejects `@gsbLookup`, `@rsub`, and `@validateHash` with `OPERATOR_NOT_SUPPORTED`; the macro reports an error and executes `YYERROR`. The corresponding `evaluate()` implementations contain TODOs and immediately return `true`. Sources: [factory][operator-factory], [grammar branches][operator-grammar], [error macro][unsupported-macro], [GsbLookup][gsb-stub], [Rsub][rsub-stub], [ValidateHash][hash-stub].
+**Befund:** `Operator::instantiate()` erkennt `gsblookup`, `rsub` und `validatehash`. Die SecRules-Grammatik weist `@gsbLookup`, `@rsub` und `@validateHash` jedoch ausdrücklich mit `OPERATOR_NOT_SUPPORTED` ab; das Makro meldet einen Fehler und führt `YYERROR` aus. Die entsprechenden `evaluate()`-Implementierungen enthalten TODOs und geben sofort `true` zurück. Quellen: [Factory][operator-factory], [Grammatikzweige][operator-grammar], [Fehlermakro][unsupported-macro], [GsbLookup][gsb-stub], [Rsub][rsub-stub], [ValidateHash][hash-stub].
 
-**Check:** Was the normal SecRules loading path inspected? The existence of a class or factory entry alone does not justify saying that the operator is available for use in rules. No exploitable security effect is inferred here either.
+**Prüfung:** Wurde der normale SecRules-Ladepfad untersucht? Die bloße Existenz einer Klasse oder eines Factory-Eintrags rechtfertigt nicht die Aussage, der Operator könne in Regeln verwendet werden. Auch eine ausnutzbare Sicherheitswirkung wird daraus hier nicht abgeleitet.
 
-## 9. Internal phase values are not SecRules phase numbers
+## 9. Interne Phasenwerte sind keine SecRules-Phasennummern
 
-**Finding:** The enum contains `ConnectionPhase`, `UriPhase`, `RequestHeadersPhase`, and other phases. `Phase::init()` translates `phase:1` to `RequestHeadersPhase`, whose internal value is `2`. It translates `phase:0` to `ConnectionPhase`. `processURI()` populates variables and does not invoke evaluation of `UriPhase` in the inspected function body. Sources: [enum][phase-enum], [mapping][phase-action], [URI function][uri].
+**Befund:** Das Enum enthält `ConnectionPhase`, `UriPhase`, `RequestHeadersPhase` und weitere Phasen. `Phase::init()` übersetzt `phase:1` in `RequestHeadersPhase`, deren interner Wert `2` ist. Es übersetzt `phase:0` in `ConnectionPhase`. `processURI()` befüllt Variablen und ruft im untersuchten Funktionskörper keine Auswertung von `UriPhase` auf. Quellen: [Enum][phase-enum], [Zuordnung][phase-action], [URI-Funktion][uri].
 
-**Check:** Does a number come from SecRules, an internal enum, an API, or a log representation? The full mapping is in [architecture.md](architecture.md).
+**Prüfung:** Stammt eine Zahl aus SecRules, einem internen Enum, einer API oder einer Logdarstellung? Die vollständige Zuordnung steht in [architecture.md](architecture.md).
 
-## 10. This repository describes the library
+## 10. Dieses Repository beschreibt die Bibliothek
 
-**Finding:** The upstream README distinguishes libmodsecurity from the separately maintained web server connectors. The library processes HTTP data supplied by its caller. The examples and public transaction methods demonstrate API use, but do not establish a complete integration with a particular Nginx, Apache, or IIS version. Sources: [project scope][scope], [transaction API][transaction-public].
+**Befund:** Die Upstream-README unterscheidet libmodsecurity von den separat gepflegten Webserver-Connectors. Die Bibliothek verarbeitet HTTP-Daten, die ihr Aufrufer liefert. Die Beispiele und öffentlichen Transaktionsmethoden zeigen die API-Verwendung, belegen aber keine vollständige Integration mit einer bestimmten Nginx-, Apache- oder IIS-Version. Quellen: [Projektumfang][scope], [Transaktions-API][transaction-public].
 
-**Check:** Does the behavior under investigation belong to the library or the connector? For an external connector, request its own source and version, or inspect them within the authorized scope. Do not equate a library intervention with an HTTP response actually sent without further evidence.
+**Prüfung:** Gehört das untersuchte Verhalten zur Bibliothek oder zum Connector? Fordere für einen externen Connector dessen eigene Quellen und Version an oder untersuche sie innerhalb des autorisierten Umfangs. Setze eine Bibliotheksintervention ohne weitere Belege nicht mit einer tatsächlich gesendeten HTTP-Antwort gleich.
 
-## 11. Submodule versions come from gitlinks
+## 11. Submodulversionen stammen aus Gitlinks
 
-**Finding:** `.gitmodules` lists paths and URLs. The following commit pins were read from the Git tree of the pinned main repository commit, rather than from branch names or README example output. Sources: [.gitmodules][gitmodules], [pinned upstream tree][source-tree].
+**Befund:** `.gitmodules` führt Pfade und URLs auf. Die folgenden festgelegten Commits wurden aus dem Git-Baum des festgelegten Hauptrepository-Commits gelesen, nicht aus Branchnamen oder README-Beispielausgaben. Quellen: [.gitmodules][gitmodules], [festgelegter Upstream-Baum][source-tree].
 
-| Submodule path | Gitlink commit |
+| Submodulpfad | Gitlink-Commit |
 | --- | --- |
 | `bindings/python` | `bc625d5bb0bac6a64bcce8dc9902208612399348` |
 | `others/libinjection` | `211782219663f889f471650150df12b623c5766e` |
 | `others/mbedtls` | `0fe989b6b514192783c469039edd325fd0989806` |
 | `test/test-cases/secrules-language-tests` | `f73c73027ef49ccf99c7911744929a71d15ff419` |
 
-**Check:** Do the checkout and [upstream-lock.json](upstream-lock.json) match these gitlinks? The mapping can be reproduced with `git ls-tree -r effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`. A pin alone establishes neither that submodules are initialized nor that their file contents have been reviewed.
+**Prüfung:** Stimmen Checkout und [upstream-lock.json](upstream-lock.json) mit diesen Gitlinks überein? Die Zuordnung lässt sich mit `git ls-tree -r effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` nachvollziehen. Eine Commit-Festlegung allein belegt weder die Initialisierung der Submodule noch die Prüfung ihrer Dateiinhalte.
 
-## 12. The scanner image does not enforce a passing test run
+## 12. Das Scanner-Image erzwingt keinen erfolgreichen Testlauf
 
-**Finding:** `.oss-scanner/Dockerfile` stops on errors in its build chain, but then handles `make check` with `|| echo "WARNING: make check reported failures"`. A failure of that test command therefore need not fail the image build. The comment before the test line also describes this behavior. Source: [build and test steps][scanner-docker].
+**Befund:** `.oss-scanner/Dockerfile` bricht bei Fehlern in seiner Build-Kette ab, behandelt `make check` anschließend aber mit `|| echo "WARNING: make check reported failures"`. Ein Fehler dieses Testbefehls muss deshalb den Image-Build nicht fehlschlagen lassen. Auch der Kommentar vor der Testzeile beschreibt dieses Verhalten. Quelle: [Build- und Testschritte][scanner-docker].
 
-**Check:** Does the evidence show "image built" or "tests passed"? Evaluate test output and the original test status separately; do not record a successful Docker build as a passing test suite.
+**Prüfung:** Belegen die Ergebnisse „Image gebaut“ oder „Tests bestanden“? Werte Testausgabe und ursprünglichen Teststatus getrennt aus; halte einen erfolgreichen Docker-Build nicht als bestandene Testsuite fest.
 
-## Maintaining this list
+## Pflege dieser Liste
 
-**Our recommendation:** When moving to a newer source revision, read the affected implementations again. Change or remove entries only with traceable sources; do not carry resolved discrepancies into new chats. For additional observations, always record the finding, source, practical significance, and remaining uncertainty.
+**Unsere Empfehlung:** Lies bei einem Wechsel zu einem neueren Quellstand die betroffenen Implementierungen erneut. Ändere oder entferne Einträge nur mit nachvollziehbaren Quellen; übertrage behobene Abweichungen nicht in neue Chats. Halte bei zusätzlichen Beobachtungen immer Befund, Quelle, praktische Bedeutung und verbleibende Unsicherheit fest.
 
-## Sources at the pinned commit
+## Quellen am festgelegten Commit
 
 [readme-api]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L233-L255
 [rules-api]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/headers/modsecurity/rules_set.h#L38-L77

@@ -1,4 +1,4 @@
-# Adapted local schema; no Framework/MRTS repositories are configured.
+# Angepasstes lokales Schema; keine Framework-/MRTS-Repositories sind eingerichtet.
 schema_version = 1
 repository = "Easton97-Jens/ModSecurity"
 routing_marker = "codex-control-plane-routing:repository"

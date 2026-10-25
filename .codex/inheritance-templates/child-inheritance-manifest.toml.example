@@ -1,5 +1,5 @@
-# Disabled example only. No child repository is configured or implied.
-# A future consumer must explicitly implement and validate this contract.
+# Nur ein deaktiviertes Beispiel. Kein untergeordnetes Repository ist eingerichtet oder vorausgesetzt.
+# Ein künftiger Nutzer muss diesen Vertrag ausdrücklich implementieren und prüfen.
 schema_version = 1
 active = false
 repository = "REPLACE_WITH_SELECTED_REPOSITORY"

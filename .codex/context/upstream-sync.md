@@ -1,15 +1,15 @@
-# Updating the official v3 baseline deliberately
+# Die offizielle v3-Grundlage bewusst aktualisieren
 
-This is the chosen maintenance workflow for this documentation baseline.
-It does not update itself. The initially examined baseline is pinned in
-[upstream-lock.json](upstream-lock.json); historical provenance and the
-branch comparison are recorded in [provenance.md](provenance.md).
+Dies ist der gewählte Pflegeablauf für die Quellgrundlage dieser Dokumentation.
+Sie aktualisiert sich nicht selbst. Der zuerst untersuchte Stand ist in
+[upstream-lock.json](upstream-lock.json) festgehalten; historische Herkunft und
+Branch-Vergleich stehen in [provenance.md](provenance.md).
 
-## 1. Preserve and understand the existing state first
+## 1. Zuerst den vorhandenen Zustand bewahren und verstehen
 
-When an upstream update is requested, first read `AGENTS.md`,
-`current-state.md` and the recorded decisions. Then inspect the working tree
-and remotes:
+Wenn eine Upstream-Aktualisierung beauftragt wird, lies zuerst `AGENTS.md`,
+`current-state.md` und die festgehaltenen Entscheidungen. Prüfe anschließend
+Arbeitsbaum und Remotes:
 
 ```sh
 git status --short
@@ -19,58 +19,57 @@ git rev-parse HEAD
 python3 .codex/bin/verify-context.py
 ```
 
-Preserve existing changes. Do not automatically reset to a new branch tip.
-Check that `upstream` actually points to the official repository.
-Do not assume the remote name merely because this guide uses it.
+Erhalte vorhandene Änderungen. Setze nicht automatisch auf eine neue Branch-Spitze zurück.
+Prüfe, ob `upstream` tatsächlich auf das offizielle Repository zeigt.
+Setze die Bedeutung des Remote-Namens nicht voraus, nur weil diese Anleitung ihn verwendet.
 
-## 2. Identify a new official baseline
+## 2. Eine neue offizielle Grundlage bestimmen
 
-After verifying the remote, the following fetch is an intentional
-network operation:
+Nach dem Prüfen des Remotes ist der folgende Fetch eine bewusste Netzwerkaktion:
 
 ```sh
 git fetch upstream
 git rev-parse upstream/v3/master
 ```
 
-Use the previous commit ID from `upstream-lock.json` and the actual
-new commit ID returned to read `git log` and `git diff` between
-those exact revisions. First check whether the old revision is an ancestor
-of the new one. A different relationship needs an explanation and must not
-be treated as an ordinary forward update.
+Nutze die bisherige Commit-ID aus `upstream-lock.json` und die tatsächlich
+zurückgegebene neue Commit-ID, um `git log` und `git diff` zwischen genau diesen
+Revisionen zu lesen. Prüfe zuerst, ob der alte Stand ein Vorfahr des neuen ist.
+Eine andere Beziehung erfordert eine Erklärung und darf nicht als gewöhnliche
+Vorwärtsaktualisierung behandelt werden.
 
-The name `v3/master` is a moving reference. The new full commit ID becomes
-the documentation baseline only after it has been examined. A version macro
-in a header or a README statement alone proves neither a release nor
-tested compatibility.
+Der Name `v3/master` ist ein veränderlicher Verweis. Die neue vollständige Commit-ID
+wird erst nach ihrer Untersuchung zur Dokumentationsgrundlage. Ein Versionsmakro in
+einem Header oder eine README-Aussage allein beweist weder ein Release noch
+getestete Kompatibilität.
 
-## 3. Review the code update and documentation together
+## 3. Code-Aktualisierung und Dokumentation gemeinsam prüfen
 
-How the code is brought into the working branch depends on the requested
-Git workflow and existing changes. Afterwards:
+Wie der Code in den Arbeitsbranch übernommen wird, hängt vom beauftragten Git-Ablauf
+und vorhandenen Änderungen ab. Danach:
 
-1. Read changed public headers, implementations, grammar, build files,
-   submodule pins and tests.
-2. Revise affected technical chapters against the new code. Pay particular
-   attention to claims about phases, ownership, optional features and tests.
-3. Point source links to verified lines at the new commit. Do not simply
-   replace the old SHA string throughout the documentation.
-4. Explicitly account for deleted or renamed files and changed submodules
-   in the inventory and explanations.
-5. Keep historical session notes tied to their original baseline. Refer to
-   the revised technical chapters for current facts.
+1. Lies geänderte öffentliche Header, Implementierungen, Grammatik, Build-Dateien,
+   Submodulbindungen und Tests.
+2. Überarbeite betroffene technische Kapitel anhand des neuen Codes. Achte besonders
+   auf Aussagen zu Phasen, Besitzverhältnissen, optionalen Funktionen und Tests.
+3. Richte Quellverweise auf überprüfte Zeilen des neuen Commits. Ersetze nicht einfach
+   die alte SHA-Zeichenfolge in der gesamten Dokumentation.
+4. Berücksichtige gelöschte oder umbenannte Dateien und geänderte Submodule ausdrücklich
+   im Inventar und den Erklärungen.
+5. Behalte für historische Sitzungsnotizen deren ursprüngliche Grundlage bei.
+   Verweise für aktuelle Fakten auf die überarbeiteten technischen Kapitel.
 
-## 4. Regenerate the provenance data
+## 4. Herkunftsdaten neu erzeugen
 
-`upstream-lock.json` contains the commit, tree, observation date, inventory
-counts and submodule pins. These values come from the actual Git history,
-not an estimated version number. `source-index.tsv` has the columns
-`mode`, `type`, `object`, `path` and contains every entry in the new baseline
-commit as read with `git ls-tree -r`.
+`upstream-lock.json` enthält Commit, Baum, Beobachtungsdatum, Inventarzahlen und
+Submodulbindungen. Diese Werte stammen aus der tatsächlichen Git-Historie, nicht
+aus einer geschätzten Versionsnummer. `source-index.tsv` hat die Spalten
+`mode`, `type`, `object`, `path` und enthält jeden mit `git ls-tree -r` gelesenen
+Eintrag im neuen Basis-Commit.
 
-The Python sequence below regenerates **only the inventory**, after the
-new verified commit has already been deliberately entered in `upstream-lock.json`.
-It does not automatically update explanations, metadata or submodules.
+Die folgende Python-Sequenz erzeugt **nur das Inventar** neu, nachdem der neue
+überprüfte Commit bereits bewusst in `upstream-lock.json` eingetragen wurde.
+Sie aktualisiert Erklärungen, Metadaten oder Submodule nicht automatisch.
 
 ```sh
 python3 - <<'PY'
@@ -91,18 +90,18 @@ Path('.codex/audit/source-index.tsv').write_text(''.join(rows), encoding='utf-8'
 PY
 ```
 
-This maintenance command writes the specified file. The ordinary
-`verify-context.py` run only reads files.
+Dieser Pflegebefehl schreibt die angegebene Datei. Ein gewöhnlicher Lauf von
+`verify-context.py` liest ausschließlich Dateien.
 
-## 5. Run the final checks and hand off the result
+## 5. Abschließende Prüfungen ausführen und Ergebnis übergeben
 
-The context check must pass with the updated data. If product changes are
-intentional, the normal run reports the differences; `--strict-source`
-is appropriate only when everything outside the context files is expected
-to match the pinned official source exactly.
+Die Kontextprüfung muss mit den aktualisierten Daten erfolgreich sein. Sind
+Produktänderungen beabsichtigt, meldet der normale Lauf die Unterschiede;
+`--strict-source` ist nur passend, wenn alles außerhalb der Kontextdateien exakt
+mit der festgehaltenen offiziellen Quelle übereinstimmen soll.
 
-Then actually run the build and regression tests appropriate to the code
-change from [build-and-test.md](build-and-test.md), and record their scope.
-Update `current-state.md`, decisions and open tasks. Do not present a new
-source baseline as freshly verified using test results from an older
-revision.
+Führe anschließend die für die Code-Änderung geeigneten Builds und Regressionstests
+aus [build-and-test.md](build-and-test.md) tatsächlich aus und halte ihren Umfang fest.
+Aktualisiere `current-state.md`, Entscheidungen und offene Aufgaben. Stelle eine
+neue Quellgrundlage nicht anhand von Testergebnissen einer älteren Revision als
+frisch überprüft dar.

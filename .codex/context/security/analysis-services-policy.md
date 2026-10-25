@@ -1,19 +1,19 @@
-# Optional external analysis services
+# Optionale externe Analysedienste
 
-Use this guide only when external analysis is requested or is already part of the authorized task. This file does not establish that any service, plugin, CLI, endpoint, account, or license is available.
+Nutze diesen Leitfaden nur, wenn externe Analyse angefragt wird oder bereits zur freigegebenen Aufgabe gehört. Diese Datei stellt nicht fest, dass ein Dienst, Plugin, eine CLI, ein Endpunkt, Konto oder eine Lizenz verfügbar ist.
 
-## Before use
+## Vor der Nutzung
 
-Identify the actual configured access path, supported operation, selected source revision, and authorized scope. Use current official service guidance when needed. Do not invent a TAC daemon, scanner command, run identifier, SonarQube project, or Quality Gate. Do not upload code or data beyond the task's authorized scope.
+Ermittle den tatsächlich konfigurierten Zugangsweg, die unterstützte Operation, den ausgewählten Quellstand und freigegebenen Umfang. Nutze bei Bedarf aktuelle offizielle Diensthinweise. Erfinde weder TAC-Daemon, Scannerbefehl, Laufkennung, SonarQube-Projekt noch Qualitätskriterium. Lade keinen Code und keine Daten außerhalb des freigegebenen Aufgabenumfangs hoch.
 
-Keep credentials, private request bodies, raw customer logs, and unrelated files out of analysis inputs and retained output. Use the smallest relevant source scope that the requested analysis needs.
+Halte Zugangsdaten, private Anfragekörper, unverarbeitete Kundenprotokolle und sachfremde Dateien aus Analyseeingaben und aufbewahrten Ausgaben heraus. Nutze den kleinsten relevanten Quellumfang, den die angefragte Analyse benötigt.
 
-## Record and reconcile
+## Aufzeichnen und abgleichen
 
-For each service actually used, record its identity, invocation, revision/branch binding, analyzed files, returned run or request identifiers when available, candidate results, and limitations. A successful upload or authentication step is not a completed analysis.
+Halte für jeden tatsächlich genutzten Dienst seine Identität, den Aufruf, die Zuordnung zu Revision und Branch, analysierte Dateien, zurückgegebene Lauf- oder Anfragekennungen, soweit verfügbar, Kandidatenergebnisse und Grenzen fest. Ein erfolgreicher Upload oder Authentifizierungsschritt ist keine abgeschlossene Analyse.
 
-Keep service findings, compiler diagnostics, source reasoning, tests, and runtime observations as separate evidence sources. Validate candidates with [finding validation](checks/finding-validation.md); deduplicate only after preserving provenance and independently reachable instances.
+Halte Dienstbefunde, Compilerdiagnosen, Quellcodebegründungen, Tests und Laufzeitbeobachtungen als getrennte Nachweisquellen fest. Validiere Kandidaten anhand der [Befundvalidierung](checks/finding-validation.md); fasse Duplikate erst zusammen, nachdem Herkunft und unabhängig erreichbare Vorkommen erhalten wurden.
 
-A clean result does not disprove an independently demonstrated issue. A disagreement requires inspection of the underlying source path and conditions. External analysis does not substitute for a required build, test, or separately scoped connector result.
+Ein unauffälliges Ergebnis widerlegt kein unabhängig nachgewiesenes Problem. Ein Widerspruch verlangt die Untersuchung des zugrunde liegenden Quellpfads und seiner Bedingungen. Externe Analyse ersetzt weder einen erforderlichen Build oder Test noch ein gesondert abgegrenztes Connector-Ergebnis.
 
-If a requested service cannot run, record the exact access or environment gap and continue the independent work that remains authorized. Do not silently claim another service provided equivalent coverage.
+Kann ein angefragter Dienst nicht ausgeführt werden, halte die genaue Zugriffs- oder Umgebungslücke fest und setze die weiterhin freigegebene unabhängige Arbeit fort. Behaupte nicht stillschweigend, ein anderer Dienst habe gleichwertige Abdeckung geliefert.

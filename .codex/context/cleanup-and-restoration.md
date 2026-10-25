@@ -1,78 +1,90 @@
-# Cleanup and workspace restoration
+# Aufräumen und Arbeitsbereich wiederherstellen
 
-## Preserve ownership
+## Zugehörigkeit beachten
 
-This working policy covers cleanup after a scoped task. A worktree, local
-branch, remote branch, PR, external clone, submodule checkout, gitlink, and
-GitHub repository are distinct objects. Authorization to change one does not
-authorize deletion or replacement of another.
+Diese Arbeitsrichtlinie gilt für das Aufräumen nach einer abgegrenzten Aufgabe.
+Worktree, lokaler Branch, Remote-Branch, PR, externer Clone, Submodul-Checkout,
+Gitlink und GitHub-Repository sind unterschiedliche Objekte. Die Erlaubnis,
+eines davon zu verändern, erlaubt nicht das Löschen oder Ersetzen eines
+anderen.
 
-Preserve the main checkout, existing user work, other agents' changes, and
-unknown files. An ignored filename or a path named `tmp` is not enough to
-establish that the task owns it. Do not use broad deletion, `git clean`, a
-hard reset, forced checkout, or an automatic stash as routine cleanup.
+Erhalte den Hauptcheckout, vorhandene Benutzerarbeit, Änderungen anderer
+Agenten und unbekannte Dateien. Ein ignorierter Dateiname oder ein Pfad namens
+`tmp` reicht nicht aus, um dessen Zugehörigkeit zur Aufgabe festzustellen.
+Verwende keine pauschale Löschung, `git clean`, keinen Hard-Reset, erzwungenen
+Checkout oder automatischen Stash als gewöhnliche Aufräummaßnahme.
 
-## Temporary data and generated files
+## Temporäre Daten und erzeugte Dateien
 
-Keep an inventory appropriate to the work: temporary fixture paths, build or
-runtime roots, process references, retained logs, and any worktrees created
-for the task. Remove only clearly owned data after its retention needs and
-active users are resolved.
+Führe ein zur Arbeit passendes Verzeichnis der temporären Testdatenpfade,
+Build- oder Laufzeitverzeichnisse, Prozessreferenzen, aufbewahrten Logs und
+gegebenenfalls für die Aufgabe erstellten Worktrees. Entferne nur eindeutig
+zugeordnete Daten, nachdem Aufbewahrungsbedarf und aktive Nutzung geklärt sind.
 
-The source tree has generated and ignored build products, but build cleanup
-also has specific semantics. The root Makefile lists maintainer-clean files;
-the parser Makefile's `CLEANFILES` includes generated scanner/parser files.
-Inspect the applicable target before using it, especially when parser changes
-or generated output are part of the task.
-Sources: [ignored files][ignore], [maintainer-clean list][maintainer],
-[parser cleanup list][parser-clean].
+Der Quellbaum enthält erzeugte und ignorierte Build-Ergebnisse; auch das
+Build-Aufräumen hat jedoch konkrete Semantik. Das Makefile im Stammverzeichnis
+führt maintainer-clean-Dateien auf; `CLEANFILES` des Parser-Makefiles enthält
+erzeugte Scanner-/Parserdateien. Prüfe das jeweilige Ziel vor der Verwendung,
+besonders wenn Parseränderungen oder erzeugte Ausgaben zur Aufgabe gehören.
+Quellen: [ignorierte Dateien][ignore], [maintainer-clean-Liste][maintainer],
+[Parser-Bereinigungsliste][parser-clean].
 
-Do not delete generated output merely because it can normally be regenerated
-when it contains unreviewed work or the required generator is unavailable.
-Leave it intact and report the reason if safe removal cannot be established.
+Lösche erzeugte Ausgaben nicht allein deshalb, weil sie normalerweise neu
+erzeugt werden können, wenn sie ungeprüfte Arbeit enthalten oder der
+benötigte Generator nicht verfügbar ist. Lass sie bestehen und melde den
+Grund, wenn eine sichere Entfernung nicht festgestellt werden kann.
 
-## Worktrees and branches
+## Worktrees und Branches
 
-Before removing a task-owned worktree, verify its exact path and repository,
-tracked/staged/untracked state, unique or unpublished work, active processes,
-and whether evidence or another task still depends on it. Use the normal Git
-worktree mechanism only when removal is safe and within scope. Do not manually
-delete a registered worktree or force removal to bypass unresolved state.
+Prüfe vor dem Entfernen eines aufgabeneigenen Worktrees dessen genauen Pfad
+und Repository, versionierte, vorgemerkte und nicht versionierte Änderungen,
+einzigartige oder unveröffentlichte Arbeit, aktive Prozesse sowie die
+Abhängigkeit von Belegen oder anderen Aufgaben. Verwende den normalen
+Git-Worktree-Mechanismus nur, wenn die Entfernung sicher ist und zum Auftrag
+gehört. Lösche einen registrierten Worktree nicht manuell und erzwinge keine
+Entfernung, um ungeklärten Zustand zu umgehen.
 
-Local branch deletion requires that the branch is no longer needed, has no
-required unique work, and is not in use by another worktree. Prefer safe
-non-forcing deletion. A remote branch or PR requires its own task disposition;
-completion of local editing alone does not authorize remote deletion.
+Ein lokaler Branch darf nur gelöscht werden, wenn er nicht mehr benötigt wird,
+keine erforderliche einzigartige Arbeit enthält und nicht von einem anderen
+Worktree verwendet wird. Bevorzuge sicheres Löschen ohne Erzwingen. Für einen
+Remote-Branch oder PR braucht es eine eigene Festlegung im Auftrag; der bloße
+Abschluss lokaler Bearbeitung erlaubt keine entfernte Löschung.
 
-## Restore only a state actually requested
+## Nur einen tatsächlich angeforderten Zustand wiederherstellen
 
-Do not switch to a branch named `master` or `v3/master` merely to make the
-workspace look finished. Preserve the branch chosen for the task unless
-restoration or integration is part of the user's request.
+Wechsle nicht allein deshalb zu einem Branch namens `master` oder `v3/master`,
+damit der Arbeitsbereich abgeschlossen wirkt. Erhalte den für die Aufgabe
+gewählten Branch, sofern Wiederherstellung oder Integration nicht zur Anfrage
+gehören.
 
-When a return to another branch is authorized, first inspect the actual root,
-branch, HEAD, status, and intended remote. Switch without forcing, preserve
-uncommitted work, and verify the resulting state. A remote update is a separate
-network action; use it only when included in the task and avoid rewriting
-unrelated history.
+Ist die Rückkehr zu einem anderen Branch autorisiert, prüfe zuerst das
+tatsächliche Stammverzeichnis, Branch, HEAD, Status und beabsichtigte Remote.
+Wechsle ohne Erzwingen, erhalte nicht committete Arbeit und prüfe den
+resultierenden Zustand. Eine Remote-Aktualisierung ist eine gesonderte
+Netzwerkaktion; verwende sie nur innerhalb des Auftrags und vermeide das
+Umschreiben nicht zugehöriger Historie.
 
-## Submodule restoration
+## Submodule wiederherstellen
 
-The core repository pins four declared submodule paths. Treat the gitlink and
-the nested checkout separately; a nested detached HEAD can simply reflect the
-recorded dependency revision. Do not switch dependencies to their own default
-branches or update them to newer commits as cleanup.
-Source: [submodule declarations][submodules].
+Das Core-Repository legt vier deklarierte Submodulpfade fest. Behandle Gitlink
+und verschachtelten Checkout getrennt; ein verschachtelter Detached HEAD kann
+einfach die festgehaltene Abhängigkeitsrevision abbilden. Wechsle
+Abhängigkeiten beim Aufräumen nicht auf deren eigene Standardbranches und
+aktualisiere sie nicht auf neuere Commits.
+Quelle: [Submoduldeklarationen][submodules].
 
-If task work changed a nested checkout, inspect its own status and preserve
-required work before returning it to the revision recorded by the parent.
-Dependency initialization can require network access and must not be hidden
-inside a supposedly offline cleanup step.
+Hat die Aufgabenbearbeitung einen verschachtelten Checkout verändert, prüfe
+dessen eigenen Status und erhalte erforderliche Arbeit, bevor du ihn auf die
+vom übergeordneten Repository festgehaltene Revision zurücksetzt.
+Die Initialisierung von Abhängigkeiten kann Netzwerkzugriff benötigen und
+darf nicht in einem vermeintlich offline ausgeführten Aufräumschritt
+versteckt werden.
 
-Finish by reporting any retained temporary state, unfinished process cleanup,
-or blocked restoration with its concrete reason. Follow
-[subagents-and-background.md](subagents-and-background.md) for processes and
-[resources-and-storage.md](resources-and-storage.md) for storage.
+Berichte zum Abschluss über verbliebenen temporären Zustand, noch nicht
+abgeschlossene Prozessbereinigung oder blockierte Wiederherstellung mit dem
+konkreten Grund. Für Prozesse gilt
+[subagents-and-background.md](subagents-and-background.md), für Speicher
+[resources-and-storage.md](resources-and-storage.md).
 
 [ignore]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitignore
 [maintainer]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/Makefile.am#L26-L51

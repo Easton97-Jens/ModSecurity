@@ -1,103 +1,107 @@
-# Building, testing, and investigating failures
+# Bauen, testen und Fehler untersuchen
 
-## Scope and how to read this guide
+## Geltungsbereich und Hinweise zum Lesen
 
-This guide describes the inspected upstream source revision
-`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` of `owasp-modsecurity/ModSecurity`,
-branch `v3/master`. Source links point to this immutable commit.
-The commands below are derived from build files, test programs, and CI
-configuration. Including a command here does **not** mean it was run in this
-session or already works on your machine. The project's current state records
-which checks were actually performed.
+Dieser Leitfaden beschreibt den untersuchten Upstream-Quellstand
+`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729` von `owasp-modsecurity/ModSecurity`,
+Branch `v3/master`. Die Quellverweise zeigen auf diesen unveränderlichen Commit.
+Die folgenden Befehle sind aus Build-Dateien, Testprogrammen und der
+CI-Konfiguration abgeleitet. Dass ein Befehl hier aufgeführt ist, bedeutet
+**nicht**, dass er in dieser Sitzung ausgeführt wurde oder auf deinem Rechner
+bereits funktioniert. Der aktuelle Projektstand hält fest, welche Prüfungen
+tatsächlich durchgeführt wurden.
 
-## 1. What the build produces
+## 1. Was der Build erzeugt
 
-On Unix, the project uses Autotools to build `libmodsecurity.la` and the
-associated shared library. The top-level build visits `others`, `src`, `doc`,
-and `tools`, plus `examples` and `test` when enabled by the configuration.
-This does not automatically build a web server connector. The examples and
-rule checker are separate programs that use the library.
-Sources: [top-level Makefile][root-make], [library target and public headers][src-make],
-[connector boundaries][readme-connectors].
+Unter Unix verwendet das Projekt Autotools, um `libmodsecurity.la` und die
+zugehörige dynamische Bibliothek zu bauen. Der Build auf oberster Ebene
+durchläuft `others`, `src`, `doc` und `tools` sowie `examples` und `test`, wenn
+diese durch die Konfiguration aktiviert sind. Dabei wird nicht automatisch ein
+Webserver-Connector gebaut. Die Beispiele und das Regelprüfprogramm sind
+eigenständige Programme, die die Bibliothek verwenden.
+Quellen: [Makefile auf oberster Ebene][root-make],
+[Bibliotheksziel und öffentliche Header][src-make],
+[Abgrenzung zu Connectors][readme-connectors].
 
-| Component | Actual requirement or purpose | Source |
+| Bestandteil | Tatsächliche Voraussetzung oder Zweck | Quelle |
 | --- | --- | --- |
-| C and C++ compilers | `AC_PROG_CC` and `AC_PROG_CXX`; `AX_CXX_COMPILE_STDCXX(17, noext, mandatory)` makes C++17 mandatory. | [configure.ac, 49–63][compiler] |
-| Autotools | `build.sh` invokes `libtoolize`, or `glibtoolize` on Darwin, followed by `autoreconf`, `autoheader`, `automake`, and `autoconf`. | [build.sh][bootstrap] |
-| `make`, archiver, `pkg-config` | Detected during configuration; `pkg-config` helps locate external libraries. | [configure.ac, 49–63][compiler], [library detection][find-lib] |
-| Flex and Bison | Required when regenerating the parser with `--enable-parser-generation=yes`. This option is disabled by default; pregenerated parser files are included in the repository. | [configure.ac, 284–310][parser-option], [src/Makefile.am, 17–28][src-make] |
-| Git submodules | `configure.ac` checks for specific files from libinjection and the nested mbedTLS source tree. Missing files stop configuration. | [configure.ac, 65–107][submodule-checks] |
+| C- und C++-Compiler | `AC_PROG_CC` und `AC_PROG_CXX`; `AX_CXX_COMPILE_STDCXX(17, noext, mandatory)` schreibt C++17 vor. | [configure.ac, 49–63][compiler] |
+| Autotools | `build.sh` ruft `libtoolize` beziehungsweise unter Darwin `glibtoolize` auf, danach `autoreconf`, `autoheader`, `automake` und `autoconf`. | [build.sh][bootstrap] |
+| `make`, Archivierungsprogramm, `pkg-config` | Werden während der Konfiguration erkannt; `pkg-config` hilft beim Auffinden externer Bibliotheken. | [configure.ac, 49–63][compiler], [Bibliothekserkennung][find-lib] |
+| Flex und Bison | Werden benötigt, wenn der Parser mit `--enable-parser-generation=yes` neu erzeugt wird. Diese Option ist standardmäßig deaktiviert; bereits erzeugte Parserdateien sind im Repository enthalten. | [configure.ac, 284–310][parser-option], [src/Makefile.am, 17–28][src-make] |
+| Git-Submodule | `configure.ac` prüft auf bestimmte Dateien aus libinjection und dem verschachtelten mbedTLS-Quellbaum. Fehlende Dateien brechen die Konfiguration ab. | [configure.ac, 65–107][submodule-checks] |
 
-`build.sh` changes generated files: among other operations, it removes
-Autotools intermediates and regenerates `src/headers.mk`. Inspect existing
-changes with `git status --short` before running it. This is a working rule
-introduced by this guide; the file operations themselves are defined in
+`build.sh` verändert erzeugte Dateien: Unter anderem entfernt es
+Autotools-Zwischendateien und erzeugt `src/headers.mk` neu. Prüfe vorhandene
+Änderungen vor dem Aufruf mit `git status --short`. Dies ist eine Arbeitsregel
+dieses Leitfadens; die Dateioperationen selbst stehen in
 [build.sh][bootstrap].
 
-## 2. Submodules and external libraries
+## 2. Submodule und externe Bibliotheken
 
-The main repository declares four submodules:
+Das Hauptrepository deklariert vier Submodule:
 
-| Path | Role supported by the source tree |
+| Pfad | Aus dem Quellbaum belegbare Rolle |
 | --- | --- |
-| `others/libinjection` | Bundled libinjection sources; configuration requires `src/libinjection_html5.c`. |
-| `others/mbedtls` | Bundled Mbed TLS sources; configuration specifically requires `tf-psa-crypto/utilities/base64.c`, which is inside a nested source tree. |
-| `test/test-cases/secrules-language-tests` | Additional shared SecLang test cases; the default unit-test paths and test suite refer to this location. |
-| `bindings/python` | Separate Python bindings submodule; it does not appear in the top-level library build's `SUBDIRS` list. |
+| `others/libinjection` | Eingebundene libinjection-Quellen; die Konfiguration benötigt `src/libinjection_html5.c`. |
+| `others/mbedtls` | Eingebundene Mbed-TLS-Quellen; die Konfiguration benötigt ausdrücklich `tf-psa-crypto/utilities/base64.c` innerhalb eines verschachtelten Quellbaums. |
+| `test/test-cases/secrules-language-tests` | Zusätzliche gemeinsame SecLang-Testfälle; die Standardpfade des Unit-Testprogramms und die Testsuite verweisen auf diesen Ort. |
+| `bindings/python` | Eigenständiges Submodul mit Python-Anbindungen; es steht nicht in der `SUBDIRS`-Liste des Bibliotheks-Builds auf oberster Ebene. |
 
-Sources: [.gitmodules][submodules], [configuration checks][submodule-checks],
-[default unit-test path][unit-default], [test list][test-list], [build subdirectories][root-make].
+Quellen: [.gitmodules][submodules], [Konfigurationsprüfungen][submodule-checks],
+[Standardpfad der Unit-Tests][unit-default], [Testliste][test-list],
+[Build-Unterverzeichnisse][root-make].
 
-From the repository root:
+Im Stammverzeichnis des Repositorys:
 
 ```sh
 git submodule update --init --recursive
 git submodule status --recursive
 ```
 
-The upstream README requires recursive initialization. A leading `-` in
-the status output identifies an uninitialized submodule. Using recursive
-status output as well is a workflow choice made here to expose nested
-dependencies.
-Source: [README: preparing a Git checkout][readme-build].
+Die Upstream-README verlangt eine rekursive Initialisierung. Ein führendes `-`
+in der Statusausgabe kennzeichnet ein nicht initialisiertes Submodul. Auch die
+Statusabfrage rekursiv auszuführen, ist eine hier gewählte Vorgehensweise, um
+verschachtelte Abhängigkeiten sichtbar zu machen.
+Quelle: [README: Vorbereitung eines Git-Checkouts][readme-build].
 
-### Which library is needed for which purpose?
+### Welche Bibliothek wird wofür benötigt?
 
-The table distinguishes actual build logic from the intended test
-environment. Here, “optional” means that Unix configuration does not
-always require the library; it does not promise unchanged functionality
-when that library is absent.
+Die Tabelle unterscheidet die tatsächliche Build-Logik von der vorgesehenen
+Testumgebung. „Optional“ bedeutet hier, dass die Unix-Konfiguration die
+Bibliothek nicht immer voraussetzt; daraus folgt keine Zusage unveränderter
+Funktionalität bei fehlender Bibliothek.
 
-| Library | Status in the inspected revision | Evidence |
+| Bibliothek | Status im untersuchten Quellstand | Beleg |
 | --- | --- | --- |
-| PCRE2 or explicitly selected legacy PCRE | The default path searches for PCRE2; `--with-pcre` selects the other path. Without `WITH_PCRE`, `regex.h` directly includes `pcre2.h`. A usable build therefore needs the selected regex dependency. | [configure.ac, 147–157][regex-selection], [regex.h, 15–20][regex-header] |
-| YAJL | The README calls YAJL mandatory. However, the Unix macros allow automatic detection to continue when it is absent; `TEST_UTILITIES` is enabled only when `YAJL_FOUND=1`. Explicitly request it for the test build described here. | [README: Dependencies][readme-deps], [YAJL macro][yajl], [generic detection][find-lib], [test activation][test-enable] |
-| libcurl | Configuration defines `MSC_WITH_CURL` when curl is detected; upstream associates curl with `SecRemoteRules`. | [configure.ac, 130–138][curl-config], [README: operator dependencies][readme-deps] |
-| libxml2 | Optional build component for XML processing; the XML implementation and transaction path are conditional on `WITH_LIBXML2`. | [configure.ac, 141–144][xml-config], [XML implementation][xml-code] |
-| LMDB | Controls the collection backend: LMDB with `WITH_LMDB`, otherwise `InMemoryPerProcess`. | [ModSecurity constructor][collections] |
-| Lua, SSDEEP, GeoIP/MaxMind | Detected as separate capabilities. Tests may be skipped depending on compiled capabilities; runners check `resource` against their own resource lists. | [configure.ac, 115–128][optional-config], [regression-test resources][regression-resources] |
+| PCRE2 oder ausdrücklich gewähltes älteres PCRE | Der Standardpfad sucht nach PCRE2; `--with-pcre` wählt den anderen Pfad. Ohne `WITH_PCRE` bindet `regex.h` unmittelbar `pcre2.h` ein. Ein nutzbarer Build benötigt daher die gewählte Regex-Abhängigkeit. | [configure.ac, 147–157][regex-selection], [regex.h, 15–20][regex-header] |
+| YAJL | Die README bezeichnet YAJL als verpflichtend. Die Unix-Makros lassen die automatische Erkennung bei fehlendem YAJL jedoch weiterlaufen; `TEST_UTILITIES` wird nur bei `YAJL_FOUND=1` aktiviert. Fordere es für den hier beschriebenen Test-Build ausdrücklich an. | [README: Abhängigkeiten][readme-deps], [YAJL-Makro][yajl], [allgemeine Erkennung][find-lib], [Testaktivierung][test-enable] |
+| libcurl | Die Konfiguration definiert `MSC_WITH_CURL`, wenn curl erkannt wird; Upstream ordnet curl `SecRemoteRules` zu. | [configure.ac, 130–138][curl-config], [README: Operatorabhängigkeiten][readme-deps] |
+| libxml2 | Optionaler Build-Bestandteil für die XML-Verarbeitung; die XML-Implementierung und der Transaktionspfad hängen von `WITH_LIBXML2` ab. | [configure.ac, 141–144][xml-config], [XML-Implementierung][xml-code] |
+| LMDB | Steuert das Collection-Backend: LMDB mit `WITH_LMDB`, andernfalls `InMemoryPerProcess`. | [ModSecurity-Konstruktor][collections] |
+| Lua, SSDEEP, GeoIP/MaxMind | Werden als eigenständige Fähigkeiten erkannt. Tests können abhängig von den einkompilierten Fähigkeiten übersprungen werden; die Testprogramme prüfen `resource` anhand ihrer eigenen Ressourcenlisten. | [configure.ac, 115–128][optional-config], [Ressourcen der Regressionstests][regression-resources] |
 
-**Practical consequence of the YAJL discrepancy:** Successful configuration
-alone does not establish that the unit-test and regression-test programs
-were built. For a test build, check for `Test Utilities ... enabled` in the
-summary and inspect the actual test counts. When debug logging is disabled,
-`regression_tests` also has a path that prints a message and exits with `0`
-without running the regressions. Sources:
-[test activation][test-enable], [configuration summary][configure-summary],
-[NO_LOGS path][regression-main], [suite skip handling][test-driver].
+**Praktische Folge der YAJL-Abweichung:** Eine erfolgreiche Konfiguration allein
+belegt nicht, dass die Programme für Unit- und Regressionstests gebaut wurden.
+Prüfe bei einem Test-Build, ob die Zusammenfassung `Test Utilities ... enabled`
+meldet, und kontrolliere die tatsächlichen Testzahlen. Bei deaktiviertem
+Debug-Logging besitzt `regression_tests` außerdem einen Pfad, der eine Meldung
+ausgibt und mit `0` endet, ohne die Regressionstests auszuführen. Quellen:
+[Testaktivierung][test-enable], [Konfigurationszusammenfassung][configure-summary],
+[NO_LOGS-Pfad][regression-main], [Behandlung übersprungener Tests][test-driver].
 
-## 3. A Unix development build
+## 3. Ein Entwicklungs-Build unter Unix
 
-Package names depend on the operating system. This document does not
-provide a universal package installation command. The inspected GitHub
-workflows contain concrete Ubuntu and macOS examples. They build with
-GCC or Clang, enable assertions, and run `make check`. The workflow files
-establish which checks are configured, not whether they succeed on an
-arbitrary machine or whether a CI run was performed here.
-Sources: [Linux CI][linux-ci], [additional Linux/macOS CI][new-ci].
+Paketnamen hängen vom Betriebssystem ab. Dieses Dokument gibt keinen
+universellen Befehl zur Paketinstallation vor. Die untersuchten GitHub-Workflows
+enthalten konkrete Beispiele für Ubuntu und macOS. Sie bauen mit GCC oder
+Clang, aktivieren Assertions und führen `make check` aus. Die Workflow-Dateien
+belegen, welche Prüfungen konfiguriert sind, nicht deren Erfolg auf einem
+beliebigen Rechner oder einen hier durchgeführten CI-Lauf.
+Quellen: [Linux-CI][linux-ci], [weitere Linux-/macOS-CI][new-ci].
 
-After installing suitable build tools and development libraries, run these
-commands from the checkout root:
+Führe nach der Installation geeigneter Build-Werkzeuge und
+Entwicklungsbibliotheken diese Befehle im Stammverzeichnis des Checkouts aus:
 
 ```sh
 git status --short
@@ -109,18 +113,18 @@ make -j2
 make check
 ```
 
-The `build.sh`, `configure`, `make`, and `make check` sequence comes from
-the upstream README and CI. Explicit YAJL/PCRE2 flags and `-j2` are the
-development variant chosen here: missing libraries should be detected
-during configuration, and the number of parallel compiler processes
-remains modest. `MSC_CHECK_LIB` treats `yes` as a mandatory requirement.
-Sources: [README build sequence][readme-build],
-[Linux CI][linux-ci], [library options][find-lib], [PCRE2 macro][pcre2].
+Die Reihenfolge `build.sh`, `configure`, `make` und `make check` stammt aus der
+Upstream-README und der CI. Die ausdrücklichen YAJL-/PCRE2-Flags und `-j2` sind
+die hier gewählte Entwicklungsvariante: Fehlende Bibliotheken sollen während
+der Konfiguration erkannt werden, und die Zahl paralleler Compilerprozesse
+bleibt überschaubar. `MSC_CHECK_LIB` behandelt `yes` als zwingende Anforderung.
+Quellen: [Build-Abfolge der README][readme-build], [Linux-CI][linux-ci],
+[Bibliotheksoptionen][find-lib], [PCRE2-Makro][pcre2].
 
-For most source work, an installation step is not initially necessary:
-the test programs link against the build under `src/.libs`. If a local
-installation is needed, set the installation prefix to a writable path
-during configuration, for example:
+Für die meisten Arbeiten am Quellcode ist zunächst keine Installation nötig:
+Die Testprogramme werden gegen den Build unter `src/.libs` gelinkt. Wenn eine
+lokale Installation benötigt wird, setze bei der Konfiguration den
+Installationspräfix auf einen beschreibbaren Pfad, zum Beispiel:
 
 ```sh
 ./configure --prefix="$HOME/.local/modsecurity" \
@@ -130,16 +134,17 @@ make check
 make install
 ```
 
-This local prefix is a choice made by this guide. The default prefix
-in the source is `/usr/local/modsecurity`; `make install` installs build
-products and is not a verification step.
-Sources: [default prefix][prefix], [test linker paths][test-make],
-[installable library and headers][src-make], [upstream installation sequence][readme-build].
+Dieser lokale Präfix ist eine Entscheidung dieses Leitfadens. Der
+Standardpräfix im Quellcode lautet `/usr/local/modsecurity`; `make install`
+installiert Build-Ergebnisse und ist kein Prüfschritt.
+Quellen: [Standardpräfix][prefix], [Linkerpfade der Tests][test-make],
+[installierbare Bibliothek und Header][src-make],
+[Upstream-Installationsabfolge][readme-build].
 
-### Debug builds and parser work
+### Debug-Builds und Arbeiten am Parser
 
-For the debug variant derived here, set both C and C++ flags during
-configuration:
+Setze für die hier abgeleitete Debug-Variante bei der Konfiguration sowohl
+C- als auch C++-Flags:
 
 ```sh
 CFLAGS='-g -O0' CXXFLAGS='-g -O0' ./configure \
@@ -147,48 +152,49 @@ CFLAGS='-g -O0' CXXFLAGS='-g -O0' ./configure \
 make -j2
 ```
 
-The assertion option is implemented: it sets `-UNDEBUG` instead of
-`-DNDEBUG`. The additional C++ debug flags are a workflow choice made
-by this guide. Inspect the actual compiler command to determine whether
-other flags are added in a particular build.
-Source: [assertions and global flags][assertions].
+Die Assertion-Option ist implementiert: Sie setzt `-UNDEBUG` anstelle von
+`-DNDEBUG`. Die zusätzlichen C++-Debug-Flags sind eine hier gewählte
+Vorgehensweise. Prüfe den tatsächlichen Compileraufruf, um festzustellen, ob
+ein bestimmter Build weitere Flags ergänzt.
+Quelle: [Assertions und globale Flags][assertions].
 
-For grammar or scanner changes, edit the inputs
-`src/parser/seclang-parser.yy` and `src/parser/seclang-scanner.ll`.
-Generation is enabled with `--enable-parser-generation=yes`. The parser
-Makefile also includes a postprocessing step for the generated header;
-an arbitrary standalone Bison command should not be assumed to replace
-the project build.
-Sources: [parser option and tool detection][parser-option],
-[parser Makefile][parser-make].
+Bearbeite für Änderungen an Grammatik oder Scanner die Eingabedateien
+`src/parser/seclang-parser.yy` und `src/parser/seclang-scanner.ll`.
+Die Erzeugung wird mit `--enable-parser-generation=yes` aktiviert. Das
+Parser-Makefile enthält außerdem eine Nachbearbeitung des erzeugten Headers;
+ein beliebiger eigenständiger Bison-Aufruf darf daher nicht als Ersatz für den
+Projekt-Build angenommen werden.
+Quellen: [Parseroption und Werkzeugerkennung][parser-option],
+[Parser-Makefile][parser-make].
 
-## 4. Selecting focused tests
+## 4. Gezielte Tests auswählen
 
-After a successful build with `TEST_UTILITIES` enabled, as in Section 3
-with YAJL explicitly requested, `test` contains the `unit_tests` and
-`regression_tests` programs. Their shared argument parser accepts a
-file path, among other inputs; regression tests also support the
-`file.json:N` selection form. Regressions are sorted by their loaded
-keys, and the runner counts `N` from `1`.
-Sources: [program names][test-make],
-[argument parser][test-cli], [regression selection][regression-main].
+Nach einem erfolgreichen Build mit aktiviertem `TEST_UTILITIES`, wie in
+Abschnitt 3 mit ausdrücklich angefordertem YAJL, enthält `test` die Programme
+`unit_tests` und `regression_tests`. Ihr gemeinsamer Argumentparser akzeptiert
+unter anderem einen Dateipfad; Regressionstests unterstützen zusätzlich die
+Auswahlform `file.json:N`. Regressionen werden nach ihren geladenen Schlüsseln
+sortiert, und das Testprogramm zählt `N` ab `1`.
+Quellen: [Programmnamen][test-make], [Argumentparser][test-cli],
+[Auswahl von Regressionen][regression-main].
 
-The upstream README uses `tests/` once in its general compilation
-section. The actual build definitions and files use `test/`, without
-a final `s`; commands must use that real path.
-Sources: [inconsistent README passage][readme-test-path],
-[test integration][test-integration].
+Die Upstream-README verwendet im allgemeinen Kompilierungsabschnitt einmal
+`tests/`. Die tatsächlichen Build-Definitionen und Dateien verwenden `test/`,
+ohne abschließendes `s`; Befehle müssen diesen tatsächlichen Pfad nutzen.
+Quellen: [abweichende README-Stelle][readme-test-path],
+[Testeinbindung][test-integration].
 
-To run the full configured test suite from the repository root:
+So führst du die gesamte konfigurierte Testsuite im Stammverzeichnis des
+Repositorys aus:
 
 ```sh
 make check
 ```
 
-For the direct invocations below, first change into `test`. The working
-directory matters because fixtures and default paths are relative to
-it; the shell test driver makes this same directory change.
-Source: [test/test-suite.sh][test-driver].
+Wechsle für die folgenden direkten Aufrufe zuerst nach `test`. Das
+Arbeitsverzeichnis ist relevant, weil Testdaten und Standardpfade relativ
+dazu sind; der Shell-Testtreiber wechselt ebenfalls in dieses Verzeichnis.
+Quelle: [test/test-suite.sh][test-driver].
 
 ```sh
 cd test
@@ -197,120 +203,123 @@ cd test
 ./regression_tests test-cases/regression/secruleengine.json:1
 ```
 
-The first example selects an existing local transformation test file.
-The second checks the existing rule-engine cases; the third selects
-one entry from that file. These are documented invocations, not a test
-execution record.
-Sources: [existing unit-test file][hash-test],
-[existing engine regressions][engine-test], [argument handling][test-cli].
+Das erste Beispiel wählt eine vorhandene lokale Datei mit Transformationstests.
+Das zweite prüft die vorhandenen Fälle der Regel-Engine; das dritte wählt einen
+Eintrag aus dieser Datei aus. Dies sind dokumentierte Aufrufe, kein Protokoll
+einer Testausführung.
+Quellen: [vorhandene Unit-Testdatei][hash-test],
+[vorhandene Engine-Regressionen][engine-test], [Argumentbehandlung][test-cli].
 
-Without a file argument, `unit_tests` defaults to operator cases under
-`test-cases/secrules-language-tests/operators` and adds `transformations`
-when using that default target. Additional local files under
-`test-cases/unit` are therefore not automatically covered by this
-direct default invocation. For the full suite listed by the project,
-`make check` and `test/test-suite.in` define the scope.
-Sources: [default unit-test path][unit-default], [additional load path][unit-main],
-[test list][test-list], [Makefile test integration][test-integration].
+Ohne Dateiargument verwendet `unit_tests` standardmäßig Operatorfälle unter
+`test-cases/secrules-language-tests/operators` und lädt bei diesem Standardziel
+zusätzlich `transformations`. Weitere lokale Dateien unter `test-cases/unit`
+werden von diesem direkten Standardaufruf daher nicht automatisch erfasst.
+Den Umfang der vollständigen vom Projekt aufgeführten Suite bestimmen
+`make check` und `test/test-suite.in`.
+Quellen: [Standardpfad der Unit-Tests][unit-default],
+[zusätzlicher Ladepfad][unit-main], [Testliste][test-list],
+[Testeinbindung im Makefile][test-integration].
 
-### What a test result establishes
+### Was ein Testergebnis belegt
 
-- Record the exit code, number of executed cases, skipped cases, and
-  disabled cases together. The programs exclude skipped cases from
-  failure counts; exit code `0` therefore does not establish that all
-  possible capabilities were exercised. [Unit result calculation][unit-main],
-  [regression result calculation][regression-main].
-- When adding a regression test, also check whether it is listed in
-  `test/test-suite.in`. The suite is included through that file.
-  [Makefile integration][test-integration], [test list][test-list].
-- `format` is a writing mode of the regression-test program: it opens
-  JSON files for output. It is not an alternative read-only test command.
-  [Formatting branch][regression-main].
-- An existing JSON expectation defines a test contract; only a
-  documented execution establishes whether the current build meets it.
-  Keeping that distinction is a working rule for this repository.
+- Halte Exitcode, Zahl der ausgeführten Fälle sowie übersprungene und
+  deaktivierte Fälle gemeinsam fest. Die Programme nehmen übersprungene Fälle
+  von den Fehlerzahlen aus; Exitcode `0` belegt daher nicht, dass alle möglichen
+  Fähigkeiten geprüft wurden. [Ergebnisberechnung der Unit-Tests][unit-main],
+  [Ergebnisberechnung der Regressionstests][regression-main].
+- Prüfe beim Hinzufügen eines Regressionstests auch, ob er in
+  `test/test-suite.in` aufgeführt ist. Die Suite wird über diese Datei
+  eingebunden. [Makefile-Einbindung][test-integration], [Testliste][test-list].
+- `format` ist ein schreibender Modus des Regressionstestprogramms: Er öffnet
+  JSON-Dateien zur Ausgabe. Er ist kein alternativer, nur lesender Testbefehl.
+  [Formatierungszweig][regression-main].
+- Eine vorhandene JSON-Erwartung definiert einen Testvertrag; erst eine
+  dokumentierte Ausführung belegt, ob der aktuelle Build ihn erfüllt.
+  Diese Unterscheidung ist eine Arbeitsregel für dieses Repository.
 
-## 5. Loading rule files and running static checks
+## 5. Regeldateien laden und statische Prüfungen ausführen
 
-The Unix build defines `tools/rules-check/modsec-rules-check`.
-It treats an existing filesystem object as an input file
-(`RulesSet::loadFromUri`); otherwise, it treats the argument as SecLang
-text (`RulesSet::load`). A negative load result is reported as an error.
-Sources: [program target][rules-check-make], [implementation][rules-check].
+Der Unix-Build definiert `tools/rules-check/modsec-rules-check`.
+Das Programm behandelt ein vorhandenes Dateisystemobjekt als Eingabedatei
+(`RulesSet::loadFromUri`); andernfalls behandelt es das Argument als SecLang-Text
+(`RulesSet::load`). Ein negatives Ladeergebnis wird als Fehler gemeldet.
+Quellen: [Programmziel][rules-check-make], [Implementierung][rules-check].
 
-Example from the repository root after building:
+Beispiel aus dem Stammverzeichnis des Repositorys nach dem Build:
 
 ```sh
 ./tools/rules-check/modsec-rules-check 'SecRuleEngine DetectionOnly'
 ```
 
-The checker loads rules and reports loading errors; its `main` does
-not simulate an HTTP transaction. Successful loading therefore does
-not replace a regression with appropriate request and response data.
-Source: [the checker's complete control flow][rules-check].
+Das Prüfprogramm lädt Regeln und meldet Ladefehler; seine `main`-Funktion
+simuliert keine HTTP-Transaktion. Erfolgreiches Laden ersetzt daher keinen
+Regressionstest mit passenden Anfrage- und Antwortdaten.
+Quelle: [vollständiger Kontrollfluss des Prüfprogramms][rules-check].
 
-`make check-static` invokes `cppcheck`; its options and suppressions
-are in the top-level Makefile. `make check-style` invokes
-`check-coding-style`, uses `cpplint.py`, and writes `coding-style.txt`.
-The relevant tools must be installed for these additional checks.
-Source: [static analysis and style checks][static-checks].
+`make check-static` ruft `cppcheck` auf; Optionen und Unterdrückungen stehen
+im Makefile auf oberster Ebene. `make check-style` ruft `check-coding-style`
+auf, verwendet `cpplint.py` und schreibt `coding-style.txt`. Für diese
+zusätzlichen Prüfungen müssen die jeweiligen Werkzeuge installiert sein.
+Quelle: [statische Analyse und Stilprüfungen][static-checks].
 
-## 6. Windows uses a separate build path
+## 6. Windows verwendet einen eigenen Build-Weg
 
-The inspected Windows path uses Visual Studio 2022 Build Tools, Conan,
-and CMake. `vcbuild.bat` runs `conan install` with `compiler.cppstd=17`,
-generates a project with `Visual Studio 17 2022`, and builds the chosen
-configuration. `build/win32/CMakeLists.txt` requires at least CMake 3.24
-and C++17.
-Sources: [Windows README][windows-readme], [vcbuild.bat][vcbuild],
-[Windows CMake][windows-cmake].
+Der untersuchte Windows-Weg verwendet Visual Studio 2022 Build Tools, Conan
+und CMake. `vcbuild.bat` führt `conan install` mit `compiler.cppstd=17` aus,
+erzeugt ein Projekt mit `Visual Studio 17 2022` und baut die gewählte
+Konfiguration. `build/win32/CMakeLists.txt` verlangt mindestens CMake 3.24
+und C++17.
+Quellen: [Windows-README][windows-readme], [vcbuild.bat][vcbuild],
+[Windows-CMake][windows-cmake].
 
-Source-backed example invocations from a suitably prepared Windows
-environment, at the repository root:
+Aus den Quellen belegte Beispielaufrufe in einer passend vorbereiteten
+Windows-Umgebung, im Stammverzeichnis des Repositorys:
 
 ```bat
 vcbuild.bat Release x86_64 NO_ASAN
 vcbuild.bat Debug x86_64 USE_ASAN
 ```
 
-According to the Windows guide, build products are placed under
-`build\win32\build\<configuration>`. Additional CMake options are
-forwarded starting with the fourth argument; CI uses
-`-DWITH_LMDB=ON`, for example.
-Sources: [vcbuild.bat][vcbuild],
-[Windows README][windows-readme], [Windows CI][windows-ci].
+Laut Windows-Anleitung liegen die Build-Ergebnisse unter
+`build\win32\build\<configuration>`. Zusätzliche CMake-Optionen werden ab dem
+vierten Argument weitergereicht; die CI verwendet zum Beispiel
+`-DWITH_LMDB=ON`.
+Quellen: [vcbuild.bat][vcbuild], [Windows-README][windows-readme],
+[Windows-CI][windows-ci].
 
-**Check the source revision rather than generalizing the guide:** The
-Windows README includes LMDB in a list of features enabled by default.
-The actual CMake option `WITH_LMDB` is `OFF`, while Lua, libxml2,
-MaxMind, and curl are `ON`. For this revision, the CMake options define
-those defaults. Conan dependencies have fixed versions in the repository;
-their resolvability was not checked by writing this documentation.
-Sources: [CMake options][windows-cmake], [conflicting README passage][windows-readme],
-[conanfile.txt][conan].
+**Prüfe den Quellstand, statt die Anleitung zu verallgemeinern:** Die
+Windows-README führt LMDB unter den standardmäßig aktivierten Funktionen auf.
+Die tatsächliche CMake-Option `WITH_LMDB` steht auf `OFF`, während Lua, libxml2,
+MaxMind und curl auf `ON` stehen. Für diesen Quellstand legen die
+CMake-Optionen diese Standards fest. Die Conan-Abhängigkeiten haben im
+Repository feste Versionen; ob sie auflösbar sind, wurde beim Erstellen dieser
+Dokumentation nicht geprüft.
+Quellen: [CMake-Optionen][windows-cmake],
+[widersprüchliche README-Stelle][windows-readme], [conanfile.txt][conan].
 
-Before `ctest -C Release --output-on-failure`, Windows CI prepares DLLs,
-test programs, and fixtures, among other items, and disables several
-named cases. Copying the CTest command alone does not establish
-equivalence with the full Linux check.
-Source: [Windows test preparation][windows-ci].
+Vor `ctest -C Release --output-on-failure` bereitet die Windows-CI unter anderem
+DLLs, Testprogramme und Testdaten vor und deaktiviert mehrere benannte Fälle.
+Den CTest-Befehl allein zu übernehmen, belegt keine Gleichwertigkeit mit der
+vollständigen Linux-Prüfung.
+Quelle: [Vorbereitung der Windows-Tests][windows-ci].
 
-## 7. Recording failures for the next session
+## 7. Fehler für die nächste Sitzung festhalten
 
-To make subsequent work reproducible, save these details:
+Speichere für reproduzierbare weitere Arbeit diese Angaben:
 
-1. Commit, branch, operating system, and compiler.
-2. Output of `git submodule status --recursive`.
-3. Exact `configure` or `vcbuild.bat` invocation and detected capabilities.
-4. First failing command, exit code, and relevant error message.
-5. Specific test file, selected cases, case counts, and skipped/disabled counts.
-6. Confirmed cause, or an explicitly unresolved hypothesis.
+1. Commit, Branch, Betriebssystem und Compiler.
+2. Ausgabe von `git submodule status --recursive`.
+3. Exakter Aufruf von `configure` oder `vcbuild.bat` und erkannte Fähigkeiten.
+4. Erster fehlgeschlagener Befehl, Exitcode und relevante Fehlermeldung.
+5. Konkrete Testdatei, ausgewählte Fälle, Fallzahlen sowie Zahlen
+   übersprungener und deaktivierter Fälle.
+6. Bestätigte Ursache oder eine ausdrücklich ungeklärte Hypothese.
 
-This list defines the workflow introduced here. It does not assert that
-any builds have already run. Its commands and technical details can be
-checked against the build and test sources linked above.
+Diese Liste definiert die hier eingeführte Vorgehensweise. Sie behauptet nicht,
+dass bereits Builds ausgeführt wurden. Ihre Befehle und technischen Angaben
+lassen sich anhand der oben verlinkten Build- und Testquellen prüfen.
 
-## Sources
+## Quellen
 [root-make]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/Makefile.am#L1-L17
 [src-make]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/Makefile.am#L1-L67
 [readme-connectors]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L35-L49

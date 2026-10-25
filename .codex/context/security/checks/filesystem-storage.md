@@ -1,13 +1,13 @@
-# File, path, and storage boundary questions
+# Fragen zu Datei-, Pfad- und Speichergrenzen
 
-Use only for actual file/storage operations reached by the selected core path, such as rule loading, audit output, collection storage, or temporary-file handling. Read the concrete implementation and its configured path before selecting cases.
+Nur für tatsächliche Datei- und Speicheroperationen verwenden, die der ausgewählte Kernpfad erreicht, etwa Laden von Regeln, Audit-Ausgabe, Kollektionsspeicherung oder Umgang mit temporären Dateien. Lies vor der Fallauswahl die konkrete Implementierung und ihren konfigurierten Pfad.
 
-- Who supplies the path, which directory resolves it, and whose privileges perform the operation?
-- Are creation, open, read, write, rename, deletion, and cleanup applied to the intended object?
-- What containment, permissions, symlink/replacement, length, and error checks exist at the point of use?
-- Is data size bounded, and what happens on short reads/writes or unavailable/full storage?
-- Are temporary resources released without deleting another task's or caller's files?
+- Wer liefert den Pfad, relativ zu welchem Verzeichnis wird er aufgelöst und mit wessen Berechtigungen wird die Operation ausgeführt?
+- Werden Erstellen, Öffnen, Lesen, Schreiben, Umbenennen, Löschen und Freigabe auf das beabsichtigte Objekt angewendet?
+- Welche Prüfungen für Pfadbegrenzung, Berechtigungen, symbolische Verknüpfungen beziehungsweise Austausch, Längen und Fehler bestehen am Verwendungsort?
+- Ist die Datenmenge begrenzt, und was geschieht bei unvollständigem Lesen oder Schreiben beziehungsweise nicht verfügbarem oder vollem Speicher?
+- Werden temporäre Ressourcen freigegeben, ohne Dateien einer anderen Aufgabe oder eines anderen Aufrufers zu löschen?
 
-A recognized configuration directive is not proof that a path setting is applied. Do not import private UDS/peer-credential assumptions from connector services into a library path that does not use that service.
+Eine erkannte Konfigurationsdirektive beweist nicht, dass eine Pfadeinstellung angewendet wird. Übernimm keine Annahmen zu privaten UDS oder Gegenstellen-Berechtigungsnachweisen aus Connector-Diensten in einen Bibliothekspfad, der diesen Dienst nicht nutzt.
 
-Record actual file identity, relevant metadata, bounded evidence, and cleanup for any executed test. Entry points: [rules/parser](../components/rules-parser.md), [body processors](../components/body-processors.md), and [logging/storage](../components/logging-storage.md).
+Halte für jeden ausgeführten Test tatsächliche Dateiidentität, relevante Metadaten, begrenzte Nachweise und Bereinigung fest. Einstiegspunkte: [Regeln und Parser](../components/rules-parser.md), [Verarbeitung der Nachrichtenkörper](../components/body-processors.md) und [Protokollierung und Speicherung](../components/logging-storage.md).

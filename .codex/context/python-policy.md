@@ -1,76 +1,83 @@
-# Python environments and dependencies
+# Python-Umgebungen und Abhängigkeiten
 
-## Scope
+## Geltungsbereich
 
-This working policy covers documentation helpers, source generators, optional
-Python tools, and explicitly scoped bindings work. It does not make Python
-the language of the core engine or assume that a particular virtual environment
-already exists.
+Diese Arbeitsrichtlinie gilt für Dokumentationshilfen, Quellgeneratoren,
+optionale Python-Werkzeuge und ausdrücklich zum Auftrag gehörende Arbeiten an
+Anbindungen. Sie macht Python nicht zur Sprache der Core-Engine und setzt
+keine bestimmte vorhandene virtuelle Umgebung voraus.
 
-## Identify the actual Python task
+## Die tatsächliche Python-Aufgabe bestimmen
 
-| Task | Entry point and boundary |
+| Aufgabe | Einstiegspunkt und Grenze |
 | --- | --- |
-| Documentation validation | Run `python3 .codex/bin/verify-context.py --strict-source` and `python3 .codex/bin/validate-structure.py` from the repository root, as described in [testing-and-evidence.md](testing-and-evidence.md). These are working-repository helpers. |
-| HTML entity generation | `tools/gen-html-entities.py` reads a JSON input and prints generated table content. Its imports are `json`, `sys`, and `collections.defaultdict`. Inspect the input and output destination before regeneration. |
-| Python bindings | `bindings/python` is a separate declared submodule. Its own source revision, instructions, and dependency contract must be inspected before changing it. |
-| Windows build tooling | The checked-in Windows workflows use Conan. Choose a compatible environment from the actual build route rather than assuming a globally installed package manager. |
+| Dokumentationsvalidierung | `python3 .codex/bin/verify-context.py --strict-source` und `python3 .codex/bin/validate-structure.py` im Stammverzeichnis des Repositorys ausführen, wie in [testing-and-evidence.md](testing-and-evidence.md) beschrieben. Dies sind Hilfsprogramme des Arbeitsrepositorys. |
+| Erzeugung von HTML-Entities | `tools/gen-html-entities.py` liest eine JSON-Eingabe und gibt erzeugte Tabelleninhalte aus. Importiert werden `json`, `sys` und `collections.defaultdict`. Vor einer Neuerzeugung Eingabe und Ausgabeziel prüfen. |
+| Python-Anbindungen | `bindings/python` ist ein eigenständiges deklariertes Submodul. Vor Änderungen müssen dessen eigener Quellstand, Anweisungen und Abhängigkeitsvorgaben geprüft werden. |
+| Windows-Build-Werkzeuge | Die versionierten Windows-Workflows verwenden Conan. Eine kompatible Umgebung anhand des tatsächlichen Build-Wegs wählen, statt einen global installierten Paketmanager vorauszusetzen. |
 
-Upstream evidence: [entity generator][generator], [bindings declaration][bindings],
-[Windows CI tooling][conan-ci], [Windows release tooling][conan-release].
-The two cited Windows workflows use different Conan installation commands;
-do not infer one universal version contract from only one of them.
+Upstream-Belege: [Entity-Generator][generator],
+[Deklaration der Anbindungen][bindings], [Windows-CI-Werkzeuge][conan-ci],
+[Windows-Release-Werkzeuge][conan-release]. Die beiden angeführten
+Windows-Workflows verwenden unterschiedliche Conan-Installationsbefehle;
+leite nicht aus einem einzelnen eine allgemeingültige Versionsvorgabe ab.
 
-## Select an interpreter deliberately
+## Einen Interpreter bewusst auswählen
 
-Use an available Python 3 interpreter compatible with the script and its
-documented environment. Read imports and version-sensitive syntax when
-compatibility is uncertain. A local `.venv` or interpreter selection file is
-evidence about that checkout, not proof of a new upstream compatibility promise.
+Verwende einen verfügbaren Python-3-Interpreter, der zum Skript und seiner
+dokumentierten Umgebung passt. Lies bei unklarer Kompatibilität die Imports
+und versionsabhängige Syntax. Eine lokale `.venv` oder Datei zur
+Interpreterauswahl ist ein Beleg für diesen Checkout, keine neue
+Kompatibilitätszusage von Upstream.
 
-Running a script that only needs the standard library does not require
-creating a package manifest or installing a third-party package. If a task
-requires external dependencies, use an appropriate isolated environment within
-the current filesystem permissions. Record the interpreter, required package
-versions, and any dependency changes that affect reproducibility.
+Ein Skript, das nur die Standardbibliothek benötigt, erfordert weder ein
+Paketmanifest noch die Installation eines Fremdpakets. Benötigt eine Aufgabe
+externe Abhängigkeiten, verwende eine geeignete isolierte Umgebung innerhalb
+der aktuellen Dateisystemberechtigungen. Halte Interpreter, benötigte
+Paketversionen und alle für die Reproduzierbarkeit relevanten
+Abhängigkeitsänderungen fest.
 
-Keep system Python and the user site unchanged during ordinary repository
-work. For an authorized package installation, address the selected interpreter
-explicitly with its `-m pip` interface. Environment controls such as
-`PYTHONNOUSERSITE=1`, `PIP_REQUIRE_VIRTUALENV=true`, and
-`PIP_DISABLE_PIP_VERSION_CHECK=1` can help keep an isolated installation scoped;
-they do not create or activate an environment by themselves.
+Lass System-Python und das Benutzer-Paketverzeichnis bei gewöhnlicher
+Repository-Arbeit unverändert. Sprich bei einer autorisierten Paketinstallation
+den gewählten Interpreter ausdrücklich über seine Schnittstelle `-m pip` an.
+Umgebungssteuerungen wie `PYTHONNOUSERSITE=1`, `PIP_REQUIRE_VIRTUALENV=true` und
+`PIP_DISABLE_PIP_VERSION_CHECK=1` können helfen, eine isolierte Installation auf
+ihren Bereich zu beschränken; sie erstellen oder aktivieren selbst keine
+Umgebung.
 
-## Dependency and tool changes
+## Änderungen an Abhängigkeiten und Werkzeugen
 
-Distinguish packages imported by maintained code or tests from standalone
-analysis tools. A new maintained dependency requires an explicit purpose,
-compatible version selection, appropriate manifest/lock changes where the
-component uses them, and a check of the affected behavior.
+Unterscheide von gepflegtem Code oder Tests importierte Pakete von
+eigenständigen Analysewerkzeugen. Eine neue dauerhaft gepflegte Abhängigkeit
+benötigt einen ausdrücklichen Zweck, eine kompatible Versionsauswahl,
+entsprechende Manifest-/Lock-Änderungen, sofern die Komponente diese verwendet,
+und eine Prüfung des betroffenen Verhaltens.
 
-An optional external CLI should not silently become a product dependency.
-Do not install or upgrade tooling merely because a checker suggests it. When
-installation is necessary and within scope, use the trusted package source and
-version selection applicable to that task. Record unresolved availability or
-compatibility as a limitation instead of substituting a system-wide install.
+Eine optionale externe CLI darf nicht stillschweigend zur Produktabhängigkeit
+werden. Installiere oder aktualisiere Werkzeuge nicht allein deshalb, weil ein
+Prüfprogramm dazu rät. Wenn eine Installation notwendig ist und zum Auftrag
+gehört, verwende die für diese Aufgabe geltende vertrauenswürdige Paketquelle
+und Versionsauswahl. Halte ungeklärte Verfügbarkeit oder Kompatibilität als
+Einschränkung fest, statt auf eine systemweite Installation auszuweichen.
 
-Do not copy credentials into package URLs, commands, reports, or manifests.
-Do not change the bindings submodule or its gitlink just because a documentation
-helper needs Python. See [resources-and-storage.md](resources-and-storage.md)
-for the actual submodule boundaries.
+Kopiere keine Zugangsdaten in Paket-URLs, Befehle, Berichte oder Manifeste.
+Ändere weder das Submodul der Anbindungen noch seinen Gitlink, nur weil eine
+Dokumentationshilfe Python benötigt. Die tatsächlichen Submodulgrenzen stehen
+in [resources-and-storage.md](resources-and-storage.md).
 
-## Validation
+## Validierung
 
-Syntax checks, import checks, helper behavior, formatting, type analysis,
-package consistency, and dependency audits establish different facts. Select
-the ones relevant to the change and report their actual outcome. No linter,
-type checker, package audit service, or installation workflow is made mandatory
-merely by listing it here.
+Syntaxprüfungen, Importprüfungen, Verhalten der Hilfsprogramme, Formatierung,
+Typanalyse, Paketkonsistenz und Abhängigkeitsaudits belegen unterschiedliche
+Sachverhalte. Wähle die für die Änderung relevanten Prüfungen aus und berichte
+ihre tatsächlichen Ergebnisse. Kein Linter, Typprüfer, Paketaudit-Dienst oder
+Installationsablauf wird allein durch seine Erwähnung hier verpflichtend.
 
-For helper changes, exercise the meaningful success or failure behavior that
-changed without broadening a Markdown task into unrelated environment work.
-Keep generated output and temporary fixtures under known ownership, and clean
-them according to [cleanup-and-restoration.md](cleanup-and-restoration.md).
+Prüfe bei Änderungen an Hilfsprogrammen das relevante veränderte Erfolgs- oder
+Fehlerverhalten, ohne eine Markdown-Aufgabe auf sachfremde Umgebungsarbeiten
+auszuweiten. Ordne erzeugte Ausgaben und temporäre Testdaten eindeutig der
+Aufgabe zu und bereinige sie gemäß
+[cleanup-and-restoration.md](cleanup-and-restoration.md).
 
 [generator]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/tools/gen-html-entities.py#L20-L86
 [bindings]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/.gitmodules#L7-L9

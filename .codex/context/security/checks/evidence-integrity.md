@@ -1,14 +1,14 @@
-# Evidence integrity and claim binding
+# Nachweisintegrität und Zuordnung von Aussagen
 
-For each claim, record component, source revision, caller/harness, effective rules and settings, optional-feature/dependency identity, tool versions, command/working directory, observed result, and evidence location.
+Halte für jede Aussage Komponente, Quellstand, Aufrufer beziehungsweise Testgerüst, wirksame Regeln und Einstellungen, Identität optionaler Funktionen und Abhängigkeiten, Werkzeugversionen, Befehl und Arbeitsverzeichnis, beobachtetes Ergebnis und Nachweisort fest.
 
-- Is the artifact from the reported revision and configuration, or from an earlier/mixed run?
-- Were tests actually built, discovered, and executed, with meaningful cases and assertions?
-- Does an exit code hide a skip, empty run, caught failure, or failed prerequisite?
-- Does a generated report preserve the original observations, or introduce a stronger claim?
-- Is a source statement being promoted into a runtime result, or a core result into connector enforcement?
-- Does shared evidence actually cover each reported component and configuration?
+- Stammt das Artefakt aus der berichteten Revision und Konfiguration oder aus einem früheren beziehungsweise vermischten Lauf?
+- Wurden Tests tatsächlich gebaut, gefunden und mit aussagekräftigen Fällen und Prüfaussagen ausgeführt?
+- Verbirgt ein Exit-Code ein Überspringen, einen leeren Lauf, einen abgefangenen Fehler oder eine fehlgeschlagene Voraussetzung?
+- Bewahrt ein generierter Bericht die ursprünglichen Beobachtungen oder führt er eine stärkere Aussage ein?
+- Wird eine Quellcodeaussage zu einem Laufzeitergebnis oder ein Kernergebnis zur Durchsetzung durch den Connector hochgestuft?
+- Decken gemeinsame Nachweise tatsächlich jede berichtete Komponente und Konfiguration ab?
 
-Keep `passed`, `failed`, `blocked`, `not_run`, and justified `not_applicable` distinct. A prerequisite failure leaves the target unexecuted; it is not a target test failure.
+Halte `passed`, `failed`, `blocked`, `not_run` und begründetes `not_applicable` auseinander. Eine fehlgeschlagene Voraussetzung lässt das Ziel unausgeführt; sie ist kein Fehler des Zieltests.
 
-Entry points: [build/dependencies](../components/build-dependencies.md), [evidence profile](../../profiles/evidence-integrity-assessment.md), and [known source discrepancies](../../fact-check.md).
+Einstiegspunkte: [Build und Abhängigkeiten](../components/build-dependencies.md), [Nachweisprofil](../../profiles/evidence-integrity-assessment.md) und [bekannte Quellwidersprüche](../../fact-check.md).

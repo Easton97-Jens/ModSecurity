@@ -1,111 +1,115 @@
-# Working on ModSecurity with Codex and ChatGPT
+# Mit Codex und ChatGPT an ModSecurity arbeiten
 
-Start here for the additional English project documentation.
+Hier beginnt die zusätzliche deutsche Projektdokumentation.
+Die Übersetzung liegt im Branch `codex/kontext-v3-de` und basiert auf dem englischen
+Branch `codex/kontext-v3`, Commit `a35e8c3a1116a763f286f965f718f36d5f8876cc`.
 
-**Technical baseline:** the official
-[`owasp-modsecurity/ModSecurity` repository, `v3/master`](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729),
-commit `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`, inspected on 2026-10-25.
-The original files at that revision are the foundation of the explanations.
-Working instructions and context files are identified as additions for this project.
+**Technische Grundlage:** das offizielle
+[Repository `owasp-modsecurity/ModSecurity`, `v3/master`](https://github.com/owasp-modsecurity/ModSecurity/tree/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729),
+Commit `effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`, untersucht am 25.10.2026.
+Die Originaldateien dieses Stands bilden die Grundlage der Erklärungen.
+Arbeitsanweisungen und Kontextdateien sind als Ergänzungen für dieses Projekt gekennzeichnet.
 
-## What is included
+## Enthaltene Dokumentation
 
-| Entry point | Content |
+| Einstiegspunkt | Inhalt |
 | --- | --- |
-| [AGENTS.md](AGENTS.md) | Reusable, repository-independent working agreement |
-| [Repository context](.codex/context/repository-context.md) | This fork's identity, source constraints, checks, and file-language requirements |
-| [.codex/context/index.md](.codex/context/index.md) | Technical guides, policy owners, task profiles, and reading paths |
-| [Project context](.codex/context/project-context.md) | What libmodsecurity provides and the scope of this repository |
-| [Repository map](.codex/context/repository-map.md) | Directories, languages, build files, and useful entry points |
-| [Architecture](.codex/context/architecture.md) | HTTP transaction data flow, central classes, and processing |
-| [C++ guide](.codex/context/cpp-guide.md) | C++17, the C interface, ownership, and reading the existing code |
-| [Feature map](.codex/context/feature-map.md) | Where features are implemented and relevant tests are defined |
-| [Configuration and rules](.codex/context/configuration-and-rules.md) | SecRules, configuration, operators, and actual limitations |
-| [Build and test guide](.codex/context/build-and-test.md) | Source-backed preparation, build paths, and meaningful checks |
-| [RTK guide](.codex/context/rtk.md) | Optional command-output reduction, source-checked examples, and Codex integration boundaries |
-| [Current state](.codex/context/current-state.md) | Completed work, verification, open questions, and blockers |
-| [Provenance](.codex/context/provenance.md) | Upstream revision, fork comparison, submodules, and evidence rules |
+| [AGENTS.md](AGENTS.md) | Wiederverwendbare, vom Repository unabhängige Arbeitsvereinbarung |
+| [Repository-Kontext](.codex/context/repository-context.md) | Identität dieses Forks, Quellenvorgaben, Prüfungen und Sprache der gepflegten Dateien |
+| [.codex/context/index.md](.codex/context/index.md) | Technische Anleitungen, zuständige Richtlinien, Aufgabenprofile und Lesepfade |
+| [Projektkontext](.codex/context/project-context.md) | Leistungen von libmodsecurity und Umfang dieses Repositorys |
+| [Repository-Übersicht](.codex/context/repository-map.md) | Verzeichnisse, Sprachen, Build-Dateien und hilfreiche Einstiegspunkte |
+| [Architektur](.codex/context/architecture.md) | Datenfluss von HTTP-Transaktionen, zentrale Klassen und Verarbeitung |
+| [C++-Leitfaden](.codex/context/cpp-guide.md) | C++17, die C-Schnittstelle, Besitzverhältnisse und das Lesen des vorhandenen Codes |
+| [Funktionsübersicht](.codex/context/feature-map.md) | Orte der Implementierung von Funktionen und zugehöriger Testdefinitionen |
+| [Konfiguration und Regeln](.codex/context/configuration-and-rules.md) | SecRules, Konfiguration, Operatoren und tatsächliche Einschränkungen |
+| [Build- und Testanleitung](.codex/context/build-and-test.md) | Quellenbelegte Vorbereitung, Build-Wege und aussagekräftige Prüfungen |
+| [RTK-Leitfaden](.codex/context/rtk.md) | Optionale Verringerung von Befehlsausgaben, anhand der Quellen geprüfte Beispiele und Grenzen der Codex-Integration |
+| [Aktueller Stand](.codex/context/current-state.md) | Abgeschlossene Arbeit, Prüfungen, offene Fragen und Hindernisse |
+| [Quellenherkunft](.codex/context/provenance.md) | Upstream-Revision, Fork-Vergleich, Submodule und Regeln für Nachweise |
 
-## Layout adapted to your connector repository
+## An das Connector-Repository angepasster Aufbau
 
-The structure follows the inspected `.codex` layout of
+Der Aufbau folgt der untersuchten `.codex`-Struktur von
 [`Easton97-Jens/ModSecurity-conector`](https://github.com/Easton97-Jens/ModSecurity-conector/tree/42fd5a8e895aca3a36b09eb09fe5c7cf9c3399e3/.codex):
-`context/`, `context/profiles/`, `context/security/`, `bin/`, `audit/`, and
-explicit manifests. Core component guides replace connector-specific guides.
-The [adaptation record](.codex/context/template-adaptation.md) explains the mapping
-and distinguishes reusable workflow from machine- or connector-specific rules.
+`context/`, `context/profiles/`, `context/security/`, `bin/`, `audit/` und
+ausdrückliche Manifestdateien. Leitfäden zu Kernkomponenten ersetzen Connector-spezifische Leitfäden.
+Der [Anpassungsnachweis](.codex/context/template-adaptation.md) erklärt die Zuordnung
+und unterscheidet wiederverwendbare Abläufe von maschinen- oder Connector-spezifischen Regeln.
 
-## Reuse the same AGENTS.md in other repositories
+## Dieselbe AGENTS.md in anderen Repositories verwenden
 
-The root `AGENTS.md` is deliberately repository-independent. It contains no fixed
-project name, branch, language version, build command, or required Python helper.
-Its `.codex` routing is conditional: a repository without that layout uses its
-own available instructions and documentation. Git-specific checks are conditional
-on having Git and an actual checkout.
+Die `AGENTS.md` im Hauptverzeichnis ist bewusst unabhängig vom Repository. Sie enthält keinen
+festen Projektnamen, Branch, Sprachstandard, Build-Befehl und kein zwingend benötigtes Python-Hilfsprogramm.
+Ihre Verweise auf `.codex` gelten bedingt: Ein Repository ohne diese Struktur nutzt seine
+eigenen verfügbaren Anweisungen und Dokumente. Git-spezifische Prüfungen setzen voraus,
+dass Git und ein tatsächlicher Checkout vorhanden sind.
 
-You can reuse that file unchanged in another repository. Each repository keeps
-its own identity, commands, versions, technical guides, and saved state. For this
-fork, those details start in
-[repository-context.md](.codex/context/repository-context.md). Copying the root file
-does not automatically distribute it, activate a global setting, or copy this
-ModSecurity-specific context into other projects.
+Du kannst diese Datei unverändert in einem anderen Repository verwenden. Jedes Repository behält
+seine eigene Identität, Befehle, Versionen, technische Anleitungen und gespeicherten Arbeitsstände.
+Für diesen Fork beginnen diese Angaben in
+[repository-context.md](.codex/context/repository-context.md). Das Kopieren der Datei im Hauptverzeichnis
+verteilt sie nicht automatisch, aktiviert keine globale Einstellung und übernimmt diesen
+ModSecurity-spezifischen Kontext nicht in andere Projekte.
 
-Repository files remain English. These files prescribe no chat language; each
-person chooses the language of their conversation.
+Die gepflegten Kontextdateien dieser Variante sind Deutsch. Die Dateien schreiben keine Chatsprache
+vor; jede Person entscheidet selbst über die Sprache ihres Gesprächs.
 
-## Why AGENTS.md and .codex?
+## Wozu AGENTS.md und .codex?
 
-`AGENTS.md` supplies concise instructions at the repository entry point. Codex
-uses these files along its project instruction path. The longer chapters are
-stored in `.codex/`, and the startup instructions direct the assistant to the
-relevant files. The official
-[AGENTS.md guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
-describes instruction discovery.
+`AGENTS.md` liefert knappe Anweisungen am Einstiegspunkt des Repositorys. Codex
+verwendet solche Dateien entlang seines Pfads für Projektanweisungen. Die längeren Kapitel
+liegen in `.codex/`; die Startanweisungen führen den Assistenten zu den relevanten Dateien.
+Die offizielle
+[Anleitung zu AGENTS.md](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
+beschreibt, wie Anweisungen gefunden werden.
 
-In this repository, `.codex/` is a versioned documentation directory. Names such
-as `current-state.md` are project conventions. They do not promise that every
-product automatically loads every file. This setup does not select a model or
-overwrite personal Codex configuration.
+In diesem Repository ist `.codex/` ein versioniertes Dokumentationsverzeichnis. Namen wie
+`current-state.md` sind Projektkonventionen. Sie versprechen nicht, dass jedes Produkt
+jede Datei automatisch lädt. Diese Einrichtung wählt kein Modell aus und überschreibt
+keine persönliche Codex-Konfiguration.
 
-A new chat can continue from these files when it has access to them and reads
-them. For ordinary ChatGPT use, provide repository access or the current files.
-Decisions that exist only in a previous conversation are not present in this
-system. Updating the saved working state is therefore part of finishing a session.
+Ein neuer Chat kann anhand dieser Dateien fortfahren, wenn er Zugriff darauf hat und sie liest.
+Stelle bei gewöhnlicher ChatGPT-Nutzung Repository-Zugriff oder die aktuellen Dateien bereit.
+Entscheidungen, die nur in einem früheren Gespräch stehen, sind in diesem System nicht enthalten.
+Den gespeicherten Arbeitsstand zu aktualisieren, gehört deshalb zum Abschluss einer Sitzung.
 
-## Reduce routine command output with RTK
+## Routinemäßige Befehlsausgaben mit RTK reduzieren
 
-The root agreement prefers supported RTK summaries when the tool is available,
-with native commands available when it is absent or exact output is needed.
-Read the [RTK guide](.codex/context/rtk.md) when using or configuring it. This
-addition supplies instructions and examples; it does not install RTK or activate
-hooks. Codex behavior is checked against official OpenAI documentation, and RTK
-behavior against its own pinned source. No session token or billing reduction
-has been measured for this documentation change.
+Die Arbeitsvereinbarung bevorzugt unterstützte RTK-Zusammenfassungen, wenn das Werkzeug verfügbar ist.
+Native Befehle stehen bereit, wenn es fehlt oder genaue Ausgaben benötigt werden.
+Lies den [RTK-Leitfaden](.codex/context/rtk.md), wenn du RTK verwendest oder einrichtest.
+Diese Ergänzung liefert Anweisungen und Beispiele; sie installiert RTK nicht und aktiviert
+keine Hooks. Codex-Verhalten wurde anhand der offiziellen OpenAI-Dokumentation geprüft,
+RTK-Verhalten anhand des eigenen festgehaltenen Quellstands. Für diese Dokumentationsänderung
+wurden keine Einsparungen bei Sitzungstokens oder Abrechnung gemessen.
 
-## Starting a new chat
+## Einen neuen Chat beginnen
 
-Open the repository in your working environment, or provide the relevant files
-in the chat. Then use a prompt such as:
+Öffne das Repository in deiner Arbeitsumgebung oder stelle die relevanten Dateien
+im Chat bereit. Verwende dann beispielsweise folgenden Prompt:
 
-> Work on this ModSecurity repository. First read AGENTS.md,
-> .codex/context/index.md, .codex/context/repository-context.md,
-> .codex/context/current-state.md, and .codex/context/decisions.md.
-> Check the actual checkout against .codex/context/upstream-lock.json.
-> Summarize the verified working state and open questions. Do not invent
-> missing information. Maintain repository files in English.
-> My next task is: ...
+> Arbeite an diesem ModSecurity-Repository im Branch codex/kontext-v3-de.
+> Lies zuerst AGENTS.md, .codex/context/index.md,
+> .codex/context/repository-context.md, .codex/context/current-state.md
+> und .codex/context/decisions.md.
+> Vergleiche den tatsächlichen Checkout mit .codex/context/upstream-lock.json.
+> Fasse den überprüften Arbeitsstand und offene Fragen zusammen. Erfinde keine
+> fehlenden Informationen. Pflege die Kontextdateien dieser Variante auf Deutsch.
+> Meine nächste Aufgabe lautet: ...
 
-A longer ready-to-copy prompt is in
-[start-new-chat.md](.codex/context/prompts/start-new-chat.md). Use
-[end-session.md](.codex/context/prompts/end-session.md) when handing work over.
+Ein längerer Prompt zum Kopieren steht in
+[start-new-chat.md](.codex/context/prompts/start-new-chat.md). Nutze
+[end-session.md](.codex/context/prompts/end-session.md) für die Übergabe.
 
-These files belong in the existing `Easton97-Jens/ModSecurity` fork.
-[using-this-fork.md](.codex/context/using-this-fork.md) explains how to open the
-`codex/kontext-v3` working branch and use it in new chats.
+Diese Dateien gehören in den bestehenden Fork `Easton97-Jens/ModSecurity`.
+[using-this-fork.md](.codex/context/using-this-fork.md) erklärt, wie du den
+Arbeitsbranch `codex/kontext-v3-de` öffnest und in neuen Chats verwendest.
+Für diese deutsche Variante ist kein Pull Request beauftragt.
 
-## Checking context consistency
+## Konsistenz des Kontexts prüfen
 
-From the repository root:
+Vom Hauptverzeichnis des Repositorys aus:
 
 ```sh
 python3 .codex/bin/verify-context.py
@@ -113,20 +117,20 @@ python3 .codex/bin/validate-structure.py
 python3 .codex/bin/validate-codex-inheritance.py --check
 ```
 
-When the upstream source is expected to be unchanged, also use:
+Wenn der Upstream-Quellcode unverändert sein soll, zusätzlich:
 
 ```sh
 python3 .codex/bin/verify-context.py --strict-source
 ```
 
-The structure and catalog validators require Python 3.11 or later. The source
-checker requires Python 3 and Git with `--no-lazy-fetch`,
-which prevents automatic object downloads in partial clones. It checks the
-pinned commit, source inventory, local document links, and the existence and
-line ranges of commit-pinned ModSecurity references. It reports worktree
-differences. It does not replace reading the code, building, or testing.
-See [validator instructions](.codex/bin/README.md) for scope and policy-digest maintenance.
+Die Struktur- und Katalogprüfer benötigen Python 3.11 oder neuer. Der Quellenprüfer
+benötigt Python 3 und Git mit `--no-lazy-fetch`, das automatische Objektdownloads
+in partiellen Klonen verhindert. Er prüft den festgehaltenen Commit, das Quelleninventar,
+lokale Dokumentationsverweise sowie Existenz und Zeilenbereiche der an einen Commit
+gebundenen ModSecurity-Verweise. Er meldet Abweichungen im Arbeitsbaum.
+Er ersetzt weder das Lesen des Codes noch Builds oder Tests.
+Die [Anleitung zu den Prüfprogrammen](.codex/bin/README.md) beschreibt Umfang und Pflege der Richtlinienprüfsummen.
 
-This documentation explains repository structure and central behavior in detail.
-It is not a verified description of every C++ function or evidence that a
-particular installation is secure.
+Diese Dokumentation erklärt den Aufbau und zentrales Verhalten des Repositorys ausführlich.
+Sie ist keine überprüfte Beschreibung jeder C++-Funktion und kein Nachweis dafür,
+dass eine bestimmte Installation sicher ist.

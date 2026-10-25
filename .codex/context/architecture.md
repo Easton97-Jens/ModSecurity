@@ -1,139 +1,139 @@
-# ModSecurity v3: architecture and data flow
+# ModSecurity v3: Architektur und Datenfluss
 
-## Scope
+## Geltungsbereich
 
-This explanation is based on `owasp-modsecurity/ModSecurity`, branch `v3/master`, commit **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`**. All source references below are pinned to this commit. The document describes the source code that was inspected; it does not establish whether a particular installation was built successfully, which optional features are enabled in that installation, or whether an external connector works correctly.
+Diese Erklärung basiert auf `owasp-modsecurity/ModSecurity`, Branch `v3/master`, Commit **`effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729`**. Alle nachfolgenden Quellenverweise sind auf diesen Commit festgelegt. Das Dokument beschreibt den untersuchten Quellcode; es belegt weder, ob eine bestimmte Installation erfolgreich gebaut wurde, noch welche optionalen Funktionen darin aktiviert sind oder ob ein externer Connector korrekt funktioniert.
 
-The main entry points are `headers/modsecurity/modsecurity.h`, `headers/modsecurity/rules_set.h`, `headers/modsecurity/transaction.h`, and their implementations in `src/`. For language features and memory ownership, continue with [cpp-guide.md](cpp-guide.md).
+Die wichtigsten Einstiegspunkte sind `headers/modsecurity/modsecurity.h`, `headers/modsecurity/rules_set.h`, `headers/modsecurity/transaction.h` und ihre Implementierungen in `src/`. Sprachmerkmale und Speicherbesitz behandelt [cpp-guide.md](cpp-guide.md).
 
-## 1. What this project provides
+## 1. Was dieses Projekt bereitstellt
 
-This repository contains **libmodsecurity**, the library of the ModSecurity v3 project. The library loads rules written in the SecRules language and processes HTTP data supplied by an application or connector. Server-specific integration lives in separate connector projects. The upstream README lists `ModSecurity-nginx` as one example. The library build produces `libmodsecurity.la`. Sources: [upstream scope][scope], [library target][lib-target].
+Dieses Repository enthält **libmodsecurity**, die Bibliothek des ModSecurity-v3-Projekts. Die Bibliothek lädt Regeln in der SecRules-Sprache und verarbeitet HTTP-Daten, die eine Anwendung oder ein Connector bereitstellt. Die serverspezifische Integration liegt in separaten Connector-Projekten. Die Upstream-README nennt `ModSecurity-nginx` als ein Beispiel. Der Bibliotheksbuild erzeugt `libmodsecurity.la`. Quellen: [Umfang des Upstream-Projekts][scope], [Bibliotheksziel][lib-target].
 
-The work therefore involves three separate questions: What data does the connector provide? Which rules and settings have been loaded? What does the library do with those data and rules? A call such as `processRequestHeaders()` does not read headers from Nginx itself: the headers are first stored in the transaction through `addRequestHeader()`. The example code follows precisely this order. Sources: [header processing][request-headers], [example connector-style sequence][example-flow].
+Bei der Arbeit stellen sich daher drei getrennte Fragen: Welche Daten liefert der Connector? Welche Regeln und Einstellungen wurden geladen? Was macht die Bibliothek mit diesen Daten und Regeln? Ein Aufruf wie `processRequestHeaders()` liest die Header nicht selbst aus Nginx: Die Header werden zunächst durch `addRequestHeader()` in der Transaktion gespeichert. Der Beispielcode folgt genau dieser Reihenfolge. Quellen: [Header-Verarbeitung][request-headers], [beispielhafter Ablauf einer Connector-Anbindung][example-flow].
 
-The library and a particular rule configuration serve different purposes. `RulesSet::loadFromUri()` parses a specified file; `modsecurity.conf-recommended` supplies engine settings, body settings, and error-handling rules, among other things. This file starts with `SecRuleEngine DetectionOnly`. The presence of a `deny` rule therefore does not establish that a particular installation actively blocks requests: the code makes execution of disruptive actions conditional on the engine state. Sources: [rule loading][load], [recommended configuration][recommended], [action execution][action-engine].
+Die Bibliothek und eine konkrete Regelkonfiguration erfüllen unterschiedliche Aufgaben. `RulesSet::loadFromUri()` parst eine angegebene Datei; `modsecurity.conf-recommended` enthält unter anderem Engine-Einstellungen, Body-Einstellungen und Regeln zur Fehlerbehandlung. Diese Datei beginnt mit `SecRuleEngine DetectionOnly`. Das Vorhandensein einer `deny`-Regel belegt daher nicht, dass eine bestimmte Installation Anfragen aktiv blockiert: Der Code macht die Ausführung eingreifender Aktionen vom Engine-Zustand abhängig. Quellen: [Laden von Regeln][load], [empfohlene Konfiguration][recommended], [Ausführung von Aktionen][action-engine].
 
-## 2. The three central objects
+## 2. Die drei zentralen Objekte
 
-| Object | Role in the inspected code | Important relationships |
+| Objekt | Rolle im untersuchten Code | Wichtige Beziehungen |
 | --- | --- | --- |
-| `modsecurity::ModSecurity` | Initializes shared collection backends and stores connector information and the logging callback. | Provides collections used by transactions. Its constructor and destructor manage these backends. [Source][engine] |
-| `modsecurity::RulesSet` | Loads and merges rules and settings; executes the rules for a phase. | Inherits from `RulesSetProperties`, contains `RulesSetPhases`, and uses `Parser::Driver` for loading. [Header][rules-api], [implementation][load] |
-| `modsecurity::Transaction` | Holds the state and data of an HTTP transaction: URI, headers, bodies, variables, rule messages, and intervention state. | Receives pointers to `ModSecurity` and `RulesSet`; contains transaction-specific collections and body processors. [Header][transaction-api], [constructor/destructor][transaction-life] |
+| `modsecurity::ModSecurity` | Initialisiert gemeinsam genutzte Collection-Backends und speichert Connector-Informationen sowie den Logging-Callback. | Stellt Collections bereit, die von Transaktionen verwendet werden. Konstruktor und Destruktor verwalten diese Backends. [Quelle][engine] |
+| `modsecurity::RulesSet` | Lädt und vereinigt Regeln und Einstellungen; führt die Regeln einer Phase aus. | Erbt von `RulesSetProperties`, enthält `RulesSetPhases` und verwendet zum Laden `Parser::Driver`. [Header][rules-api], [Implementierung][load] |
+| `modsecurity::Transaction` | Enthält den Zustand und die Daten einer HTTP-Transaktion: URI, Header, Bodys, Variablen, Regelmeldungen und Interventionszustand. | Erhält Zeiger auf `ModSecurity` und `RulesSet`; enthält transaktionsbezogene Collections und Body-Prozessoren. [Header][transaction-api], [Konstruktor/Destruktor][transaction-life] |
 
-**Lifetime inferred from the implementation:** `Transaction` stores `m_ms` and `m_rules` but does not delete these objects in its destructor. The supplied engine and ruleset objects must therefore remain valid while the transaction uses them. The chunked-body example destroys the transaction first, then the ruleset, and finally the engine. No additional automatic transfer of ownership to `Transaction` is implemented here. Sources: [constructor/destructor][transaction-life], [example cleanup][example-cleanup].
+**Aus der Implementierung abgeleitete Lebensdauer:** `Transaction` speichert `m_ms` und `m_rules`, löscht diese Objekte aber nicht in seinem Destruktor. Die übergebenen Engine- und Ruleset-Objekte müssen daher gültig bleiben, solange die Transaktion sie verwendet. Das Beispiel mit stückweise übergebenen Bodys zerstört zuerst die Transaktion, dann das Ruleset und zuletzt die Engine. Eine zusätzliche automatische Übertragung des Besitzes an `Transaction` ist hier nicht implementiert. Quellen: [Konstruktor/Destruktor][transaction-life], [Freigabe im Beispiel][example-cleanup].
 
-`Rules` and `RulesSet` are different types. `Rules` contains a vector of `std::shared_ptr<Rule>` and provides methods including `insert()`, `append()`, and `at()`. `RulesSet` is the entry point for `loadFromUri()`, `load()`, and `evaluate()`. New explanations should follow these actual headers. Sources: [Rules][rules-bucket], [RulesSet][rules-api].
+`Rules` und `RulesSet` sind unterschiedliche Typen. `Rules` enthält einen Vektor aus `std::shared_ptr<Rule>` und stellt unter anderem die Methoden `insert()`, `append()` und `at()` bereit. `RulesSet` ist der Einstiegspunkt für `loadFromUri()`, `load()` und `evaluate()`. Neue Erklärungen sollten sich an diesen tatsächlichen Headern orientieren. Quellen: [Rules][rules-bucket], [RulesSet][rules-api].
 
-## 3. How configuration becomes executable rules
+## 3. Wie aus Konfiguration ausführbare Regeln werden
 
-`RulesSet::loadFromUri()` creates a `Parser::Driver`, has it parse the file, and then takes in the rules and properties through `merge()`. For a parse error detected by this path, the method returns `-1`; success returns a rule count. The driver reads the file contents, starts the scanner, and calls `yy::seclang_parser::parse()`. Sources: [RulesSet loading path][load], [driver parsing path][driver-parse].
+`RulesSet::loadFromUri()` erzeugt einen `Parser::Driver`, lässt ihn die Datei parsen und übernimmt anschließend Regeln und Eigenschaften durch `merge()`. Bei einem auf diesem Pfad erkannten Parsefehler gibt die Methode `-1` zurück; bei Erfolg liefert sie eine Regelanzahl. Der Driver liest den Dateiinhalt, startet den Scanner und ruft `yy::seclang_parser::parse()` auf. Quellen: [Ladepfad von RulesSet][load], [Parsepfad des Drivers][driver-parse].
 
-The driver assigns rules to their phases. It receives new rules as `std::unique_ptr<RuleWithActions>`. For a chain, it transfers ownership into `m_chainedRuleChild`, which the header declares as `std::shared_ptr<RuleWithActions>`; a non-owning pointer refers to the parent object. Unchained entry rules are also converted to `std::shared_ptr` and inserted into the phase collection. At this point, the driver also checks for missing or duplicate rule IDs and rejects disruptive actions in subsequent chain members. Sources: [Driver::addSecRule()][driver-rules], [chain fields][chain-fields].
+Der Driver ordnet Regeln ihren Phasen zu. Neue Regeln erhält er als `std::unique_ptr<RuleWithActions>`. Bei einer Kette überträgt er den Besitz an `m_chainedRuleChild`, das im Header als `std::shared_ptr<RuleWithActions>` deklariert ist; ein Zeiger ohne Besitz verweist auf das Elternobjekt. Einstiegsregeln außerhalb einer Kette werden ebenfalls in `std::shared_ptr` überführt und in die Phasensammlung eingefügt. An dieser Stelle prüft der Driver außerdem auf fehlende oder doppelte Regel-IDs und weist eingreifende Aktionen in nachfolgenden Kettengliedern zurück. Quellen: [Driver::addSecRule()][driver-rules], [Kettenfelder][chain-fields].
 
 ```mermaid
 flowchart TD
-    Config["SecRules configuration"] --> Parser["Parser::Driver"]
-    Parser --> Rules["RulesSet / rules per phase"]
-    Connector["Connector or application"] --> Transaction["Transaction: HTTP data and variables"]
+    Config["SecRules-Konfiguration"] --> Parser["Parser::Driver"]
+    Parser --> Rules["RulesSet / Regeln je Phase"]
+    Connector["Connector oder Anwendung"] --> Transaction["Transaction: HTTP-Daten und Variablen"]
     Transaction -->|"evaluate(phase, transaction)"| Rules
-    Rules --> Match["Variables, transformations, operator, actions"]
-    Match --> Intervention["Intervention state"]
-    Match --> Messages["Rule messages"]
+    Rules --> Match["Variablen, Transformationen, Operator, Aktionen"]
+    Match --> Intervention["Interventionszustand"]
+    Match --> Messages["Regelmeldungen"]
     Intervention -->|"intervention()"| Connector
-    Messages --> Logging["Server callback and audit log"]
+    Messages --> Logging["Server-Callback und Audit-Log"]
 ```
 
-The diagram summarizes calls in the loading path, `Transaction`, `RulesSet::evaluate()`, `RuleWithOperator::evaluate()`, and logging. It does not depict independently running services. Sources: [loading][load], [phase execution][rules-evaluate], [rule execution][rule-evaluate], [intervention][intervention], [logging][logging].
+Das Diagramm fasst Aufrufe im Ladepfad, in `Transaction`, `RulesSet::evaluate()`, `RuleWithOperator::evaluate()` und im Logging zusammen. Es zeigt keine unabhängig laufenden Dienste. Quellen: [Laden][load], [Phasenausführung][rules-evaluate], [Regelausführung][rule-evaluate], [Intervention][intervention], [Logging][logging].
 
-## 4. Lifecycle of an HTTP transaction
+## 4. Lebenszyklus einer HTTP-Transaktion
 
-The following table summarizes the usual full sequence while the application continues processing. The example `examples/using_bodies_in_chunks/simple_request.cc` shows the API order, including repeated intervention checks. How a production connector stops or redirects HTTP processing after an intervention belongs to that connector's implementation. Sources: [example, first half][example-flow], [example, second half][example-cleanup].
+Die folgende Tabelle fasst den üblichen vollständigen Ablauf zusammen, solange die Anwendung die Verarbeitung fortsetzt. Das Beispiel `examples/using_bodies_in_chunks/simple_request.cc` zeigt die API-Reihenfolge einschließlich wiederholter Interventionsprüfungen. Wie ein produktiver Connector nach einer Intervention die HTTP-Verarbeitung beendet oder umleitet, gehört zu dessen Implementierung. Quellen: [Beispiel, erste Hälfte][example-flow], [Beispiel, zweite Hälfte][example-cleanup].
 
-| Step | C++ entry point | What the implementation does |
+| Schritt | C++-Einstiegspunkt | Verhalten der Implementierung |
 | --- | --- | --- |
-| 1. Supply connection data | `processConnection(client, clientPort, server, serverPort)` | Sets connection variables and executes `ConnectionPhase`. [Source][connection] |
-| 2. Supply the request line | `processURI(uri, method, httpVersion)` | Builds URI, method, protocol, and query variables; extracts GET arguments. It does **not** call `RulesSet::evaluate(UriPhase, …)` here. [Source][uri] |
-| 3. Collect request headers | `addRequestHeader(...)` | Populates header variables, handles cookies among other inputs, and recognizes certain body types. [Source][request-headers] |
-| 4. Inspect request headers | `processRequestHeaders()` | Executes `RequestHeadersPhase` unless the engine is disabled. [Source][request-phase] |
-| 5. Collect the request body | `appendRequestBody(buffer, length)` | Writes bytes to `m_requestBody`; applies the size limit during appending. [Source][request-append] |
-| 6. Inspect the request body | `processRequestBody()` | Processes body formats and error variables; executes `RequestBodyPhase` depending on the engine state and body access. [Source][request-body] |
-| 7. Supply and inspect response headers | `addResponseHeader(...)`, `processResponseHeaders(status, protocol)` | Populates response variables and executes `ResponseHeadersPhase` unless the engine is disabled. [Source][response-headers] |
-| 8. Collect and inspect the response body | `appendResponseBody(...)`, `processResponseBody()` | Accounts for the size limit, response body access, and configured MIME types; executes `ResponseBodyPhase` when applicable. [Source][response-body] |
-| 9. Complete logging | `processLogging()` | Returns immediately when the engine is disabled; otherwise executes `LoggingPhase` and considers saving to the audit log if one is present. [Source][logging] |
-| 10. Release resources | Destructor or `msc_transaction_cleanup()` | Releases transaction resources; the API cleanup calls `delete transaction`. [Destructor][transaction-life], [C cleanup][c-cleanup] |
+| 1. Verbindungsdaten übergeben | `processConnection(client, clientPort, server, serverPort)` | Setzt Verbindungsvariablen und führt `ConnectionPhase` aus. [Quelle][connection] |
+| 2. Anfragezeile übergeben | `processURI(uri, method, httpVersion)` | Baut URI-, Methoden-, Protokoll- und Query-Variablen auf; extrahiert GET-Argumente. Ruft hier **nicht** `RulesSet::evaluate(UriPhase, …)` auf. [Quelle][uri] |
+| 3. Anfrageheader sammeln | `addRequestHeader(...)` | Befüllt Header-Variablen, behandelt unter anderem Cookies und erkennt bestimmte Body-Typen. [Quelle][request-headers] |
+| 4. Anfrageheader prüfen | `processRequestHeaders()` | Führt `RequestHeadersPhase` aus, sofern die Engine nicht deaktiviert ist. [Quelle][request-phase] |
+| 5. Anfragebody sammeln | `appendRequestBody(buffer, length)` | Schreibt Bytes in `m_requestBody`; berücksichtigt beim Anhängen die Größenbegrenzung. [Quelle][request-append] |
+| 6. Anfragebody prüfen | `processRequestBody()` | Verarbeitet Body-Formate und Fehlervariablen; führt `RequestBodyPhase` abhängig vom Engine-Zustand und Body-Zugriff aus. [Quelle][request-body] |
+| 7. Antwortheader übergeben und prüfen | `addResponseHeader(...)`, `processResponseHeaders(status, protocol)` | Befüllt Antwortvariablen und führt `ResponseHeadersPhase` aus, sofern die Engine nicht deaktiviert ist. [Quelle][response-headers] |
+| 8. Antwortbody sammeln und prüfen | `appendResponseBody(...)`, `processResponseBody()` | Berücksichtigt Größenbegrenzung, Zugriff auf den Antwortbody und konfigurierte MIME-Typen; führt gegebenenfalls `ResponseBodyPhase` aus. [Quelle][response-body] |
+| 9. Logging abschließen | `processLogging()` | Kehrt bei deaktivierter Engine sofort zurück; führt andernfalls `LoggingPhase` aus und berücksichtigt das Speichern im Audit-Log, sofern eines vorhanden ist. [Quelle][logging] |
+| 10. Ressourcen freigeben | Destruktor oder `msc_transaction_cleanup()` | Gibt Transaktionsressourcen frei; die API-Freigabe ruft `delete transaction` auf. [Destruktor][transaction-life], [C-Freigabe][c-cleanup] |
 
-### Two different numbering systems
+### Zwei unterschiedliche Nummerierungssysteme
 
-The values of `enum Phases` are not identical to the usual SecRules phase numbers. The enum also contains `UriPhase`. `actions::Phase::init()` translates the rule's phase specification into the internal value. Sources for the full mapping: [enum][phases], [translation][phase-action].
+Die Werte von `enum Phases` sind nicht mit den üblichen SecRules-Phasennummern identisch. Das Enum enthält zusätzlich `UriPhase`. `actions::Phase::init()` übersetzt die Phasenangabe einer Regel in den internen Wert. Quellen für die vollständige Zuordnung: [Enum][phases], [Übersetzung][phase-action].
 
-| Internal name | Internal enum value | SecRules specification in the inspected code |
+| Interner Name | Interner Enum-Wert | SecRules-Angabe im untersuchten Code |
 | --- | ---: | --- |
 | `ConnectionPhase` | 0 | `phase:0` |
-| `UriPhase` | 1 | No separate mapping in `Phase::init()`; `processURI()` populates data without this rule evaluation call. |
+| `UriPhase` | 1 | Keine eigene Zuordnung in `Phase::init()`; `processURI()` befüllt Daten ohne diesen Aufruf zur Regelauswertung. |
 | `RequestHeadersPhase` | 2 | `phase:1` |
-| `RequestBodyPhase` | 3 | `phase:2`, alias `request` |
+| `RequestBodyPhase` | 3 | `phase:2`, Alias `request` |
 | `ResponseHeadersPhase` | 4 | `phase:3` |
-| `ResponseBodyPhase` | 5 | `phase:4`, alias `response` |
-| `LoggingPhase` | 6 | `phase:5`, alias `logging` |
+| `ResponseBodyPhase` | 5 | `phase:4`, Alias `response` |
+| `LoggingPhase` | 6 | `phase:5`, Alias `logging` |
 
-Whenever a number appears in logs, tests, or C++ code, establish which numbering system it uses. The header parameter name `protocol` in `processURI()` is also insufficient on its own: the implementation names the second parameter `method`, and examples pass values such as `"GET"` in that position. Sources: [header][transaction-api], [implementation][uri], [example][example-flow].
+Kläre bei einer Zahl in Logs, Tests oder C++-Code, welches Nummerierungssystem sie verwendet. Auch der Header-Parametername `protocol` in `processURI()` reicht für sich allein nicht aus: Die Implementierung nennt den zweiten Parameter `method`, und Beispiele übergeben an dieser Stelle Werte wie `"GET"`. Quellen: [Header][transaction-api], [Implementierung][uri], [Beispiel][example-flow].
 
-## 5. What happens during rule evaluation
+## 5. Was während der Regelauswertung passiert
 
-`RulesSet::evaluate()` first selects the rule collection for the supplied internal phase. Its loop accounts for `allow`, `skip`, markers, and both configured and transaction-specific exclusions. After a rule executes, match variables are cleared. Once a disruptive intervention is set, the loop stops evaluating the current phase. Source: [RulesSet::evaluate()][rules-evaluate].
+`RulesSet::evaluate()` wählt zunächst die Regelsammlung für die übergebene interne Phase aus. Die Schleife berücksichtigt `allow`, `skip`, Marker sowie konfigurierte und transaktionsbezogene Ausnahmen. Nach der Ausführung einer Regel werden die Treffer-Variablen geleert. Sobald eine eingreifende Intervention gesetzt ist, beendet die Schleife die Auswertung der aktuellen Phase. Quelle: [RulesSet::evaluate()][rules-evaluate].
 
-`RuleWithOperator::evaluate()` determines the final target variables, asks them to resolve their values, accounts for excluded targets, and applies transformations. The operator then tests the resulting values. A match adds match information and origin details. The function distinguishes actions executed independently of the overall chain result from actions executed after a complete chain match. It would therefore be incorrect to claim that every action runs only after the entire chain succeeds. Sources: [rule evaluation][rule-evaluate], [independent and complete-chain actions][rule-actions].
+`RuleWithOperator::evaluate()` bestimmt die endgültigen Zielvariablen, lässt deren Werte auflösen, berücksichtigt ausgeschlossene Ziele und wendet Transformationen an. Anschließend prüft der Operator die entstandenen Werte. Ein Treffer ergänzt Trefferinformationen und Herkunftsangaben. Die Funktion unterscheidet Aktionen, die unabhängig vom Gesamtergebnis der Kette ausgeführt werden, von Aktionen, die nach einem vollständigen Kettentreffer ausgeführt werden. Die Behauptung, jede Aktion laufe erst nach dem Erfolg der gesamten Kette, wäre daher falsch. Quellen: [Regelauswertung][rule-evaluate], [unabhängige Aktionen und Aktionen nach vollständigem Kettentreffer][rule-actions].
 
-Transformations are part of the comparison path. `executeTransformations()` starts with a copy of the input value, accounts for default actions and `t:none`, and provides multiple comparison states with `multiMatch`. This does not imply that the original HTTP message in the web server is rewritten accordingly. Sources: [transformations][transformations], [operator call and match processing][rule-evaluate].
+Transformationen sind Teil des Vergleichspfads. `executeTransformations()` beginnt mit einer Kopie des Eingabewerts, berücksichtigt Standardaktionen und `t:none` und stellt mit `multiMatch` mehrere Vergleichszustände bereit. Daraus folgt nicht, dass die ursprüngliche HTTP-Nachricht im Webserver entsprechend umgeschrieben wird. Quellen: [Transformationen][transformations], [Operatoraufruf und Trefferverarbeitung][rule-evaluate].
 
-A disruptive action such as `deny` sets the status, log text, and `disruptive` flag in the transaction. The decision is then exposed to the API caller through `Transaction::intervention()`. `RuleWithActions::executeAction()` executes disruptive actions only with `EnabledRuleEngine`. Sources: [deny][deny], [engine check][action-engine], [intervention][intervention].
+Eine eingreifende Aktion wie `deny` setzt Status, Logtext und das Flag `disruptive` in der Transaktion. Die Entscheidung wird dem API-Aufrufer anschließend über `Transaction::intervention()` zugänglich gemacht. `RuleWithActions::executeAction()` führt eingreifende Aktionen nur bei `EnabledRuleEngine` aus. Quellen: [deny][deny], [Engine-Prüfung][action-engine], [Intervention][intervention].
 
-## 6. Request and response bodies
+## 6. Anfrage- und Antwortbodys
 
-### Selecting the request processor
+### Auswahl des Anfrageprozessors
 
-Header processing recognizes multipart and URL-encoded types from `Content-Type`. JSON and XML are selected through `ctl:requestBodyProcessor=JSON` or `XML`: the action classes set `m_requestBodyProcessor`. `modsecurity.conf-recommended` contains corresponding phase 1 rules. Sources: [header detection][request-type], [JSON action][json-selection], [XML action][xml-selection], [configuration rules][recommended].
+Die Header-Verarbeitung erkennt Multipart- und URL-kodierte Typen anhand von `Content-Type`. JSON und XML werden über `ctl:requestBodyProcessor=JSON` oder `XML` ausgewählt: Die Aktionsklassen setzen `m_requestBodyProcessor`. `modsecurity.conf-recommended` enthält entsprechende Regeln für Phase 1. Quellen: [Header-Erkennung][request-type], [JSON-Aktion][json-selection], [XML-Aktion][xml-selection], [Konfigurationsregeln][recommended].
 
-| Body path | Processing in `processRequestBody()` | Condition or result |
+| Body-Pfad | Verarbeitung in `processRequestBody()` | Bedingung oder Ergebnis |
 | --- | --- | --- |
-| URL-encoded | `extractArguments("POST", ...)` | Uses `m_requestBodyType == WWWFormUrlEncoded`; accounts for the limit excluding files. |
-| Multipart | Local `Multipart` object with `init()`, `process()`, `multipart_complete()` | Takes in parser errors and the size of data excluding files. |
-| JSON | `m_json->init()`, `processChunk()`, `complete()` | Under `WITH_YAJL`; accounts for the configured JSON depth limit when applicable. |
-| XML | `m_xml->init()`, `processChunk()`, `complete()` | Under `WITH_LIBXML2`. |
+| URL-kodiert | `extractArguments("POST", ...)` | Verwendet `m_requestBodyType == WWWFormUrlEncoded`; berücksichtigt die Begrenzung ohne Dateien. |
+| Multipart | Lokales `Multipart`-Objekt mit `init()`, `process()`, `multipart_complete()` | Übernimmt Parserfehler und die Größe der Daten ohne Dateien. |
+| JSON | `m_json->init()`, `processChunk()`, `complete()` | Unter `WITH_YAJL`; berücksichtigt gegebenenfalls die konfigurierte JSON-Tiefenbegrenzung. |
+| XML | `m_xml->init()`, `processChunk()`, `complete()` | Unter `WITH_LIBXML2`. |
 
-Source for this table: [full request body path][request-body]. The variables `REQBODY_ERROR`, `REQBODY_PROCESSOR_ERROR`, and related messages are set in the parsing path. The example configuration contains rules that evaluate these errors. A set error flag does not mean the web server has already blocked the request. Sources: [body path][request-body], [configuration error rules][recommended-errors].
+Quelle für diese Tabelle: [vollständiger Anfragebody-Pfad][request-body]. Die Variablen `REQBODY_ERROR`, `REQBODY_PROCESSOR_ERROR` und zugehörige Meldungen werden im Parsepfad gesetzt. Die Beispielkonfiguration enthält Regeln, die diese Fehler auswerten. Ein gesetztes Fehlerflag bedeutet nicht, dass der Webserver die Anfrage bereits blockiert hat. Quellen: [Body-Pfad][request-body], [Fehlerregeln der Konfiguration][recommended-errors].
 
-### Buffering, inspection, and limits
+### Pufferung, Prüfung und Begrenzungen
 
-`appendRequestBody()` and `appendResponseBody()` accept individual chunks of data, but write them into the respective stream. `processRequestBody()` later accesses `m_requestBody.str()`. The chunk API therefore does not establish that each SecRule is immediately applied to every new network packet. Sources: [request appending][request-append], [request evaluation][request-body], [response processing][response-body].
+`appendRequestBody()` und `appendResponseBody()` nehmen einzelne Datenstücke entgegen, schreiben diese aber in den jeweiligen Stream. `processRequestBody()` greift später auf `m_requestBody.str()` zu. Die Chunk-API belegt daher nicht, dass jede SecRule sofort auf jedes neue Netzwerkpaket angewendet wird. Quellen: [Anhängen von Anfragedaten][request-append], [Anfrageauswertung][request-body], [Antwortverarbeitung][response-body].
 
-Size limits can already matter during appending. The `ProcessPartial` branch writes only the remaining capacity and returns `false`. In the reject branch, an intervention with status 403 may be set while the append method still returns `true`. Correct integration therefore requires treating the return value **and** the intervention check separately. Sources: [request limit][request-append], [response limit][response-body].
+Größenbegrenzungen können bereits beim Anhängen greifen. Der Zweig `ProcessPartial` schreibt nur die verbleibende Kapazität und gibt `false` zurück. Im Ablehnungszweig kann eine Intervention mit Status 403 gesetzt werden, obwohl die Append-Methode weiterhin `true` zurückgibt. Für eine korrekte Integration müssen daher der Rückgabewert **und** die Interventionsprüfung getrennt behandelt werden. Quellen: [Anfragebegrenzung][request-append], [Antwortbegrenzung][response-body].
 
-The exact location of a check matters: in `processRequestBody()`, the engine check comes first, format processing follows, and the check of `SecRequestBodyAccess` or its transaction-specific override occurs further down, before the rule phase. Response evaluation also checks response body access and MIME selection before `ResponseBodyPhase`. This description must not be extended into a general claim about an external connector's buffering sequence. Sources: [request body][request-body], [response body][response-body].
+Die genaue Position einer Prüfung ist entscheidend: In `processRequestBody()` steht die Engine-Prüfung zuerst, danach folgt die Formatverarbeitung; die Prüfung von `SecRequestBodyAccess` oder seiner transaktionsbezogenen Überschreibung erfolgt weiter unten vor der Regelphase. Auch die Antwortauswertung prüft den Zugriff auf den Antwortbody und die MIME-Auswahl vor `ResponseBodyPhase`. Diese Beschreibung darf nicht zu einer allgemeinen Behauptung über die Pufferungsreihenfolge eines externen Connectors erweitert werden. Quellen: [Anfragebody][request-body], [Antwortbody][response-body].
 
-## 7. Understanding interventions
+## 7. Interventionen verstehen
 
-`ModSecurityIntervention` contains `status`, `pause`, `url`, `log`, and `disruptive`. In the inspected code, `Transaction::intervention()` returns the disruptive state. In its active branch, it copies the URL and log text using `strdup`, transfers the status and disruptive flag, marks the transaction as interrupted, and resets the internal intervention state. A repeated call is therefore not guaranteed to return the same result. Sources: [structure and helpers][intervention-type], [implementation][intervention].
+`ModSecurityIntervention` enthält `status`, `pause`, `url`, `log` und `disruptive`. Im untersuchten Code liefert `Transaction::intervention()` den eingreifenden Zustand zurück. Im aktiven Zweig kopiert die Methode URL und Logtext mit `strdup`, überträgt Status und das Flag für den eingreifenden Zustand, markiert die Transaktion als unterbrochen und setzt den internen Interventionszustand zurück. Ein wiederholter Aufruf liefert daher nicht garantiert dasselbe Ergebnis. Quellen: [Struktur und Hilfsfunktionen][intervention-type], [Implementierung][intervention].
 
-For the caller, this is a request to act. The library does not set an HTTP status in the web server at this point. The chunked-body example checks the return value and displays the status or redirect; the production effect must be checked in the connector. The C entry point `msc_intervention_cleanup()` frees the copied buffers and reinitializes the structure. Sources: [example helper][example-intervention], [C cleanup][c-cleanup].
+Für den Aufrufer ist dies eine Handlungsaufforderung. Die Bibliothek setzt an dieser Stelle keinen HTTP-Status im Webserver. Das Beispiel mit stückweise übergebenen Bodys prüft den Rückgabewert und zeigt den Status oder die Umleitung an; die Wirkung im Produktivbetrieb muss im Connector geprüft werden. Der C-Einstiegspunkt `msc_intervention_cleanup()` gibt die kopierten Puffer frei und initialisiert die Struktur neu. Quellen: [Hilfsfunktion im Beispiel][example-intervention], [C-Freigabe][c-cleanup].
 
-**Specific discrepancy between comment and code:** the comment on `intervention()` promises initialized fields on success. The function body does not assign `pause`, however. Fully initializing the structure is therefore a justified precaution for newly written calling code. This observation comes from source inspection, not an executed failure test. Sources: [comment and implementation][intervention], [structure][intervention-type].
+**Konkrete Abweichung zwischen Kommentar und Code:** Der Kommentar zu `intervention()` verspricht bei Erfolg initialisierte Felder. Der Funktionskörper weist `pause` jedoch keinen Wert zu. Die vollständige Initialisierung der Struktur ist deshalb eine begründete Vorsichtsmaßnahme für neu geschriebenen aufrufenden Code. Diese Beobachtung stammt aus der Quellcodeprüfung, nicht aus einem ausgeführten Fehlertest. Quellen: [Kommentar und Implementierung][intervention], [Struktur][intervention-type].
 
-## 8. Variables, collections, and logs
+## 8. Variablen, Collections und Logs
 
-Request and response properties are stored in variables anchored to the transaction. `VariableValue` contains the collection, key, value, and origin details; rule evaluation uses those details for match references, among other things. This explains why changes to decoding or offsets can affect diagnostic output as well as comparison values. Sources: [VariableValue][variable-value], [match evaluation][rule-evaluate], [URI processing][uri].
+Anfrage- und Antworteigenschaften werden in Variablen gespeichert, die an die Transaktion gebunden sind. `VariableValue` enthält Collection, Schlüssel, Wert und Herkunftsangaben; die Regelauswertung verwendet diese Angaben unter anderem für Trefferreferenzen. Das erklärt, warum Änderungen an der Dekodierung oder an Offsets neben Vergleichswerten auch die Diagnoseausgabe beeinflussen können. Quellen: [VariableValue][variable-value], [Trefferauswertung][rule-evaluate], [URI-Verarbeitung][uri].
 
-`ModSecurity` creates the backends for `GLOBAL`, `RESOURCE`, `IP`, `SESSION`, and `USER`. With `WITH_LMDB`, this constructor uses LMDB; otherwise it uses `InMemoryPerProcess`. `collection::Collections` receives pointers to these backends and also creates its own in-memory backend for `TX`, which its destructor deletes. Persistence must therefore not be promised for every collection and every build. Sources: [engine backends][engine], [transaction collections][collections].
+`ModSecurity` erzeugt die Backends für `GLOBAL`, `RESOURCE`, `IP`, `SESSION` und `USER`. Mit `WITH_LMDB` verwendet dieser Konstruktor LMDB; andernfalls verwendet er `InMemoryPerProcess`. `collection::Collections` erhält Zeiger auf diese Backends und erzeugt zusätzlich ein eigenes In-Memory-Backend für `TX`, das sein Destruktor löscht. Persistenz darf daher nicht für jede Collection und jeden Build versprochen werden. Quellen: [Engine-Backends][engine], [Transaktions-Collections][collections].
 
-There are several distinct logging paths. `Transaction::debug()` forwards through the ruleset to the debug log. `ModSecurity::serverLog()` invokes the configured callback with text or a `RuleMessage`. `processLogging()` returns before the logging phase and audit selection when the engine is disabled. Otherwise it evaluates phase 5 and, when `m_auditLog` exists, calls its `AuditLog::saveIfRelevant()`; that method considers the audit status, relevance, and writer, among other factors. A callback event alone therefore does not prove that an audit record was written. Sources: [debug forwarding][transaction-debug], [server callback][callback], [logging phase][logging], [audit selection][audit].
+Es gibt mehrere getrennte Logging-Pfade. `Transaction::debug()` leitet über das Ruleset an das Debug-Log weiter. `ModSecurity::serverLog()` ruft den konfigurierten Callback mit Text oder einer `RuleMessage` auf. Bei deaktivierter Engine kehrt `processLogging()` vor der Logging-Phase und der Audit-Auswahl zurück. Andernfalls wertet die Methode Phase 5 aus und ruft, falls `m_auditLog` vorhanden ist, dessen `AuditLog::saveIfRelevant()` auf; diese Methode berücksichtigt unter anderem Audit-Status, Relevanz und Writer. Ein Callback-Ereignis allein belegt daher nicht, dass ein Audit-Datensatz geschrieben wurde. Quellen: [Debug-Weiterleitung][transaction-debug], [Server-Callback][callback], [Logging-Phase][logging], [Audit-Auswahl][audit].
 
-## 9. Limits of this architecture overview
+## 9. Grenzen dieser Architekturübersicht
 
-This overview describes the central sequence and its evidenced branches. When making a change, it does not replace reading the affected operator, action, and variable implementations or running the relevant regression tests. It provides no guarantees about all possible inputs, thread safety, external connector versions, or the effectiveness of a loaded ruleset. These points must be checked for the specific task and recorded as unresolved while supporting evidence is missing.
+Diese Übersicht beschreibt den zentralen Ablauf und seine belegten Verzweigungen. Bei einer Änderung ersetzt sie weder das Lesen der betroffenen Operator-, Aktions- und Variablenimplementierungen noch die Ausführung der relevanten Regressionstests. Sie gibt keine Garantien für alle möglichen Eingaben, Thread-Sicherheit, externe Connector-Versionen oder die Wirksamkeit eines geladenen Rulesets. Diese Punkte müssen für die konkrete Aufgabe geprüft und bei fehlenden Belegen als ungeklärt festgehalten werden.
 
-Particular pitfalls for new chats include outdated API names in some comment examples, the two phase numbering systems, the distinction between a rule match and an intervention, and the separate meanings of chunk input and rule evaluation. The implementations linked above provide the relevant starting points.
+Besondere Stolperfallen für neue Chats sind veraltete API-Namen in einigen Kommentarbeispielen, die beiden Phasennummerierungen, die Unterscheidung zwischen einem Regeltreffer und einer Intervention sowie die unterschiedlichen Bedeutungen von Chunk-Eingabe und Regelauswertung. Die oben verlinkten Implementierungen liefern die passenden Einstiegspunkte.
 
 [scope]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/README.md#L21-L46
 [lib-target]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/src/Makefile.am#L1-L14

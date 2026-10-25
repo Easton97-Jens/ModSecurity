@@ -1,22 +1,24 @@
-# Testing and evidence
+# Tests und Nachweise
 
-## Select checks from the changed behavior
+## Prüfungen aus dem geänderten Verhalten ableiten
 
-This is the validation policy of the working repository. It does not assert
-that any check has already run. Choose evidence that resolves the task's concrete
-acceptance criteria, using [build-and-test.md](build-and-test.md) for commands
-and prerequisites.
+Dies ist die Validierungsrichtlinie des Arbeitsrepositorys. Sie behauptet
+nicht, dass bereits eine Prüfung ausgeführt wurde. Wähle Nachweise, die die
+konkreten Abnahmekriterien der Aufgabe klären; Befehle und Voraussetzungen
+stehen in [build-and-test.md](build-and-test.md).
 
-The core suite is defined through the top-level Makefile, `test/test-suite.in`,
-the test Makefile, and the actual runners. Preserve that scope when describing
-a full suite. This policy does not impose the reference connector repository's
-100-case inventory, historical qualification campaign, or host matrix on core.
-Sources: [suite integration][suite], [test programs][programs].
+Die Core-Testsuite wird über das Makefile auf oberster Ebene,
+`test/test-suite.in`, das Test-Makefile und die tatsächlichen Testprogramme
+definiert. Erhalte diesen Umfang, wenn du eine vollständige Suite beschreibst.
+Diese Richtlinie überträgt weder das Inventar mit 100 Fällen noch die frühere
+Qualifizierungskampagne oder Host-Matrix des Connector-Referenzrepositorys auf
+den Core. Quellen: [Suite-Einbindung][suite], [Testprogramme][programs].
 
-## Documentation and policy changes
+## Änderungen an Dokumentation und Richtlinien
 
-For a documentation-only change, read the affected source, check references,
-review the diff, and run the repository's documentation checks when available:
+Lies bei einer reinen Dokumentationsänderung die betroffenen Quellen, prüfe
+Verweise und Diff und führe die Dokumentationsprüfungen des Repositorys aus,
+wenn sie verfügbar sind:
 
 ```sh
 python3 .codex/bin/verify-context.py --strict-source
@@ -24,83 +26,94 @@ python3 .codex/bin/validate-structure.py
 git diff --check
 ```
 
-Run these from the repository root. They are documentation-workflow commands,
-not upstream C++ tests. Inspect their actual output and scope. Passing them does
-not prove that every explanation is semantically correct, that external sites
-were contacted, or that ModSecurity compiled.
+Führe sie im Stammverzeichnis des Repositorys aus. Dies sind Befehle für den
+Dokumentationsablauf, keine C++-Tests von Upstream. Prüfe ihre tatsächliche
+Ausgabe und ihren Umfang. Ihr Bestehen beweist weder die inhaltliche
+Richtigkeit jeder Erklärung noch den Zugriff auf externe Websites oder eine
+Kompilierung von ModSecurity.
 
-A C++ build is not required merely because explanatory Markdown changed.
-An executable helper change needs a check of its own behavior where material:
-for example, verify that a reference checker rejects the specific invalid input
-it is intended to reject, using task-owned temporary fixtures.
+Ein C++-Build ist nicht allein deshalb erforderlich, weil erklärendes Markdown
+geändert wurde. Eine Änderung an einem ausführbaren Hilfsprogramm benötigt bei
+wesentlicher Bedeutung eine Prüfung seines eigenen Verhaltens: etwa den
+Nachweis, dass ein Referenzprüfer die konkrete ungültige Eingabe zurückweist,
+die er zurückweisen soll, mit aufgabeneigenen temporären Testdaten.
 
-`--strict-source` is appropriate when the task promises unchanged upstream
-source. If an authorized product change intentionally differs from the pinned
-baseline, report that difference and review the affected context. Do not change
-the pin merely to turn a source-drift failure into a passing result.
+`--strict-source` ist passend, wenn die Aufgabe unveränderte Upstream-Quellen
+zusagt. Weicht eine autorisierte Produktänderung bewusst von der festgelegten
+Basis ab, berichte diese Abweichung und prüfe den betroffenen Kontext. Ändere
+die Quellbindung nicht nur, um eine fehlgeschlagene Abweichungsprüfung in ein
+bestandenes Ergebnis zu verwandeln.
 
-## Product and build changes
+## Produkt- und Build-Änderungen
 
-Choose focused tests for the affected behavior, including a relevant boundary
-or error path when that is the reason for the change. Add a regression when it
-captures an observable defect or requirement. Avoid tests that merely restate
-the implementation or unrelated large test campaigns.
+Wähle gezielte Tests für das betroffene Verhalten und einen passenden Grenz-
+oder Fehlerpfad, wenn dieser der Grund für die Änderung ist. Ergänze eine
+Regression, wenn sie einen beobachtbaren Fehler oder eine Anforderung erfasst.
+Vermeide Tests, die nur die Implementierung wiederholen, sowie nicht zugehörige
+große Testkampagnen.
 
-For build, parser, public API, or dependency changes, also check the affected
-configuration and callers. Expand validation only to resolve a concrete remaining
-risk or satisfy an applicable existing gate. Once the task's acceptance criteria
-are sufficiently supported, finish the task and report remaining limits.
+Prüfe bei Build-, Parser-, öffentlichen API- oder Abhängigkeitsänderungen
+zusätzlich die betroffene Konfiguration und Aufrufer. Erweitere die
+Validierung nur, um ein konkretes verbleibendes Risiko zu klären oder eine
+anwendbare bestehende Prüfvorgabe zu erfüllen. Sobald die Abnahmekriterien der
+Aufgabe ausreichend belegt sind, schließe sie ab und benenne verbleibende Grenzen.
 
-Do not disable, truncate, or rewrite tests to obtain a passing result. A broad
-or platform-specific check that cannot run keeps its actual status. An automated
-CI job is not exempt from truthful reporting because the local task was smaller.
+Deaktiviere, kürze oder ändere keine Tests, um ein bestandenes Ergebnis zu
+erzielen. Eine umfassende oder plattformspezifische Prüfung, die nicht laufen
+kann, behält ihren tatsächlichen Status. Ein automatisierter CI-Job ist nicht
+von wahrheitsgemäßer Berichterstattung ausgenommen, nur weil die lokale Aufgabe
+kleiner war.
 
-## Core-specific evidence traps
+## Core-spezifische Fallstricke bei Nachweisen
 
-| Observation | Required interpretation | Source |
+| Beobachtung | Erforderliche Einordnung | Quelle |
 | --- | --- | --- |
-| Unix configuration succeeds | Confirm `TEST_UTILITIES` is enabled before claiming unit/regression binaries were built; activation depends on `YAJL_FOUND=1`. | [Test activation][activation], [conditional subdirectory][subdir]. |
-| `regression_tests` exits `0` | Inspect output and counts: its `NO_LOGS` branch returns `0` without running the regressions. | [Runner branch][nologs]. |
-| A case is skipped | Record it separately from executed passes; capability/resource selection matters. | [Regression resource check][resources], [suite driver][driver]. |
-| A rule file loads | This demonstrates loading, not a complete HTTP transaction. `modsec-rules-check` loads through `RulesSet` and does not create a transaction. | [Rule checker][rules-check]. |
-| A test JSON contains an expected result | It describes a test expectation, not a recorded execution. | Working evidence rule. |
-| A core regression passes | Bind the claim to that build, case, configuration, and API path; external web-server behavior needs evidence from that separate integration. | [Core/connector boundary][connectors]. |
+| Die Unix-Konfiguration gelingt | Prüfen, ob `TEST_UTILITIES` aktiviert ist, bevor der Bau der Unit-/Regressionsprogramme behauptet wird; die Aktivierung hängt von `YAJL_FOUND=1` ab. | [Testaktivierung][activation], [bedingtes Unterverzeichnis][subdir]. |
+| `regression_tests` endet mit `0` | Ausgabe und Fallzahlen prüfen: Der Zweig `NO_LOGS` gibt `0` zurück, ohne die Regressionen auszuführen. | [Programmzweig][nologs]. |
+| Ein Fall wird übersprungen | Getrennt von ausgeführten, bestandenen Fällen erfassen; die Auswahl nach Fähigkeiten/Ressourcen ist relevant. | [Ressourcenprüfung der Regressionen][resources], [Suite-Treiber][driver]. |
+| Eine Regeldatei lässt sich laden | Das belegt das Laden, keine vollständige HTTP-Transaktion. `modsec-rules-check` lädt über `RulesSet` und erzeugt keine Transaktion. | [Regelprüfprogramm][rules-check]. |
+| Ein Test-JSON enthält ein erwartetes Ergebnis | Es beschreibt eine Testerwartung, keine aufgezeichnete Ausführung. | Arbeitsregel für Nachweise. |
+| Eine Core-Regression besteht | Die Aussage auf diesen Build, Fall, diese Konfiguration und diesen API-Pfad begrenzen; externes Webserver-Verhalten benötigt Belege aus der gesonderten Integration. | [Core-/Connector-Grenze][connectors]. |
 
-The actual test directory is `test/`. Direct runner examples rely on that
-working directory; `test/test-suite.sh` explicitly changes into it. Read the
-build guide before selecting individual files or `file.json:N` cases.
-Source: [test driver][driver].
+Das tatsächliche Testverzeichnis ist `test/`. Beispiele für direkte
+Testprogrammaufrufe setzen dieses Arbeitsverzeichnis voraus;
+`test/test-suite.sh` wechselt ausdrücklich dorthin. Lies den Build-Leitfaden,
+bevor du einzelne Dateien oder Fälle über `file.json:N` auswählst.
+Quelle: [Testtreiber][driver].
 
-## Evidence layers and statuses
+## Nachweisebenen und Statuswerte
 
-Keep source inspection, documentation validation, compilation, configuration
-loading, unit tests, transaction regressions, static analysis, and external
-host/runtime tests distinct. A result at one layer does not establish another.
-Use [configuration-and-rules.md](configuration-and-rules.md) for rule behavior
-and [cpp-guide.md](cpp-guide.md) for API and lifetime questions.
+Halte Quellprüfung, Dokumentationsvalidierung, Kompilierung,
+Konfigurationsladen, Unit-Tests, Transaktionsregressionen, statische Analyse
+und externe Host-/Laufzeittests auseinander. Ein Ergebnis auf einer Ebene
+belegt keine andere. Verwende
+[configuration-and-rules.md](configuration-and-rules.md) für Regelverhalten
+und [cpp-guide.md](cpp-guide.md) für API- und Lebensdauerfragen.
 
-Use these working statuses consistently:
+Verwende diese Arbeitsstatus einheitlich:
 
-| Status | Meaning |
+| Status | Bedeutung |
 | --- | --- |
-| `passed` | The stated check ran and satisfied its stated criterion. |
-| `failed` | The check ran and did not satisfy that criterion. |
-| `blocked` | A required prerequisite or authority prevented the check. |
-| `not_run` | No execution occurred; state the reason. |
-| `not_applicable` | The check does not apply to this scope; explain why. |
+| `passed` | Die angegebene Prüfung wurde ausgeführt und erfüllte ihr angegebenes Kriterium. |
+| `failed` | Die Prüfung wurde ausgeführt und erfüllte dieses Kriterium nicht. |
+| `blocked` | Eine erforderliche Voraussetzung oder Befugnis verhinderte die Prüfung. |
+| `not_run` | Es fand keine Ausführung statt; den Grund nennen. |
+| `not_applicable` | Die Prüfung ist auf diesen Umfang nicht anwendbar; den Grund erklären. |
 
-Retain native runner skip/disabled counts as separate evidence. Do not translate
-an unavailable capability, missing fixture, cancelled job, or old successful
-run into a fresh pass.
+Erhalte die vom Testprogramm gemeldeten Zahlen übersprungener und deaktivierter
+Fälle als eigene Belege. Mache aus einer nicht verfügbaren Fähigkeit, fehlenden
+Testdaten, einem abgebrochenen Job oder einem alten erfolgreichen Lauf kein
+neues bestandenes Ergebnis.
 
-## Handover record
+## Übergabeprotokoll
 
-Record the exact command and directory, core commit and relevant submodule
-revisions, local changes, build options, tool versions when material, selected
-case/file, exit code, counts, important output, and limitations. Keep evidence
-references accessible and remove secrets from retained excerpts. A subsequent
-chat should be able to distinguish what was read, inferred, executed, and left
-open without inventing a previous result.
+Erfasse exakten Befehl und Verzeichnis, Core-Commit und relevante
+Submodulrevisionen, lokale Änderungen, Build-Optionen, gegebenenfalls relevante
+Werkzeugversionen, ausgewählten Fall/Datei, Exitcode, Fallzahlen, wichtige
+Ausgabe und Einschränkungen. Halte Belegverweise zugänglich und entferne
+Geheimnisse aus aufbewahrten Auszügen. Ein späterer Chat soll unterscheiden
+können, was gelesen, abgeleitet, ausgeführt und offengelassen wurde, ohne ein
+früheres Ergebnis zu erfinden.
 
 [suite]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/Makefile.am#L88-L96
 [programs]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/test/Makefile.am#L29-L99

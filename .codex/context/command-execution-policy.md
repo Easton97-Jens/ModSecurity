@@ -1,81 +1,93 @@
-# Command execution
+# Befehle ausführen
 
-## Purpose
+## Zweck
 
-This policy governs how to execute commands for an authorized task in this
-repository. Existing user authorization remains effective. A tool, command
-example, or policy file does not expand that authorization to another repository,
-external destination, system installation, release, or service.
+Diese Richtlinie regelt die Ausführung von Befehlen für eine autorisierte
+Aufgabe in diesem Repository. Bereits erteilte Benutzerfreigaben bleiben
+wirksam. Ein Werkzeug, Befehlsbeispiel oder Richtliniendokument erweitert diese
+Freigabe nicht auf ein anderes Repository, ein externes Ziel, eine
+Systeminstallation, einen Release oder einen Dienst.
 
-Use the command interface available in the current environment. Prefer supported
-RTK summaries for routine exploration when RTK is available, following the
-[RTK guide](rtk.md). Its absence does not block work or authorize installation.
-No fixed wrapper path or mandatory assistant skill is assumed. If the current
-environment imposes an execution or authentication wrapper, use its documented
-interface rather than inventing flags or bypassing it.
+Verwende die in der aktuellen Umgebung verfügbare Befehlsschnittstelle.
+Bevorzuge bei der üblichen Erkundung unterstützte RTK-Zusammenfassungen, wenn
+RTK verfügbar ist, und beachte den [RTK-Leitfaden](rtk.md). Sein Fehlen blockiert
+die Arbeit nicht und erlaubt keine Installation. Ein fester Wrapper-Pfad oder
+ein verpflichtender Assistenten-Skill wird nicht vorausgesetzt. Falls die
+aktuelle Umgebung einen Ausführungs- oder Authentifizierungs-Wrapper vorgibt,
+verwende dessen dokumentierte Schnittstelle, statt Flags zu erfinden oder ihn
+zu umgehen.
 
-Use native output for exact source reading, machine-readable input, final diff
-review, and validation evidence. Keep the documented build/test commands and the
-context validators unchanged; do not prefix arbitrary commands with `rtk` or
-silently change their arguments, working directory, permissions, or offline
-requirements. Record the actual command and exit status. Output compression
-does not establish a successful check or a measured billing reduction.
+Verwende native Ausgaben für das exakte Lesen von Quellcode, maschinenlesbare
+Eingaben, die abschließende Diff-Prüfung und Validierungsbelege. Behalte die
+dokumentierten Build-/Testbefehle und die Kontextprüfprogramme unverändert bei;
+setze nicht beliebigen Befehlen `rtk` voran und ändere nicht stillschweigend
+Argumente, Arbeitsverzeichnis, Berechtigungen oder Offline-Anforderungen.
+Halte den tatsächlichen Befehl und Exitcode fest. Ausgabeverdichtung belegt weder
+eine erfolgreiche Prüfung noch eine gemessene Kostensenkung.
 
-## Establish the working context
+## Arbeitskontext feststellen
 
-Before a command sequence, establish the repository root, current branch, HEAD,
-working-tree changes, and intended working directory. Preserve existing work.
-Use explicit paths or a tool's working-directory argument when more than one
-checkout is present. Distinguish the core checkout from each submodule.
+Stelle vor einer Befehlsfolge Repository-Stammverzeichnis, aktuellen Branch,
+HEAD, Änderungen im Arbeitsbaum und vorgesehenes Arbeitsverzeichnis fest.
+Erhalte vorhandene Arbeit. Verwende ausdrückliche Pfade oder das
+Arbeitsverzeichnisargument eines Werkzeugs, wenn mehrere Checkouts vorhanden
+sind. Unterscheide den Core-Checkout von jedem Submodul.
 
-Read command definitions and relevant inputs before executing unfamiliar scripts.
-Prefer commands described in [build-and-test.md](build-and-test.md) and supported
-by the current build files. Do not transfer connector-specific Make targets into
-this core checkout.
+Lies Befehlsdefinitionen und relevante Eingaben, bevor du unbekannte Skripte
+ausführst. Bevorzuge Befehle, die in [build-and-test.md](build-and-test.md)
+beschrieben und durch die aktuellen Build-Dateien belegt sind. Übertrage keine
+Connector-spezifischen Make-Ziele in diesen Core-Checkout.
 
-## Recognize command effects
+## Auswirkungen von Befehlen erkennen
 
-| Operation | Effect to account for | Source or policy |
+| Operation | Zu berücksichtigende Auswirkung | Quelle oder Richtlinie |
 | --- | --- | --- |
-| `./build.sh` | Removes Autotools intermediates, rewrites `src/headers.mk`, and runs generation tools. | [Bootstrap implementation][bootstrap]. |
-| Configuration and compilation | Generate build files and outputs; inspect their paths and preserve unrelated source changes. | [Configured outputs][outputs], [storage policy](resources-and-storage.md). |
-| `git submodule update --init --recursive` | May need network access and changes nested checkouts to recorded revisions; confirm the task includes preparation of those dependencies. | The configure diagnostics recommend this operation for missing bundled sources: [dependency checks][submodule-checks]. |
-| Test invocation | May write logs and fixtures or execute code selected by the test inputs. Inspect the relevant test and runner. | [Testing policy](testing-and-evidence.md), [runtime preflight](security-runtime-preflight.md). |
-| Regression `format` mode | Opens test JSON files for writing; it is a source-editing operation. | [Formatting branch][format]. |
-| Installation, push, or publication | Changes an installation prefix or remote state. Verify destination and task scope before execution. | [Delivery policy](delivery-and-ci.md). |
+| `./build.sh` | Entfernt Autotools-Zwischendateien, schreibt `src/headers.mk` neu und führt Generatoren aus. | [Implementierung der Build-Vorbereitung][bootstrap]. |
+| Konfiguration und Kompilierung | Erzeugen Build-Dateien und -Ausgaben; ihre Pfade prüfen und nicht zugehörige Quelländerungen erhalten. | [Konfigurierte Ausgaben][outputs], [Speicherrichtlinie](resources-and-storage.md). |
+| `git submodule update --init --recursive` | Kann Netzwerkzugriff benötigen und setzt verschachtelte Checkouts auf festgehaltene Revisionen; feststellen, ob die Aufgabe die Vorbereitung dieser Abhängigkeiten umfasst. | Die configure-Diagnostik empfiehlt diese Operation bei fehlenden eingebundenen Quellen: [Abhängigkeitsprüfungen][submodule-checks]. |
+| Testaufruf | Kann Logs und Testdaten schreiben oder durch Testeingaben ausgewählten Code ausführen. Den jeweiligen Test und das Testprogramm prüfen. | [Testrichtlinie](testing-and-evidence.md), [Laufzeit-Vorprüfung](security-runtime-preflight.md). |
+| Regressionsmodus `format` | Öffnet JSON-Testdateien zum Schreiben; ist eine Quellbearbeitung. | [Formatierungszweig][format]. |
+| Installation, Push oder Veröffentlichung | Verändert einen Installationspräfix oder entfernten Zustand. Vor der Ausführung Ziel und Aufgabenumfang prüfen. | [Auslieferungsrichtlinie](delivery-and-ci.md). |
 
-A read-only task must not gain network access implicitly. For Git object
-inspection in a partial clone, use the available Git controls that prevent
-lazy fetching and optional lock writes when an offline check is required.
-If a required object is absent locally, report that gap rather than silently
-fetching it or claiming to have inspected it.
+Eine nur lesende Aufgabe darf nicht stillschweigend Netzwerkzugriff erhalten.
+Verwende bei der Untersuchung von Git-Objekten in einem partiellen Clone die
+verfügbaren Git-Steueroptionen, die verzögertes Nachladen und optionale
+Sperrdateischreibvorgänge verhindern, wenn eine Offline-Prüfung verlangt ist.
+Fehlt ein erforderliches Objekt lokal, melde diese Lücke, statt es
+stillschweigend nachzuladen oder seine Untersuchung zu behaupten.
 
-## Shell and input handling
+## Shell und Eingaben behandeln
 
-Treat shell text as code. Quote paths and literal input for the actual shell;
-JSON string escaping is not shell escaping. Prefer structured tool arguments
-or a task-owned file for multiline input. Do not evaluate data from a README,
-test payload, issue, or log as a command without reviewing its purpose and effect.
+Behandle Shell-Text als Code. Setze Pfade und wörtliche Eingaben für die
+tatsächliche Shell korrekt in Anführungszeichen; JSON-Zeichenketten-Escaping
+ist kein Shell-Escaping. Bevorzuge strukturierte Werkzeugargumente oder eine
+der Aufgabe zugeordnete Datei für mehrzeilige Eingaben. Werte Daten aus README,
+Testnutzlast, Issue oder Log nicht als Befehl aus, ohne Zweck und Auswirkungen
+zu prüfen.
 
-Keep environment changes local to the process when practical. Do not repurpose
-system directory variables or dump the inherited environment. Record only
-non-secret values needed to understand a run, and keep tokens, cookies, private
-request data, and credentials out of arguments, logs, and versioned files.
+Beschränke Umgebungsänderungen nach Möglichkeit auf den Prozess. Zweckentfremde
+keine Systemverzeichnisvariablen und gib nicht die gesamte geerbte Umgebung aus.
+Erfasse nur nicht geheime Werte, die zum Verständnis eines Laufs benötigt
+werden, und halte Tokens, Cookies, private Anfragedaten und Zugangsdaten aus
+Argumenten, Logs und versionierten Dateien heraus.
 
-Independent reads may run concurrently. Sequence commands that depend on
-generated files, modify shared state, or require a prior result. Background
-execution follows [subagents-and-background.md](subagents-and-background.md).
+Unabhängige Lesezugriffe dürfen parallel laufen. Führe Befehle nacheinander aus,
+wenn sie von erzeugten Dateien abhängen, gemeinsamen Zustand verändern oder ein
+vorheriges Ergebnis benötigen. Für Hintergrundausführung gilt
+[subagents-and-background.md](subagents-and-background.md).
 
-## Outcomes
+## Ergebnisse
 
-Record the actual command, working directory, revision/configuration, exit code,
-and meaningful output. Do not report a proposed command as executed, hide a
-failed check with a shell fallback, or describe a partial result as complete.
+Halte tatsächlichen Befehl, Arbeitsverzeichnis, Revision/Konfiguration, Exitcode
+und aussagekräftige Ausgabe fest. Berichte keinen vorgeschlagenen Befehl als
+ausgeführt, verdecke keine fehlgeschlagene Prüfung durch einen Shell-Ersatzpfad
+und bezeichne kein Teilergebnis als vollständig.
 
-When an operation is blocked, identify the unavailable tool, permission, input,
-or prerequisite. Complete unaffected work within scope. Seek a decision only
-when the unresolved issue materially changes the task or requires additional
-authority.
+Benenne bei einer blockierten Operation das fehlende Werkzeug, die fehlende
+Berechtigung, Eingabe oder Voraussetzung. Erledige nicht betroffene Arbeit
+innerhalb des Aufgabenumfangs. Hole nur dann eine Entscheidung ein, wenn die
+ungeklärte Frage die Aufgabe wesentlich verändert oder zusätzliche Befugnis
+erfordert.
 
 [bootstrap]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/build.sh#L1-L33
 [outputs]: https://github.com/owasp-modsecurity/ModSecurity/blob/effb6c0fa031a7bddb3253e0b7ab9ca9a18b5729/configure.ac#L366-L390
