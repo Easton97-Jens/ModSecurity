@@ -1,4 +1,4 @@
-name: Quality Assurance new
+name: Quality Assurance
 
 on:
   push:
@@ -105,15 +105,16 @@ jobs:
         run: make -j "$(nproc)" V=1
 
   build-linux:
-    name: Linux (${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
+    name: Linux (${{ matrix.os }}, ${{ matrix.platform.label }}, ${{ matrix.compiler.label }}, ${{ matrix.configure.label }})
 
     # Ubuntu 24.04 does not provide native 32-bit (i386) installation images.
     # Only amd64 (x86_64) is officially supported. 32-bit has been removed from this matrix.
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04,ubuntu-26.04]
         platform:
           - { label: "x64", arch: "amd64", configure: "" }
 
@@ -132,9 +133,13 @@ jobs:
           - { label: "with lmdb",       opt: "--with-lmdb" }
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",        opt: "--with-pcre" }
+        exclude:
+          # Ubuntu 26.04 no longer provides the PCRE1 development package.
+          - os: ubuntu-26.04
+            configure: { label: "with pcre", opt: "--with-pcre" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -183,12 +188,15 @@ jobs:
             libxml2-dev \
             libfuzzy-dev \
             pcre2-utils \
-            libpcre3-dev \
             bison \
             flex \
             pkg-config \
             python3 \
             python3-venv
+
+      - name: Install PCRE1 development package
+        if: matrix.os != 'ubuntu-26.04'
+        run: sudo apt-get install -y libpcre3-dev
 
       - name: Show Lua installation
         run: |
@@ -205,7 +213,7 @@ jobs:
           CXX: ${{ matrix.compiler.cxx }}
         run: ./configure ${{ matrix.platform.configure }} ${{ matrix.configure.opt }} --enable-assertions=yes
 
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
 
       - name: Compile
         run: make -j "$(nproc)"
@@ -214,13 +222,13 @@ jobs:
         run: make check
 
   build-macos:
-    name: macOS (${{ matrix.configure.label }})
+    name: macOS (${{ matrix.os }}, ${{ matrix.configure.label }})
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-15, macos-26]
+        os: [macos-15,macos-26]
         configure:
           - { label: "with parser generation", opt: "--enable-parser-generation" }
           - { label: "without curl",    opt: "--without-curl" }
@@ -233,8 +241,14 @@ jobs:
           - { label: "with pcre2 (default)", opt: "" }
           - { label: "with pcre",       opt: "--with-pcre" }
 
+        include:
+          - os: xcode-27
+            configure: { label: "with pcre2 (default)", opt: "" }
+          - os: xcode-27
+            configure: { label: "with parser generation", opt: "--enable-parser-generation" }
+
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -261,7 +275,7 @@ jobs:
       - name: Configure
         run: ./configure ${{ matrix.configure.opt }} --enable-assertions=yes
 
-      - uses: ammaraskar/gcc-problem-matcher@master
+      - uses: ammaraskar/gcc-problem-matcher@cb2e3f949c41b7818628f35f8484a9b0acf90cf9 # master (2026-03-12)
 
       - name: Compile
         run: make -j "$(sysctl -n hw.logicalcpu)"
@@ -288,7 +302,7 @@ jobs:
           - { label: "with lmdb",        opt: "-DWITH_LMDB=ON" }
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -298,7 +312,7 @@ jobs:
           pip3 install conan --upgrade
           conan profile detect
 
-      - uses: ammaraskar/msvc-problem-matcher@master
+      - uses: ammaraskar/msvc-problem-matcher@47189a176388253d16c6f0b79eee6274512b761a # master (2026-09-05)
 
       - name: Build project
         shell: cmd
@@ -337,7 +351,7 @@ jobs:
     runs-on: macos-26
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
@@ -368,7 +382,7 @@ jobs:
       - name: Mark repo as safe for git
         run: git config --global --add safe.directory $GITHUB_WORKSPACE
         
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
